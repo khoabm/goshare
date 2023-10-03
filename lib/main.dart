@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:goshare/router.dart';
+import 'package:goshare/theme/pallet.dart';
 
 void main() {
   runApp(
@@ -21,6 +22,9 @@ class MyApp extends StatelessWidget {
       // routerDelegate: AppRouter().router.routerDelegate,
       //routeInformationParser: AppRouter().router.routeInformationParser,
       routerConfig: AppRouter().router,
+      theme: ThemeData(
+        scaffoldBackgroundColor: Pallete.primaryColor,
+      ),
     );
   }
 }
