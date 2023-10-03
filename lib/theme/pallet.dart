@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class Pallete {
   // Colors
-  static const primaryColor = Color.fromRGBO(5, 32, 74, 100);
+  static const primaryColor = Color.fromRGBO(5, 32, 74, 1);
 
   // Themes
   // static var darkModeAppTheme = ThemeData.dark().copyWith(
