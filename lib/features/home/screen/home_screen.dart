@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/common/large_button.dart';
+import 'package:goshare/core/constants/constants.dart';
 import 'package:goshare/theme/pallet.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -26,13 +27,13 @@ class HomeScreen extends ConsumerWidget {
                       .width, // This will take the full width of your screen
                   height: MediaQuery.of(context).size.height * .25,
                   child: SvgPicture.asset(
-                    'assets/images/car_banner.svg',
+                    Constants.carBanner,
                     fit: BoxFit.fill,
                   ),
                 ),
                 Positioned(
-                  top: 35.0,
-                  left: 35.0,
+                  top: MediaQuery.of(context).size.height * .05,
+                  left: MediaQuery.of(context).size.width * .1,
                   child: Text(
                     'Chào Khải, ',
                     style: TextStyle(
@@ -61,7 +62,8 @@ class HomeScreen extends ConsumerWidget {
                   const Text(
                     'Bạn muốn đi đến đâu ?',
                     style: TextStyle(
-                      color: Color.fromRGBO(5, 32, 74, 1),
+                      color: Pallete.primaryColor,
+                      fontWeight: FontWeight.bold,
                       fontSize: 24,
                     ),
                   ),
