@@ -5,10 +5,12 @@ import 'package:goshare/core/page_navigation.dart';
 import 'package:goshare/details_screen.dart';
 import 'package:goshare/features/dashboard/screen/dashboard.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
+import 'package:goshare/features/signup/screen/sign_up_screen.dart';
 
 class AppRouter {
   /// The route configuration.
   final GoRouter router = GoRouter(
+    initialLocation: '/sign-up',
     routes: <RouteBase>[
       GoRoute(
         name: RouteConstants.dashBoard,
@@ -42,7 +44,14 @@ class AppRouter {
           child: const DetailsScreen(),
           key: state.pageKey,
         ),
-      )
+      ),
+      GoRoute(
+        path: '/sign-up',
+        pageBuilder: (context, state) => SlideBottomTransition(
+          child: const SignUpScreen(),
+          key: state.pageKey,
+        ),
+      ),
     ],
   );
 }

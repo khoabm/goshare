@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:goshare/router.dart';
@@ -23,8 +24,16 @@ class MyApp extends StatelessWidget {
       //routeInformationParser: AppRouter().router.routeInformationParser,
       routerConfig: AppRouter().router,
       theme: ThemeData(
+        colorScheme: ThemeData().colorScheme.copyWith(
+              primary: Pallete.primaryColor,
+            ),
+        primaryColor: Pallete.primaryColor,
         scaffoldBackgroundColor: Pallete.primaryColor,
         fontFamily: 'Raleway',
+        textTheme: Theme.of(context).textTheme.apply(
+              displayColor: Pallete.primaryColor,
+              bodyColor: Pallete.primaryColor,
+            ),
       ),
     );
   }

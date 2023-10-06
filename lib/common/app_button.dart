@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:goshare/theme/pallet.dart';
 
-class LargeButton extends StatelessWidget {
+class AppButton extends StatelessWidget {
   final String buttonText;
+  final double? fontSize;
   final VoidCallback onPressed;
-  const LargeButton({
+  const AppButton({
     super.key,
     required this.buttonText,
     required this.onPressed,
+    this.fontSize,
   });
 
   @override
@@ -24,9 +26,9 @@ class LargeButton extends StatelessWidget {
       ),
       child: Text(
         buttonText,
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.white,
-          fontSize: 22,
+          fontSize: fontSize ?? 22,
           fontWeight: FontWeight.bold,
         ),
       ),

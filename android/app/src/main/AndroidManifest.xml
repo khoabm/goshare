@@ -6,7 +6,7 @@
   <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
   <!-- Include only if your app benefits from precise location access. -->
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />  
    <application
         android:label="goshare"
         android:name="${applicationName}"
