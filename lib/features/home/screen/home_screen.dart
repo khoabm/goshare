@@ -172,12 +172,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 horizontalPadding: 6.0,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         CircleAvatar(),
                         Text(
                           'GoShare hotline \n 1900xxxx',
+                          textAlign: TextAlign.center,
                           maxLines: 2,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
@@ -189,6 +193,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       width: 20,
                     ),
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
                           'Giúp chúng tôi cải thiện',
