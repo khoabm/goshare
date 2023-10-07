@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goshare/common/app_button.dart';
 import 'package:goshare/common/app_text_field.dart';
 import 'package:goshare/common/home_center_container.dart';
 import 'package:goshare/core/constants/constants.dart';
+import 'package:goshare/core/input_formatters.dart';
 import 'package:goshare/theme/pallet.dart';
 
 class LeftSideText extends StatelessWidget {
@@ -139,8 +141,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         prefixIcons: const Icon(Icons.phone),
                         controller: _phoneNumberTextController,
                         hintText: '0987654321',
-                        inputType: TextInputType.number,
-                        maxLength: 10,
+                        inputType: TextInputType.phone,
+                        formatters: [
+                          LengthLimitingTextInputFormatter(10),
+                        ],
                       ),
                       const SizedBox(
                         height: 20,
@@ -148,21 +152,35 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       const LeftSideText(
                         title: 'Ngày sinh',
                       ),
-                      SizedBox(
-                        height: 200,
-                        child: CupertinoDatePicker(
-                          mode: CupertinoDatePickerMode.date,
-                          initialDateTime: DateTime(1999, 1, 1),
-                          onDateTimeChanged: (DateTime newDateTime) {
-                            setState(
-                              () {
-                                _birthDateTextController.text =
-                                    newDateTime.toString();
-                              },
-                            );
-                          },
-                        ),
+                      const SizedBox(
+                        height: 10,
                       ),
+                      AppTextField(
+                        hintText: 'dd/mm/yyyy',
+                        prefixIcons: const Icon(Icons.calendar_today),
+                        inputType: TextInputType.phone,
+                        controller: _birthDateTextController,
+                        formatters: [
+                          DateTextFormatter(),
+                          LengthLimitingTextInputFormatter(10),
+                          FilteringTextInputFormatter.singleLineFormatter,
+                        ],
+                      ),
+                      // SizedBox(
+                      //   height: 200,
+                      //   child: CupertinoDatePicker(
+                      //     mode: CupertinoDatePickerMode.date,
+                      //     initialDateTime: DateTime(1999, 1, 1),
+                      //     onDateTimeChanged: (DateTime newDateTime) {
+                      //       setState(
+                      //         () {
+                      //           _birthDateTextController.text =
+                      //               newDateTime.toString();
+                      //         },
+                      //       );
+                      //     },
+                      //   ),
+                      // ),
                       const SizedBox(
                         height: 40,
                       ),
