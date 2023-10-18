@@ -25,18 +25,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    getCurrentLocation();
+    // getCurrentLocation();
   }
 
-  void getCurrentLocation() async {
-    final locationUtils = ref.read(locationProvider);
-    LocationData? data = await locationUtils.getCurrentLocation();
-    if (mounted) {
-      setState(() {
-        locationData = data;
-      });
-    }
-  }
+  // void getCurrentLocation() async {
+  //   final locationUtils = ref.read(locationProvider);
+  //   LocationData? data = await locationUtils.getCurrentLocation();
+  //   if (mounted) {
+  //     setState(() {
+  //       locationData = data;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -121,50 +121,51 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(
                 height: 20,
               ),
-              HomeCenterContainer(
-                width: MediaQuery.of(context).size.width * .9,
-                height: MediaQuery.of(context).size.height * .45,
-                verticalPadding: 12.0,
-                horizontalPadding: 12.0,
-                child: locationData == null
-                    ? const Loader()
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'Địa chỉ nơi làm việc',
-                            style: TextStyle(
-                              color: Pallete.primaryColor,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Expanded(
-                            child: GoogleMap(
-                              zoomControlsEnabled: false,
-                              zoomGesturesEnabled: false,
-                              scrollGesturesEnabled: false,
-                              tiltGesturesEnabled: false,
-                              rotateGesturesEnabled: false,
-                              initialCameraPosition: CameraPosition(
-                                zoom: 18.5,
-                                target: LatLng(
-                                  locationData!.latitude!,
-                                  locationData!.longitude!,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-              ),
-              const SizedBox(
-                height: 40,
-              ),
+              // HomeCenterContainer(
+              //   width: MediaQuery.of(context).size.width * .9,
+              //   height: MediaQuery.of(context).size.height * .45,
+              //   verticalPadding: 12.0,
+              //   horizontalPadding: 12.0,
+              //   child: locationData == null
+              //       ? const Loader()
+              //       : Column(
+              //           mainAxisAlignment: MainAxisAlignment.center,
+              //           crossAxisAlignment: CrossAxisAlignment.center,
+              //           children: [
+              //             const Text(
+              //               'Địa chỉ nơi làm việc',
+              //               style: TextStyle(
+              //                 color: Pallete.primaryColor,
+              //                 fontSize: 24,
+              //                 fontWeight: FontWeight.bold,
+              //               ),
+              //             ),
+              //             const SizedBox(
+              //               height: 20,
+              //             ),
+              //             Expanded(
+              //               child: GoogleMap(
+
+              //                 zoomControlsEnabled: false,
+              //                 zoomGesturesEnabled: false,
+              //                 scrollGesturesEnabled: false,
+              //                 tiltGesturesEnabled: false,
+              //                 rotateGesturesEnabled: false,
+              //                 initialCameraPosition: CameraPosition(
+              //                   zoom: 18.5,
+              //                   target: LatLng(
+              //                     locationData!.latitude!,
+              //                     locationData!.longitude!,
+              //                   ),
+              //                 ),
+              //               ),
+              //             ),
+              //           ],
+              //         ),
+              // ),
+              // const SizedBox(
+              //   height: 40,
+              // ),
               HomeCenterContainer(
                 width: MediaQuery.of(context).size.width * .9,
                 height: MediaQuery.of(context).size.height * .12,

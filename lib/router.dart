@@ -7,12 +7,14 @@ import 'package:goshare/features/connect_to_driver/screen/connect_to_driver_scre
 import 'package:goshare/features/dashboard/screen/dashboard.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
 import 'package:goshare/features/home_trip/screen/home_trip_screen.dart';
+import 'package:goshare/features/signup/screen/otp_screen.dart';
+import 'package:goshare/features/signup/screen/set_passcode_screen.dart';
 import 'package:goshare/features/signup/screen/sign_up_screen.dart';
 
 class AppRouter {
   /// The route configuration.
   final GoRouter router = GoRouter(
-    initialLocation: RouteConstants.dashBoardUrl,
+    initialLocation: RouteConstants.passcodeUrl,
     routes: <RouteBase>[
       GoRoute(
         name: RouteConstants.dashBoard,
@@ -67,6 +69,40 @@ class AppRouter {
           child: const ConnectToDriver(),
           key: state.pageKey,
         ),
+      ),
+      GoRoute(
+        name: RouteConstants.otp,
+        path: RouteConstants.otpUrl,
+        pageBuilder: (context, state) {
+          // Extract the parameters from the route
+          final Map<String, dynamic> params = state.pathParameters;
+          final String? phone = params['phone'] as String?;
+
+          return SlideBottomTransition(
+            child: OtpScreen(
+              phone: phone ?? '',
+            ), // Pass the phone parameter to OtpScreen
+            key: state.pageKey,
+          );
+        },
+      ),
+      GoRoute(
+        name: RouteConstants.passcode,
+        path: RouteConstants.passcodeUrl,
+        pageBuilder: (context, state) {
+          // Extract the parameters from the route
+          final Map<String, dynamic> params = state.pathParameters;
+          final String? phone = params['phone'] as String?;
+          final String? setToken = params['setToken'] as String?;
+
+          return SlideBottomTransition(
+            child: SetPassCodeScreen(
+              phone: phone ?? '',
+              setToken: setToken ?? '',
+            ), // Pass the phone parameter to OtpScreen
+            key: state.pageKey,
+          );
+        },
       ),
     ],
   );

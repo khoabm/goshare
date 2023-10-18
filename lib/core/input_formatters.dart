@@ -2,6 +2,22 @@ import 'dart:math';
 
 import 'package:flutter/services.dart';
 
+class DigitOnlyInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // Allow only digits (0-9)
+    final filteredValue = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    return TextEditingValue(
+      text: filteredValue,
+      selection: TextSelection.collapsed(offset: filteredValue.length),
+    );
+  }
+}
+
 class DateTextFormatter extends TextInputFormatter {
   static const _maxChars = 8;
 
