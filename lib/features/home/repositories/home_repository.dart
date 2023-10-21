@@ -1,10 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:goshare/core/constants/constants.dart';
 
 final homeRepositoryProvider = Provider((ref) {
-  return HomeRepository();
+  return HomeRepository(
+    baseApiUrl: Constants.apiBaseUrl,
+  );
 });
 
 class HomeRepository {
+  final String baseApiUrl;
+
+  HomeRepository({required this.baseApiUrl});
+
   String greeting() {
     var hour = DateTime.now().hour;
     if (hour < 12) {

@@ -45,6 +45,12 @@ class _HomeTripScreenState extends ConsumerState<HomeTripScreen> {
               AppTextField(
                 controller: _addressTextController,
                 hintText: 'Địa chỉ nhà',
+                suffixIcon: IconButton(
+                  icon: const Icon(
+                    Icons.search_outlined,
+                  ),
+                  onPressed: () {},
+                ),
               ),
               const SizedBox(
                 height: 20,

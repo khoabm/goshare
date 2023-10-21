@@ -14,7 +14,7 @@ import 'package:goshare/features/signup/screen/sign_up_screen.dart';
 class AppRouter {
   /// The route configuration.
   final GoRouter router = GoRouter(
-    initialLocation: RouteConstants.passcodeUrl,
+    initialLocation: RouteConstants.signupUrl,
     routes: <RouteBase>[
       GoRoute(
         name: RouteConstants.dashBoard,
