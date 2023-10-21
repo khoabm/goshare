@@ -3,7 +3,11 @@ class Constants {
 
   static const apiKey = 'AIzaSyC_9i-bGTTmVH8nvIWYiDNTyO7bIhAboKs';
 
-  static const apiBaseUrl = 'https://135a-171-252-189-86.ngrok-free.app/api';
+  static const apiBaseUrl =
+      'https://apimobile20231019122723.azurewebsites.net/api';
 
   static const otpResendTimeout = 120;
+
+  static const searchPlacesApiUrl =
+      'https://nominatim.openstreetmap.org/search';
 }
