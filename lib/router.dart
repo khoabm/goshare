@@ -7,6 +7,7 @@ import 'package:goshare/features/connect_to_driver/screen/connect_to_driver_scre
 import 'package:goshare/features/dashboard/screen/dashboard.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
 import 'package:goshare/features/home_trip/screen/home_trip_screen.dart';
+import 'package:goshare/features/signup/screen/log_in_screen.dart';
 import 'package:goshare/features/signup/screen/otp_screen.dart';
 import 'package:goshare/features/signup/screen/set_passcode_screen.dart';
 import 'package:goshare/features/signup/screen/sign_up_screen.dart';
@@ -53,6 +54,13 @@ class AppRouter {
         path: RouteConstants.signupUrl,
         pageBuilder: (context, state) => SlideBottomTransition(
           child: const SignUpScreen(),
+          key: state.pageKey,
+        ),
+      ),
+      GoRoute(
+        path: RouteConstants.loginUrl,
+        pageBuilder: (context, state) => SlideBottomTransition(
+          child: const LogInScreen(),
           key: state.pageKey,
         ),
       ),

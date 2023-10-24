@@ -13,6 +13,7 @@ class RouteConstants {
   static const homeUrl = '/home';
   static const dashBoardUrl = '/';
   static const signupUrl = '/sign-up';
+  static const loginUrl = '/login-up';
   static const homeTripUrl = '/home-trip';
   static const connectToDriverUrl = '/connect-to-driver';
   static const otpUrl = '/otp/:phone';
