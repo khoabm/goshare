@@ -7,7 +7,7 @@ import 'package:goshare/features/connect_to_driver/screen/connect_to_driver_scre
 import 'package:goshare/features/dashboard/screen/dashboard.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
 import 'package:goshare/features/home_trip/screen/home_trip_screen.dart';
-import 'package:goshare/features/signup/screen/log_in_screen.dart';
+import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/signup/screen/otp_screen.dart';
 import 'package:goshare/features/signup/screen/set_passcode_screen.dart';
 import 'package:goshare/features/signup/screen/sign_up_screen.dart';
@@ -15,7 +15,6 @@ import 'package:goshare/features/signup/screen/sign_up_screen.dart';
 class AppRouter {
   /// The route configuration.
   final GoRouter router = GoRouter(
-    initialLocation: RouteConstants.signupUrl,
     routes: <RouteBase>[
       GoRoute(
         name: RouteConstants.dashBoard,

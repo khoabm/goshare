@@ -46,14 +46,14 @@ class LeftSideText extends StatelessWidget {
   }
 }
 
-class LogInScreen extends ConsumerStatefulWidget {
-  const LogInScreen({super.key});
+class SignUpScreen extends ConsumerStatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _LogInScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _SignUpScreenState();
 }
 
-class _LogInScreenState extends ConsumerState<LogInScreen> {
+class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final _signUpFormKey = GlobalKey<FormState>();
   final TextEditingController _nameTextController = TextEditingController();
   final TextEditingController _passwordTextController = TextEditingController();
@@ -72,32 +72,31 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
   }
 
   void _onSubmit(WidgetRef ref) async {
-    // if (_signUpFormKey.currentState!.validate()) {
-    //   setState(() {
-    //     _isLoading = true;
-    //   });
-    //   String name = _nameTextController.text;
-    //   String phone = _phoneNumberTextController.text;
-    //   DateTime birth =
-    //       DateTimeFormatters.convertStringToDate(_birthDateTextController.text);
-    //   int gender = 1;
+    if (_signUpFormKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      String name = _nameTextController.text;
+      String phone = _phoneNumberTextController.text;
+      DateTime birth =
+          DateTimeFormatters.convertStringToDate(_birthDateTextController.text);
+      int gender = 1;
 
-    //   final result =
-    //       await ref.read(signUpControllerProvider.notifier).registerUser(
-    //             name,
-    //             phone,
-    //             gender,
-    //             birth,
-    //             context,
-    //           );
-    //   setState(() {
-    //     _isLoading = false;
-    //   });
-    //   if (result) {
-    //     navigateToOtpScreen(phone);
-    //   } else {}
-    // }
-    print('submit!');
+      final result =
+          await ref.read(signUpControllerProvider.notifier).registerUser(
+                name,
+                phone,
+                gender,
+                birth,
+                context,
+              );
+      setState(() {
+        _isLoading = false;
+      });
+      if (result) {
+        navigateToOtpScreen(phone);
+      } else {}
+    }
   }
 
   void navigateToOtpScreen(String phone) {
@@ -135,7 +134,7 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                       child: Column(
                         children: [
                           const Text(
-                            'Đăng nhâp',
+                            'Đăng ký',
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 22,
@@ -143,6 +142,21 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                           ),
                           const SizedBox(
                             height: 20,
+                          ),
+                          const LeftSideText(
+                            title: 'Họ và tên',
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          AppTextField(
+                            prefixIcons: const Icon(Icons.abc),
+                            controller: _nameTextController,
+                            hintText: 'Nhập tên của bạn',
+                            validator: (value) => InputValidator.nullValidate(
+                              value,
+                              'Tên không được trống',
+                            ),
                           ),
                           const SizedBox(
                             height: 20,
@@ -166,18 +180,20 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                             height: 20,
                           ),
                           const LeftSideText(
-                            title: 'Mật khẩu 6 số',
+                            title: 'Ngày sinh',
                           ),
                           const SizedBox(
                             height: 10,
                           ),
                           AppTextField(
-                            controller: _phoneNumberTextController,
-                            hintText: '123456',
-                            isObscure: true,
+                            hintText: 'dd/MM/yyyy',
+                            prefixIcons: const Icon(Icons.calendar_today),
                             inputType: TextInputType.phone,
+                            controller: _birthDateTextController,
                             formatters: [
+                              DateTextFormatter(),
                               LengthLimitingTextInputFormatter(10),
+                              FilteringTextInputFormatter.singleLineFormatter,
                             ],
                           ),
                           const SizedBox(
@@ -193,7 +209,7 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                                 vertical: 16,
                               ),
                               child: AppButton(
-                                buttonText: 'Đăng nhập',
+                                buttonText: 'Đăng ký',
                                 onPressed: () => _onSubmit(ref),
                               ),
                             ),
