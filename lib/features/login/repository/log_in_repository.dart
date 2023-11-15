@@ -5,7 +5,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:goshare/core/constants/constants.dart';
 import 'package:goshare/core/failure.dart';
 import 'package:goshare/core/type_def.dart';
-import 'package:goshare/core/utils.dart';
+import 'package:goshare/core/utils/utils.dart';
 import 'package:http/http.dart' as http;
 
 final loginRepositoryProvider = Provider(
@@ -36,13 +36,12 @@ class LoginRepository {
       );
 
       if (response.statusCode == 200) {
-        // print('hehe' + response.body['access_token']);
-        return 'haa';
+        return response.body;
       } else {
-        return 'hee';
+        return 'cannot login';
       }
     } catch (e) {
-      return 'kaka';
+      return 'uuu';
     }
   }
 }

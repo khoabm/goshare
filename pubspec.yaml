@@ -55,6 +55,7 @@ dependencies:
   vietmap_flutter_navigation: ^1.2.8
   flutter_typeahead: ^4.3.1
   signalr_core: ^1.1.1
+  shared_preferences: ^2.2.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

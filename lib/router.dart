@@ -19,7 +19,7 @@ import 'package:goshare/location_display_demo.dart';
 class AppRouter {
   /// The route configuration.
   final GoRouter router = GoRouter(
-    initialLocation: RouteConstants.dashBoardUrl, //'/find-trip',
+    initialLocation: RouteConstants.loginUrl, //'/find-trip',
     routes: <RouteBase>[
       GoRoute(
         name: RouteConstants.dashBoard,

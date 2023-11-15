@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ import 'package:goshare/features/login/controller/log_in_controller.dart';
 import 'package:goshare/features/login/repository/log_in_repository.dart';
 
 import 'package:goshare/theme/pallet.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LeftSideText extends StatelessWidget {
   final String title;
@@ -88,8 +90,14 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
         _isLoading = false;
       });
       if (result.isNotEmpty) {
-        print(result);
-        // navigateToOtpScreen(phone);
+        Map<String, dynamic> resultMap = json.decode(result);
+        if (resultMap.containsKey('accessToken')) {
+          String accessToken = resultMap['accessToken'];
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('accessToken', accessToken);
+          final String? action = prefs.getString('accessToken');
+        }
+        navigateToOtpScreen(phone);
       } else {}
     }
   }
