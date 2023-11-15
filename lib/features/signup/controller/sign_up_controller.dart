@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:goshare/core/utils.dart';
+import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/signup/repository/sign_up_repository.dart';
 
 final signUpControllerProvider = StateNotifierProvider<SignUpController, bool>(
@@ -14,7 +14,7 @@ class SignUpController extends StateNotifier<bool> {
   SignUpController({
     required SignUpRepository signUpRepository,
   })  : _signUpRepository = signUpRepository,
-        super(false); //loading is false
+        super(false);
 
   Future<bool> registerUser(
     String name,

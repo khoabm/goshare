@@ -2,6 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>VietMapAPIBaseURL</key>
+	<string>https://maps.vietmap.vn/api/navigations/route/</string>
+	<key>VietMapAccessToken</key>
+	<string>c3d0f188ff669f89042771a20656579073cffec5a8a69747
+</string>
+	<key>VietMapURL</key>
+	<string>https://maps.vietmap.vn/api/maps/light/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747
+</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app requires location permission to working normally</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app requires location permission to working normally</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app requires location permission to working normally</string>
+
+
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "266316185137",
+    "project_id": "goshare-bc3c4",
+    "storage_bucket": "goshare-bc3c4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:266316185137:android:0e70e6c878818e18789f10",
+        "android_client_info": {
+          "package_name": "com.goshare.goshare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWBa7BKYrcP48EcTR0rFTeuilBrGqFbJ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
