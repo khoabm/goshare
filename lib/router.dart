@@ -6,15 +6,20 @@ import 'package:goshare/details_screen.dart';
 import 'package:goshare/features/connect_to_driver/screen/connect_to_driver_screen.dart';
 import 'package:goshare/features/dashboard/screen/dashboard.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
-import 'package:goshare/features/home_trip/screen/home_trip_screen.dart';
+import 'package:goshare/features/home_trip/screen/find_trip_screen.dart';
+import 'package:goshare/features/search_trip_route/screens/car_choosing_screen.dart';
+import 'package:goshare/features/search_trip_route/screens/find_trip_screen.dart';
+import 'package:goshare/features/search_trip_route/screens/search_trip_route_screen.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/signup/screen/otp_screen.dart';
 import 'package:goshare/features/signup/screen/set_passcode_screen.dart';
 import 'package:goshare/features/signup/screen/sign_up_screen.dart';
+import 'package:goshare/location_display_demo.dart';
 
 class AppRouter {
   /// The route configuration.
   final GoRouter router = GoRouter(
+    initialLocation: RouteConstants.dashBoardUrl, //'/find-trip',
     routes: <RouteBase>[
       GoRoute(
         name: RouteConstants.dashBoard,
@@ -66,11 +71,12 @@ class AppRouter {
       GoRoute(
         path: RouteConstants.homeTripUrl,
         pageBuilder: (context, state) => SlideBottomTransition(
-          child: const HomeTripScreen(),
+          child: const FindTripScreen(),
           key: state.pageKey,
         ),
       ),
       GoRoute(
+        name: 'connect-to-driver',
         path: RouteConstants.connectToDriverUrl,
         pageBuilder: (context, state) => SlideBottomTransition(
           child: const ConnectToDriver(),
@@ -106,6 +112,86 @@ class AppRouter {
             child: SetPassCodeScreen(
               phone: phone ?? '',
               setToken: setToken ?? '',
+            ), // Pass the phone parameter to OtpScreen
+            key: state.pageKey,
+          );
+        },
+      ),
+      GoRoute(
+        name: 'location-display',
+        path: '/location-display/:refId',
+        pageBuilder: (context, state) {
+          // Extract the parameters from the route
+          final Map<String, dynamic> params = state.pathParameters;
+          // final String? longitude = params['longitude'] as String?;
+          // final String? latitude = params['latitude'] as String?;
+          final String? refId = params['refId'] as String?;
+
+          return SlideBottomTransition(
+            child: LocationDisplayDemo(
+              refId: refId ?? '',
+            ), // Pass the phone parameter to OtpScreen
+            key: state.pageKey,
+          );
+        },
+      ),
+      GoRoute(
+        name: RouteConstants.carChoosing,
+        path: RouteConstants.carChoosingUrl,
+        pageBuilder: (context, state) {
+          // Extract the parameters from the route
+          final Map<String, dynamic> params = state.pathParameters;
+          // final String? longitude = params['longitude'] as String?;
+          // final String? latitude = params['latitude'] as String?;
+          final String? startLatitude = params['startLatitude'] as String?;
+          final String? startLongitude = params['startLongitude'] as String?;
+          final String? endLatitude = params['endLatitude'] as String?;
+          final String? endLongitude = params['endLongitude'] as String?;
+
+          return SlideBottomTransition(
+            child: CarChoosingScreen(
+              //startLatitude: startLatitude ?? '10.8756434',
+              startLatitude: '10.8756434',
+              //startLongitude: startLongitude ?? '106.8006742',
+              startLongitude: '106.8006742',
+              //endLatitude: endLatitude ?? '10.682559',
+              endLatitude: '10.682559',
+              //endLongitude: endLongitude ?? '106.748967',
+              endLongitude: '106.748967',
+            ), // Pass the phone parameter to OtpScreen
+            key: state.pageKey,
+          );
+        },
+      ),
+      GoRoute(
+        name: RouteConstants.searchTripRoute,
+        path: RouteConstants.searchTripRouteUrl,
+        pageBuilder: (context, state) {
+          return SlideBottomTransition(
+            child:
+                const SearchTripRouteScreen(), // Pass the phone parameter to OtpScreen
+            key: state.pageKey,
+          );
+        },
+      ),
+      GoRoute(
+        name: RouteConstants.findTrip,
+        path: RouteConstants.findTripUrl,
+        pageBuilder: (context, state) {
+          // Extract the parameters from the route
+          final Map<String, dynamic> params = state.pathParameters;
+          // final String? longitude = params['longitude'] as String?;
+          // final String? latitude = params['latitude'] as String?;
+          final String? startLatitude = params['startLatitude'] as String?;
+          final String? startLongitude = params['startLongitude'] as String?;
+          final String? endLatitude = params['endLatitude'] as String?;
+          final String? endLongitude = params['endLongitude'] as String?;
+          return SlideBottomTransition(
+            child: FindTripScreen2(
+              startLatitude: startLatitude ?? '',
+              startLongitude: startLongitude ?? '',
+              endLatitude: endLatitude ?? '',
+              endLongitude: endLongitude ?? '',
             ), // Pass the phone parameter to OtpScreen
             key: state.pageKey,
           );

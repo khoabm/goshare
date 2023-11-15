@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:goshare/core/input_validator.dart';
 import 'package:goshare/theme/pallet.dart';
 
 class PasscodeField extends StatefulWidget {
