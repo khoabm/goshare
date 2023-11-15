@@ -7,14 +7,14 @@ import 'package:goshare/common/back_leading.dart';
 import 'package:goshare/common/home_center_container.dart';
 import 'package:goshare/features/signup/screen/sign_up_screen.dart';
 
-class HomeTripScreen extends ConsumerStatefulWidget {
-  const HomeTripScreen({super.key});
+class FindTripScreen extends ConsumerStatefulWidget {
+  const FindTripScreen({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _HomeTripScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _FindTripScreenState();
 }
 
-class _HomeTripScreenState extends ConsumerState<HomeTripScreen> {
+class _FindTripScreenState extends ConsumerState<FindTripScreen> {
   final TextEditingController _addressTextController = TextEditingController();
   @override
   Widget build(BuildContext context) {

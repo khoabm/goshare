@@ -2,15 +2,58 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:goshare/common/home_center_container.dart';
 import 'package:goshare/common/app_button.dart';
-import 'package:goshare/common/loader.dart';
 import 'package:goshare/core/constants/constants.dart';
-import 'package:goshare/core/locations_util.dart';
+import 'package:goshare/features/home/delegates/search_places_delegate.dart';
 import 'package:goshare/features/home/repositories/home_repository.dart';
+import 'package:goshare/features/home/widgets/home_tab_bar.dart';
+import 'package:goshare/providers/current_location_provider.dart';
 import 'package:goshare/theme/pallet.dart';
-import 'package:location/location.dart';
+
+class CustomSearchBar extends StatelessWidget {
+  final Function onTap;
+  const CustomSearchBar({super.key, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => onTap(),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(
+            7,
+          ),
+        ),
+        child: const Row(
+          children: [
+            Icon(
+              Icons.search,
+              color: Pallete.primaryColor,
+            ),
+            SizedBox(width: 8),
+            Text(
+              '|',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(
+              width: 8,
+            ),
+            Text(
+              'Tìm kiếm bất kì địa chỉ nào',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -20,12 +63,21 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  LocationData? locationData;
+  //LocationData? locationData;
+  final searchPlaceTextController = TextEditingController();
+  String searchText = '';
 
   @override
   void initState() {
     super.initState();
+
     // getCurrentLocation();
+  }
+
+  @override
+  void dispose() {
+    searchPlaceTextController.dispose();
+    super.dispose();
   }
 
   // void getCurrentLocation() async {
@@ -37,17 +89,69 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   //     });
   //   }
   // }
+  void navigateToSearchTripRoute(BuildContext context) {
+    context.pushNamed('search-trip-route');
+  }
 
   @override
   Widget build(BuildContext context) {
+    final locationAsyncValue = ref.watch(locationStreamProvider);
     final homeRepository = ref.read(homeRepositoryProvider);
-
+    // final location = ref.watch(locationProvider).currentLocation;
     return Scaffold(
-      //appBar: AppBar(title: const Text('Home Screen')),
+      appBar: AppBar(
+        elevation: 0,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: CustomSearchBar(onTap: () {
+              navigateToSearchTripRoute(context);
+              // showSearch(
+              //   context: context,
+              //   delegate: SearchPlacesDelegate(ref),
+              // );
+            }),
+          ),
+          // IconButton(
+          //   onPressed: () {
+          //     showSearch(
+          //       context: context,
+          //       delegate: SearchPlacesDelegate(ref),
+          //     );
+          //   },
+          //   icon: const Icon(Icons.search),
+          // ),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
+              locationAsyncValue.when(
+                data: (locationData) {
+                  final longitude = locationData.longitude;
+                  final latitude = locationData.latitude;
+                  // Use longitude and latitude here
+                  return Text(
+                    'Longitude: $longitude, Latitude: $latitude',
+                    style: const TextStyle(
+                      color: Colors.white,
+                    ),
+                  );
+                },
+                error: (_, __) => const Text(
+                  'Failed to load location',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                loading: () => const Text(
+                  'loading',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
               Stack(
                 children: <Widget>[
                   Container(
@@ -76,99 +180,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-              HomeCenterContainer(
-                width: MediaQuery.of(context).size.width * .9,
-                height: MediaQuery.of(context).size.height * .3,
-                verticalPadding: 12.0,
-                horizontalPadding: 12.0,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Bạn muốn đi đến đâu ?',
-                      style: TextStyle(
-                        color: Pallete.primaryColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(
-                        8.0,
-                      ),
-                      width: 200, // adjust width as needed
-                      height: 60, // adjust height as needed
-                      child: AppButton(
-                        buttonText: 'Nhà',
-                        onPressed: () {},
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(
-                        8.0,
-                      ),
-                      width: 200, // adjust width as needed
-                      height: 60,
-                      child: AppButton(
-                        buttonText: 'Nơi làm việc',
-                        onPressed: () {},
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const HomeTabBar(),
               const SizedBox(
                 height: 20,
               ),
-              // HomeCenterContainer(
-              //   width: MediaQuery.of(context).size.width * .9,
-              //   height: MediaQuery.of(context).size.height * .45,
-              //   verticalPadding: 12.0,
-              //   horizontalPadding: 12.0,
-              //   child: locationData == null
-              //       ? const Loader()
-              //       : Column(
-              //           mainAxisAlignment: MainAxisAlignment.center,
-              //           crossAxisAlignment: CrossAxisAlignment.center,
-              //           children: [
-              //             const Text(
-              //               'Địa chỉ nơi làm việc',
-              //               style: TextStyle(
-              //                 color: Pallete.primaryColor,
-              //                 fontSize: 24,
-              //                 fontWeight: FontWeight.bold,
-              //               ),
-              //             ),
-              //             const SizedBox(
-              //               height: 20,
-              //             ),
-              //             Expanded(
-              //               child: GoogleMap(
-
-              //                 zoomControlsEnabled: false,
-              //                 zoomGesturesEnabled: false,
-              //                 scrollGesturesEnabled: false,
-              //                 tiltGesturesEnabled: false,
-              //                 rotateGesturesEnabled: false,
-              //                 initialCameraPosition: CameraPosition(
-              //                   zoom: 18.5,
-              //                   target: LatLng(
-              //                     locationData!.latitude!,
-              //                     locationData!.longitude!,
-              //                   ),
-              //                 ),
-              //               ),
-              //             ),
-              //           ],
-              //         ),
-              // ),
-              // const SizedBox(
-              //   height: 40,
-              // ),
               HomeCenterContainer(
                 width: MediaQuery.of(context).size.width * .9,
-                height: MediaQuery.of(context).size.height * .12,
+                //height: MediaQuery.of(context).size.height * .12,
                 verticalPadding: 8.0,
                 horizontalPadding: 6.0,
                 child: Row(

@@ -5,7 +5,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:goshare/core/constants/constants.dart';
 import 'package:goshare/core/failure.dart';
 import 'package:goshare/core/type_def.dart';
-import 'package:goshare/core/utils.dart';
+import 'package:goshare/core/utils/utils.dart';
 import 'package:http/http.dart' as http;
 
 final signUpRepositoryProvider = Provider(
