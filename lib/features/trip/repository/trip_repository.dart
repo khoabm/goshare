@@ -42,7 +42,7 @@ class TripRepository {
         Uri.parse('$baseApiUrl/trip/fees'),
         headers: {
           'Authorization':
-              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJpZCI6IjUzMmQ3M2NhLWFjNWQtNDczMi1hNDhiLTc1MDUwMmQxOWMzNyIsInBob25lIjoiODQ5MzM2ODQ5MDkiLCJuYW1lIjoiVGhvIE5ndXllbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDAwNDYyMDQsImlzcyI6Imp3dCIsImF1ZCI6Imp3dCJ9.ArrTx64t2b4Uqu3NEIP6jGln_fSJ76r66tA7D6-vYWs',
+              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJpZCI6IjUzMmQ3M2NhLWFjNWQtNDczMi1hNDhiLTc1MDUwMmQxOWMzNyIsInBob25lIjoiODQ5MzM2ODQ5MDkiLCJuYW1lIjoiVGhvIE5ndXllbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDA0MTQ5NDcsImlzcyI6Imp3dCIsImF1ZCI6Imp3dCJ9.6DQIIH2wVCqjQ3qswUiNJkulFb9TiAY4MQ_Rt91-mEA',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -77,7 +77,7 @@ class TripRepository {
     }
   }
 
-  FutureEither<bool> findDriver(FindTripModel tripModel) async {
+  FutureEither<String> findDriver(FindTripModel tripModel) async {
     print('Trong REPO NEEEEEEEEEEEEEEEEEEEEEEE');
     try {
       // Map<String, dynamic> tripModelMap = tripModel.toMap();
@@ -87,17 +87,55 @@ class TripRepository {
         Uri.parse('$baseApiUrl/trip'),
         headers: {
           'Authorization':
-              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJpZCI6IjUzMmQ3M2NhLWFjNWQtNDczMi1hNDhiLTc1MDUwMmQxOWMzNyIsInBob25lIjoiODQ5MzM2ODQ5MDkiLCJuYW1lIjoiVGhvIE5ndXllbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDAwNDYyMDQsImlzcyI6Imp3dCIsImF1ZCI6Imp3dCJ9.ArrTx64t2b4Uqu3NEIP6jGln_fSJ76r66tA7D6-vYWs',
+              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJpZCI6IjUzMmQ3M2NhLWFjNWQtNDczMi1hNDhiLTc1MDUwMmQxOWMzNyIsInBob25lIjoiODQ5MzM2ODQ5MDkiLCJuYW1lIjoiVGhvIE5ndXllbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDAyMjYyMjMsImlzcyI6Imp3dCIsImF1ZCI6Imp3dCJ9.5y1xwp7fE9mI7xsVgDUzeyb6wJ79EhAVvPQNGPkpV2E',
           'Content-Type': 'application/json',
         },
         body: tripModelJson,
       );
-
+      final jsonData = jsonDecode(response.body);
       print(response.statusCode);
       print(response.body);
-      return right(true);
+      return right(jsonData['id']);
     } catch (e) {
       return left(Failure(e.toString()));
+    }
+  }
+
+  FutureEither<bool> cancelTrip(String tripId) async {
+    try {
+      print(tripId);
+      final res = await http.post(
+        Uri.parse('$baseApiUrl/trip/cancel/$tripId'),
+        headers: {
+          'Authorization':
+              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJpZCI6IjUzMmQ3M2NhLWFjNWQtNDczMi1hNDhiLTc1MDUwMmQxOWMzNyIsInBob25lIjoiODQ5MzM2ODQ5MDkiLCJuYW1lIjoiVGhvIE5ndXllbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDAyMjYyMjMsImlzcyI6Imp3dCIsImF1ZCI6Imp3dCJ9.5y1xwp7fE9mI7xsVgDUzeyb6wJ79EhAVvPQNGPkpV2E',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'tripId': tripId,
+        }),
+      );
+      print(res.body);
+      if (res.statusCode == 200) {
+        if (res.body.isNotEmpty) {
+          return right(true);
+        } else {
+          return right(false);
+        }
+      } else if (res.statusCode == 429) {
+        return left(
+          Failure('Too many request'),
+        );
+      } else {
+        return left(
+          Failure('Co loi xay ra'),
+        );
+      }
+    } catch (e) {
+      print(e.toString());
+      return left(
+        Failure('Loi roi'),
+      );
     }
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:goshare/core/utils/utils.dart';
-import 'package:goshare/features/search_trip_route/repository/trip_repository.dart';
+import 'package:goshare/features/trip/repository/trip_repository.dart';
 
 import 'package:goshare/models/car_model.dart';
 import 'package:goshare/models/find_trip_model.dart';
@@ -20,7 +20,9 @@ class TripController extends StateNotifier<bool> {
   })  : _tripRepository = tripRepository,
         super(false);
 
-  Future<bool> findDriver(BuildContext context, FindTripModel tripModel) async {
+  Future<String> findDriver(
+      BuildContext context, FindTripModel tripModel) async {
+    String id = '';
     final endAddress = await placemarkFromCoordinates(
       tripModel.endLatitude,
       tripModel.endLongitude,
@@ -41,9 +43,9 @@ class TripController extends StateNotifier<bool> {
         message: l.message,
       );
     }, (r) {
-      state = r;
+      id = r;
     });
-    return state;
+    return id;
   }
 
   Future<List<CarModel>> getCarDetails(
@@ -71,5 +73,19 @@ class TripController extends StateNotifier<bool> {
       list = r;
     });
     return list;
+  }
+
+  Future<bool> cancelTrip(BuildContext context, String tripId) async {
+    bool isCanceled = false;
+    final result = await _tripRepository.cancelTrip(tripId);
+    result.fold((l) {
+      showSnackBar(
+        context: context,
+        message: l.message,
+      );
+    }, (r) {
+      isCanceled = r;
+    });
+    return isCanceled;
   }
 }
