@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
-import 'package:goshare/features/search_trip_route/controller/trip_controller.dart';
+import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/car_model.dart';
 import 'package:goshare/theme/pallet.dart';
 import 'package:intl/intl.dart';
@@ -295,6 +295,7 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                       width: MediaQuery.of(context).size.width * .5,
                       child: ElevatedButton(
                         onPressed: () {
+                          // ref.invalidate(selectedPaymentMethodProvider);
                           navigateToFindTripScreen(
                             context,
                             widget.startLatitude,

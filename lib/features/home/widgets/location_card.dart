@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class LocationCard extends ConsumerWidget {
-  const LocationCard({super.key});
+  final Function(double latitude, double longitude) onClick;
+  const LocationCard({
+    super.key,
+    required this.onClick,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -63,7 +67,12 @@ class LocationCard extends ConsumerWidget {
               style: ElevatedButton.styleFrom(
                 elevation: 0,
               ),
-              onPressed: () {},
+              onPressed: () async {
+                await onClick(
+                  10.94738262463184,
+                  106.97866792995985,
+                );
+              },
               child: const Text(
                 'Đặt xe',
               ),

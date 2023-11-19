@@ -22,7 +22,10 @@ class _DetailsScreenState extends ConsumerState<DetailsScreen> {
       ),
       body: Center(
         child: ElevatedButton(
-          onPressed: () => context.go('/'),
+          onPressed: () async {
+            final result = await context.pushNamed('dependent-list');
+            print(result);
+          },
           child: const Text('Go back to the Home screen'),
         ),
       ),
