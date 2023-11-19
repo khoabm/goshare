@@ -21,6 +21,12 @@ import 'package:goshare/features/login/repository/log_in_repository.dart';
 import 'package:goshare/theme/pallet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+final accessTokenProvider = StateProvider<String?>((ref) => null);
+
+final tabProvider = StateProvider<int>(
+  (ref) => 0,
+);
+
 class LeftSideText extends StatelessWidget {
   final String title;
   const LeftSideText({
@@ -95,7 +101,7 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
           String accessToken = resultMap['accessToken'];
           final SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('accessToken', accessToken);
-          final String? action = prefs.getString('accessToken');
+          ref.read(accessTokenProvider.notifier).state = accessToken;
         }
         navigateToOtpScreen(phone);
       } else {}
