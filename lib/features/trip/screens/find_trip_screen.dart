@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:goshare/features/search_trip_route/controller/trip_controller.dart';
+import 'package:go_router/go_router.dart';
+import 'package:goshare/core/constants/route_constants.dart';
+import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/find_trip_model.dart';
-import 'package:goshare/theme/pallet.dart';
 import 'package:signalr_core/signalr_core.dart';
 
 import 'package:goshare/providers/signalr_providers.dart';
@@ -33,7 +34,7 @@ class FindTripScreen2 extends ConsumerStatefulWidget {
 }
 
 class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
-  bool result = false;
+  String result = '';
   MapNavigationViewController? _controller;
   late MapOptions _navigationOption;
   final _vietmapNavigationPlugin = VietMapNavigationPlugin();
@@ -101,7 +102,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     _vietmapNavigationPlugin.setDefaultOptions(_navigationOption);
   }
 
-  MapOptions? options;
+  //MapOptions? options;
 
   Future<void> initSignalR(WidgetRef ref) async {
     try {
@@ -161,18 +162,18 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           content: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      "Trần Quang Khải",
+                      driverName,
                     ),
-                    Text("Dream Honda"),
-                    Text("67FA-BASD"),
-                    Text("0327885391"),
+                    Text(driverCarType),
+                    Text(driverPlate),
+                    Text(driverPhone),
                   ],
                 ),
               ),
@@ -215,37 +216,53 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
         height: MediaQuery.of(context).size.height * .2,
         child: Column(
           children: [
-            const Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Vui lòng đợi',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+            const Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Vui lòng đợi',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'Chúng tôi đang tìm tài xế cho bạn',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      )
-                    ],
+                        Text(
+                          'Chúng tôi đang tìm tài xế cho bạn',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                CircularProgressIndicator(),
-              ],
+                  CircularProgressIndicator(),
+                ],
+              ),
             ),
             SizedBox(
               width: MediaQuery.of(context).size.width * .5,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  if (result.isNotEmpty) {
+                    final check = await ref
+                        .watch(tripControllerProvider.notifier)
+                        .cancelTrip(
+                          context,
+                          result,
+                        );
+                    if (check) {
+                      if (context.mounted) {
+                        context.goNamed(RouteConstants.dashBoard);
+                      }
+                    }
+                  }
+                },
                 child: const Text('Hủy'),
               ),
             ),
@@ -409,51 +426,51 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                         // ),
                       ],
                     )),
-            _isRouteBuilt && !_isRunning
-                ? Positioned(
-                    bottom: 20,
-                    left: 0,
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                              style: ButtonStyle(
-                                  shape: MaterialStateProperty.all<
-                                          RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(18.0),
-                                          side: const BorderSide(
-                                              color: Colors.blue)))),
-                              onPressed: () {
-                                // _isRunning = true;
-                                // _controller?.startNavigation();
-                              },
-                              child: const Text('Tiep tuc')),
-                          ElevatedButton(
-                              style: ButtonStyle(
-                                  shape: MaterialStateProperty.all<
-                                          RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(18.0),
-                                          side: const BorderSide(
-                                              color: Colors.blue)))),
-                              onPressed: () {
-                                _controller?.clearRoute();
-                                setState(() {
-                                  _isRouteBuilt = false;
-                                });
-                              },
-                              child: const Text('Xoá tuyến đường')),
-                        ],
-                      ),
-                    ),
-                  )
-                : const SizedBox.shrink()
+            // _isRouteBuilt && !_isRunning
+            //     ? Positioned(
+            //         bottom: 20,
+            //         left: 0,
+            //         child: SizedBox(
+            //           width: MediaQuery.of(context).size.width,
+            //           child: Row(
+            //             mainAxisSize: MainAxisSize.max,
+            //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //             children: [
+            //               ElevatedButton(
+            //                   style: ButtonStyle(
+            //                       shape: MaterialStateProperty.all<
+            //                               RoundedRectangleBorder>(
+            //                           RoundedRectangleBorder(
+            //                               borderRadius:
+            //                                   BorderRadius.circular(18.0),
+            //                               side: const BorderSide(
+            //                                   color: Colors.blue)))),
+            //                   onPressed: () {
+            //                     // _isRunning = true;
+            //                     // _controller?.startNavigation();
+            //                   },
+            //                   child: const Text('Tiep tuc')),
+            //               ElevatedButton(
+            //                   style: ButtonStyle(
+            //                       shape: MaterialStateProperty.all<
+            //                               RoundedRectangleBorder>(
+            //                           RoundedRectangleBorder(
+            //                               borderRadius:
+            //                                   BorderRadius.circular(18.0),
+            //                               side: const BorderSide(
+            //                                   color: Colors.blue)))),
+            //                   onPressed: () {
+            //                     _controller?.clearRoute();
+            //                     setState(() {
+            //                       _isRouteBuilt = false;
+            //                     });
+            //                   },
+            //                   child: const Text('Xoá tuyến đường')),
+            //             ],
+            //           ),
+            //         ),
+            //       )
+            //     : const SizedBox.shrink()
           ],
         ),
       ),
