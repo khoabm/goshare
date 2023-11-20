@@ -109,23 +109,28 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       final hubConnection = ref.watch(
         hubConnectionProvider,
       );
+      // final hubConnection = ref
+      //     .watch(
+      //   hubConnectionProvider,
+      // )
+      //     .whenData((value) async {
+      //   value.on('NotifyPassengerDriverOnTheWay', (message) {
+      //     print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
+      //     _handleNotifyPassengerDriverOnTheWay(message);
+      //   });
 
-      hubConnection.on('NotifyPassengerDriverOnTheWay', (message) {
-        print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
-        _handleNotifyPassengerDriverOnTheWay(message);
-      });
-
-      hubConnection.onclose((exception) async {
-        print(exception.toString() + "LOI CUA SIGNALR ON CLOSE");
-        await Future.delayed(
-          const Duration(seconds: 3),
-          () async {
-            if (hubConnection.state == HubConnectionState.disconnected) {
-              await hubConnection.start();
-            }
-          },
-        );
-      });
+      //   value.onclose((exception) async {
+      //     print(exception.toString() + "LOI CUA SIGNALR ON CLOSE");
+      //     await Future.delayed(
+      //       const Duration(seconds: 3),
+      //       () async {
+      //         if (value.state == HubConnectionState.disconnected) {
+      //           await value.start();
+      //         }
+      //       },
+      //     );
+      //   });
+      // });
     } catch (e) {
       print(e.toString());
     }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
+
+import 'package:goshare/core/failure.dart';
 import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/trip/repository/trip_repository.dart';
 
@@ -55,7 +57,6 @@ class TripController extends StateNotifier<bool> {
     double endLatitude,
     double endLongitude,
   ) async {
-    print('Car details controller');
     List<CarModel> list = [];
     final result = await _tripRepository.getCarDetails(
       startLatitude,
@@ -64,10 +65,16 @@ class TripController extends StateNotifier<bool> {
       endLongitude,
     );
     result.fold((l) {
-      showSnackBar(
-        context: context,
-        message: l.message,
-      );
+      if (l is UnauthorizedFailure) {
+        showLoginTimeOut(
+          context: context,
+        );
+      } else {
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      }
     }, (r) {
       print(r.length.toString());
       list = r;

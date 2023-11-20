@@ -120,4 +120,35 @@ class SignUpRepository {
       );
     }
   }
+
+  FutureEither<bool> reSendOtpVerification(
+    String phone,
+  ) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/resendotp'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({
+          'phone': convertPhoneNumber(phone),
+        }),
+      );
+      if (response.statusCode == 200) {
+        return right(
+          true,
+        );
+      } else {
+        return left(
+          Failure('Gửi otp thất bại'),
+        );
+      }
+    } catch (e) {
+      return left(
+        Failure(
+          e.toString(),
+        ),
+      );
+    }
+  }
 }

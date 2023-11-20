@@ -288,6 +288,19 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                         ),
                       ],
                     ),
+                    Row(
+                      children: [
+                        GestureDetector(
+                            child: const Text(
+                              'Tôi',
+                            ),
+                            onTap: () async {
+                              final result = await context
+                                  .pushNamed(RouteConstants.dependentList);
+                              print(result);
+                            }),
+                      ],
+                    ),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         vertical: 15.0,
