@@ -9,6 +9,7 @@ class RouteConstants {
   static const carChoosing = 'car-choosing';
   static const searchTripRoute = 'search-trip-route';
   static const findTrip = 'find-trip';
+  static const dependentList = 'dependent-list';
 
   ///**
   ///Route url constants
@@ -26,4 +27,5 @@ class RouteConstants {
   static const searchTripRouteUrl = '/search-trip-route';
   static const findTripUrl =
       '/find-trip/:startLongitude/:startLatitude/:endLongitude/:endLatitude';
+  static const dependentListUrl = '/dependent-list';
 }

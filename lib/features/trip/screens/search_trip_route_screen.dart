@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +13,7 @@ import 'package:location/location.dart';
 // import 'package:goshare/providers/current_location_provider.dart';
 import 'package:vietmap_flutter_navigation/embedded/controller.dart';
 import 'package:vietmap_flutter_navigation/helpers.dart';
+import 'package:vietmap_flutter_navigation/models/marker.dart';
 import 'package:vietmap_flutter_navigation/models/options.dart';
 import 'package:vietmap_flutter_navigation/models/route_progress_event.dart';
 import 'package:vietmap_flutter_navigation/models/way_point.dart';
@@ -96,8 +98,6 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
         await VietMapHelper.getBytesFromAsset('assets/download.jpeg');
     _vietmapNavigationPlugin.setDefaultOptions(_navigationOption);
 
-    final location = ref.watch(locationProvider);
-    currentLocation = await location.getCurrentLocation();
     setState(() {
       _isLoading = false;
     });
@@ -135,6 +135,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
               children: [
                 NavigationView(
                   mapOptions: _navigationOption,
+                  onMarkerClicked: (p0) {},
                   onNewRouteSelected: (p0) {
                     log(p0.toString());
                   },
@@ -153,14 +154,36 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                       await VietMapHelper.getBytesFromAsset(
                           'assets/download.jpeg'),
                     );
+                    _controller?.addImageMarkers([
+                      Marker(
+                        imagePath: 'assets/download.jpeg',
+                        latLng: const LatLng(
+                            10.778825464454686, 106.68249858948148),
+                        title: 'DAY LA TITLE',
+                        snippet: 'DAY LA SNIPPET',
+                      )
+                    ]);
                     // _controller?.buildRoute(wayPoints: wayPoints);
                     // _controller?.buildAndStartNavigation(
                     //   wayPoints: wayPoints,
                     // );
                   },
                   onMapLongClick: (WayPoint? point) async {
-                    // if (_isRunning) return;
-                    // //EasyLoading.show();
+                    if (_isRunning) return;
+                    if (point != null) {
+                      wayPoints.removeWhere(
+                          (wayPoint) => wayPoint.name == 'destination point');
+
+                      wayPoints.add(
+                        WayPoint(
+                            name: 'destination point',
+                            latitude: point.latitude,
+                            longitude: point.longitude),
+                      );
+                      _controller?.buildRoute(wayPoints: wayPoints);
+                    }
+
+                    //EasyLoading.show();
                     // var data =
                     //     await GetLocationFromLatLngUseCase(VietmapApiRepositories())
                     //         .call(LocationPoint(
@@ -306,16 +329,19 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                                 // var location = await Geolocator.getCurrentPosition(
                                 //   desiredAccuracy: LocationAccuracy.bestForNavigation,
                                 // );
+                                final location = ref.watch(locationProvider);
+                                currentLocation =
+                                    await location.getCurrentLocation();
                                 wayPoints.add(
                                   WayPoint(
-                                    name: 'destination',
+                                    name: 'origin point',
                                     latitude: currentLocation?.latitude,
                                     longitude: currentLocation?.longitude,
                                   ),
                                 );
                                 if (data?.lat != null) {
                                   wayPoints.add(WayPoint(
-                                      name: '',
+                                      name: 'destination point',
                                       latitude: data?.lat,
                                       longitude: data?.lng));
                                 }

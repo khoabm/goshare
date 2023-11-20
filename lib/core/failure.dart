@@ -3,3 +3,7 @@ class Failure {
 
   Failure(this.message);
 }
+
+class UnauthorizedFailure extends Failure {
+  UnauthorizedFailure(super.message);
+}

@@ -94,4 +94,26 @@ class SignUpController extends StateNotifier<bool> {
     );
     return state;
   }
+
+  Future<bool> reSendOtpVerification(
+    String phone,
+    BuildContext context,
+  ) async {
+    final result = await _signUpRepository.reSendOtpVerification(
+      phone,
+    );
+    result.fold(
+      (l) {
+        state = false;
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      },
+      (success) {
+        state = success;
+      },
+    );
+    return state;
+  }
 }

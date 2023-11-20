@@ -5,9 +5,10 @@ import 'package:fpdart/fpdart.dart';
 import 'package:goshare/core/constants/constants.dart';
 import 'package:goshare/core/failure.dart';
 import 'package:goshare/core/type_def.dart';
+import 'package:goshare/core/utils/http_utils.dart';
 import 'package:goshare/models/car_model.dart';
 import 'package:goshare/models/find_trip_model.dart';
-import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 final tripRepositoryProvider = Provider(
   (ref) => TripRepository(
@@ -22,14 +23,7 @@ class TripRepository {
     required this.baseApiUrl,
   });
 
-  // FutureEither<List<String>?> searchPlaces(String prompt, String format, String countryCodes){
-  //   try {
-
-  //   } catch (e) {
-
-  //   }
-  // }
-  FutureEither<List<CarModel>> getCarDetails(
+  Future<Either<Failure, List<CarModel>>> getCarDetails(
     double startLatitude,
     double startLongitude,
     double endLatitude,
@@ -37,12 +31,12 @@ class TripRepository {
   ) async {
     List<CarModel> list = [];
     try {
-      print(startLatitude);
-      final res = await http.post(
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+      final client = HttpClientWithAuth(accessToken ?? '');
+      final res = await client.post(
         Uri.parse('$baseApiUrl/trip/fees'),
         headers: {
-          'Authorization':
-              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJpZCI6IjUzMmQ3M2NhLWFjNWQtNDczMi1hNDhiLTc1MDUwMmQxOWMzNyIsInBob25lIjoiODQ5MzM2ODQ5MDkiLCJuYW1lIjoiVGhvIE5ndXllbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDA0MTQ5NDcsImlzcyI6Imp3dCIsImF1ZCI6Imp3dCJ9.6DQIIH2wVCqjQ3qswUiNJkulFb9TiAY4MQ_Rt91-mEA',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -52,50 +46,48 @@ class TripRepository {
           'endLongitude': endLongitude,
         }),
       );
-      print(res.body);
-      if (res.statusCode == 200) {
-        final List<dynamic> jsonData = json.decode(
-          res.body,
-        );
 
+      if (res.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(res.body);
         list = jsonData.map((json) => CarModel.fromMap(json)).toList();
         return right(list);
       } else if (res.statusCode == 429) {
-        return left(
-          Failure('Too many request'),
-        );
+        return left(Failure('Too many request'));
+      } else if (res.statusCode == 401) {
+        return left(UnauthorizedFailure('Unauthorized'));
       } else {
-        return left(
-          Failure('Co loi xay ra'),
-        );
+        return left(Failure('Co loi xay ra'));
       }
     } catch (e) {
       print(e.toString());
-      return left(
-        Failure('Loi roi'),
-      );
+      return left(Failure('Loi roi'));
     }
   }
 
   FutureEither<String> findDriver(FindTripModel tripModel) async {
-    print('Trong REPO NEEEEEEEEEEEEEEEEEEEEEEE');
     try {
       // Map<String, dynamic> tripModelMap = tripModel.toMap();
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
       String tripModelJson = tripModel.toJson();
-
-      final response = await http.post(
+      final client = HttpClientWithAuth(accessToken ?? '');
+      final response = await client.post(
         Uri.parse('$baseApiUrl/trip'),
         headers: {
-          'Authorization':
-              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJpZCI6IjUzMmQ3M2NhLWFjNWQtNDczMi1hNDhiLTc1MDUwMmQxOWMzNyIsInBob25lIjoiODQ5MzM2ODQ5MDkiLCJuYW1lIjoiVGhvIE5ndXllbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDAyMjYyMjMsImlzcyI6Imp3dCIsImF1ZCI6Imp3dCJ9.5y1xwp7fE9mI7xsVgDUzeyb6wJ79EhAVvPQNGPkpV2E',
           'Content-Type': 'application/json',
         },
         body: tripModelJson,
       );
       final jsonData = jsonDecode(response.body);
-      print(response.statusCode);
-      print(response.body);
-      return right(jsonData['id']);
+      if (response.statusCode == 200) {
+        return right(jsonData['id']);
+      } else if (response.statusCode == 429) {
+        return left(Failure('Too many request'));
+      } else if (response.statusCode == 401) {
+        return left(UnauthorizedFailure('Unauthorized'));
+      } else {
+        return left(Failure('Co loi xay ra'));
+      }
     } catch (e) {
       return left(Failure(e.toString()));
     }
@@ -103,12 +95,12 @@ class TripRepository {
 
   FutureEither<bool> cancelTrip(String tripId) async {
     try {
-      print(tripId);
-      final res = await http.post(
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+      final client = HttpClientWithAuth(accessToken ?? '');
+      final res = await client.post(
         Uri.parse('$baseApiUrl/trip/cancel/$tripId'),
         headers: {
-          'Authorization':
-              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJpZCI6IjUzMmQ3M2NhLWFjNWQtNDczMi1hNDhiLTc1MDUwMmQxOWMzNyIsInBob25lIjoiODQ5MzM2ODQ5MDkiLCJuYW1lIjoiVGhvIE5ndXllbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlVzZXIiLCJleHAiOjE3MDAyMjYyMjMsImlzcyI6Imp3dCIsImF1ZCI6Imp3dCJ9.5y1xwp7fE9mI7xsVgDUzeyb6wJ79EhAVvPQNGPkpV2E',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -122,6 +114,8 @@ class TripRepository {
         } else {
           return right(false);
         }
+      } else if (res.statusCode == 401) {
+        return left(UnauthorizedFailure('Unauthorized'));
       } else if (res.statusCode == 429) {
         return left(
           Failure('Too many request'),

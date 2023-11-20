@@ -56,12 +56,19 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     });
   }
 
-  void resendOtp() {
-    setState(() {
-      _isResendButtonDisabled = true;
-      _countdown = Constants.otpResendTimeout; // Reset the countdown
-      startCountdown();
-    });
+  void resendOtp(String phone) async {
+    final result =
+        await ref.read(signUpControllerProvider.notifier).reSendOtpVerification(
+              phone,
+              context,
+            );
+    if (result) {
+      setState(() {
+        _isResendButtonDisabled = true;
+        _countdown = Constants.otpResendTimeout; // Reset the countdown
+        startCountdown();
+      });
+    }
   }
 
   String formatCountdown(int seconds) {
@@ -91,7 +98,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     if (result != null && result.trim().isNotEmpty) {
       navigateToSetPassCodeScreen(phone, result);
     } else {
-      print('loi roi huhu');
+      // print('loi roi huhu');
     }
   }
 
@@ -204,8 +211,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         children: [
                           Expanded(
                             child: ElevatedButton(
-                              onPressed:
-                                  _isResendButtonDisabled ? null : resendOtp,
+                              onPressed: _isResendButtonDisabled
+                                  ? null
+                                  : () => resendOtp(widget.phone),
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 16,

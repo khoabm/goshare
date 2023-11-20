@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart' as flutter;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
+import 'package:goshare/features/login/controller/log_in_controller.dart';
 import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
 import 'package:goshare/providers/current_location_provider.dart';
 import 'package:goshare/providers/signalr_providers.dart';
@@ -37,22 +39,46 @@ class _DashBoardState extends ConsumerState<DashBoard> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        final hubConnection = ref.watch(
-          hubConnectionProvider,
+        // final abc = ref.watch(
+        //   hubConnectionProvider,
+        // );
+        // if (abc.state == HubConnectionState.disconnected) {
+        //   await abc.start()?.then(
+        //         (value) => {
+        //           print('Start thanh cong'),
+        //         },
+        //       );
+        // }
+
+        // abc.onclose((exception) {
+        //   print(
+        //     exception.toString(),
+        //   );
+        // });
+
+        final abc = await ref.watch(
+          hubConnectionProvider.future,
         );
-        if (hubConnection.state == HubConnectionState.disconnected) {
-          await hubConnection.start()?.then(
+        if (abc.state == HubConnectionState.disconnected) {
+          await abc.start()?.then(
                 (value) => {
                   print('Start thanh cong'),
                 },
               );
         }
 
-        hubConnection.onclose((exception) {
+        abc.onclose((exception) {
           print(
             exception.toString(),
           );
         });
+        final isFcmTokenUpdated =
+            await ref.watch(LoginControllerProvider.notifier).updateFcmToken();
+        if (isFcmTokenUpdated) {
+          print('fcmToken updated');
+        } else {
+          print('fcmTokenError');
+        }
       } catch (e) {
         print(e.toString());
       }
