@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:goshare/common/app_button.dart';
 import 'package:goshare/common/home_center_container.dart';
 import 'package:goshare/common/loader.dart';
@@ -48,42 +49,48 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
             SingleChildScrollView(
               child: Column(
                 children: [
-                  // Your header/banner here
                   Container(
                     padding: const EdgeInsets.all(8.0),
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * .3,
-                    // Replace with your image or SVG
-                    // child: Image.asset(Constants.feedbackBanner),
+                    margin: const EdgeInsets.only(top: 100),
                   ),
                   HomeCenterContainer(
                     width: MediaQuery.of(context).size.width * .9,
                     child: Column(
                       children: [
                         const Text(
-                          'Feedback',
+                          'Đánh giá tài xế',
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 22,
                           ),
                         ),
                         const SizedBox(height: 20),
-                        // Rating Stars
+                       
                         RatingStars(),
                         const SizedBox(height: 20),
-                        // Feedback Text Input
+                  
                         FeedbackTextInput(),
                         const SizedBox(height: 20),
-                        // Submit Button
+                   
                         Container(
                           padding: const EdgeInsets.all(8.0),
                           width: MediaQuery.of(context).size.width * .9,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             child: AppButton(
-                              buttonText: 'Submit Feedback',
+                              buttonText: 'Gửi đánh giá',
                               onPressed: () => _submitFeedback(ref),
                             ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(
+                            8.0,
+                          ),
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height * .3,
+                          child: SvgPicture.asset(
+                            Constants.carBanner,
                           ),
                         ),
                       ],
@@ -105,26 +112,42 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
   }
 }
 
-class RatingStars extends StatelessWidget {
+class RatingStars extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
-    // Implement your star rating UI here
-    // Use Riverpod to manage the selected rating
-    return Container(
-        // Your star rating UI implementation here
-        // Example: A row of stars that the user can tap to select the rating
-        );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final rating = ref.watch(ratingProvider);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        for (int i = 1; i <= 5; i++)
+          GestureDetector(
+            onTap: () => ref.read(ratingProvider.notifier).state = i,
+            child: Icon(
+              Icons.star,
+              size: 30,
+              color: (rating != null && rating >= i)
+                  ? const Color(0xffffc107)
+                  : Colors.grey,
+            ),
+          ),
+      ],
+    );
   }
 }
 
-class FeedbackTextInput extends StatelessWidget {
+class FeedbackTextInput extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
-    // Implement your feedback text input UI here
-    // Use Riverpod to manage the entered feedback text
-    return Container(
-        // Your feedback text input UI implementation here
-        // Example: A TextFormField where users can enter feedback
-        );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final feedbackText = ref.watch(feedbackTextProvider);
+
+    return TextField(
+      decoration: InputDecoration(
+        hintText: 'Nhập phản hồi của bạn',
+        border: OutlineInputBorder(),
+      ),
+      maxLines: 5, // Set the maximum number of lines for the text field
+      onChanged: (text) => ref.read(feedbackTextProvider.notifier).state = text,
+    );
   }
 }

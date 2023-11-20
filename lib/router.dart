@@ -6,6 +6,7 @@ import 'package:goshare/details_screen.dart';
 import 'package:goshare/features/connect_to_driver/screen/connect_to_driver_screen.dart';
 import 'package:goshare/features/dashboard/screen/dashboard.dart';
 import 'package:goshare/features/dependent_list/screens/dependent_list_screen.dart';
+import 'package:goshare/features/feedback/feedback.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
 
 // import 'package:goshare/features/home_trip/screen/find_trip_screen.dart';
@@ -28,7 +29,7 @@ class AppRouter {
 
   GoRouter createRouter(String initialLocation) {
     return GoRouter(
-      initialLocation: initialLocation, //'/find-trip',
+      initialLocation: RouteConstants.feedback, //'/find-trip',
       routes: <RouteBase>[
         GoRoute(
           name: RouteConstants.dashBoard,
@@ -226,6 +227,13 @@ class AppRouter {
               key: state.pageKey,
             );
           },
+        ),
+        GoRoute(
+          path: RouteConstants.feedback,
+          pageBuilder: (context, state) => SlideBottomTransition(
+            child: const FeedbackScreen(),
+            key: state.pageKey,
+          ),
         ),
       ],
     );
