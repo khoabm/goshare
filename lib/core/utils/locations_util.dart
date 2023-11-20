@@ -41,7 +41,13 @@ class LocationUtils {
     // Get location data if permission is granted
     if (permissionGranted == PermissionStatus.granted) {
       print('get current location');
-      LocationData locationData = await location.getLocation();
+
+      //LocationData locationData = await location.getLocation();
+      LocationData? locationData = await Future.any([
+        location.getLocation(),
+        Future.delayed(const Duration(seconds: 5), () => null),
+      ]);
+      locationData ??= await location.getLocation();
       return locationData;
     }
 

@@ -2,11 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
-import 'package:goshare/features/search_trip_route/screens/car_choosing_screen.dart';
-import 'package:goshare/features/search_trip_route/screens/find_trip_screen.dart';
+import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
 import 'package:goshare/providers/current_location_provider.dart';
 import 'package:goshare/providers/signalr_providers.dart';
 import 'package:goshare/theme/pallet.dart';
+import 'package:signalr_core/signalr_core.dart';
 
 class DashBoard extends ConsumerStatefulWidget {
   const DashBoard({super.key});
@@ -40,11 +40,14 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         final hubConnection = ref.watch(
           hubConnectionProvider,
         );
-        await hubConnection.start()?.then(
-              (value) => {
-                print('Start thanh cong'),
-              },
-            );
+        if (hubConnection.state == HubConnectionState.disconnected) {
+          await hubConnection.start()?.then(
+                (value) => {
+                  print('Start thanh cong'),
+                },
+              );
+        }
+
         hubConnection.onclose((exception) {
           print(
             exception.toString(),

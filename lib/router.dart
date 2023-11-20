@@ -5,12 +5,19 @@ import 'package:goshare/core/page_navigation.dart';
 import 'package:goshare/details_screen.dart';
 import 'package:goshare/features/connect_to_driver/screen/connect_to_driver_screen.dart';
 import 'package:goshare/features/dashboard/screen/dashboard.dart';
+import 'package:goshare/features/dependent_list/screens/dependent_list_screen.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
+// <<<<<<< khang-branch
 import 'package:goshare/features/home_trip/screen/find_trip_screen.dart';
 import 'package:goshare/features/search_trip_route/screens/car_choosing_screen.dart';
 import 'package:goshare/features/search_trip_route/screens/find_trip_screen.dart';
 import 'package:goshare/features/search_trip_route/screens/search_trip_route_screen.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
+// =======
+// import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
+// import 'package:goshare/features/trip/screens/find_trip_screen.dart';
+// import 'package:goshare/features/trip/screens/search_trip_route_screen.dart';
+// >>>>>>> main
 import 'package:goshare/features/signup/screen/otp_screen.dart';
 import 'package:goshare/features/signup/screen/set_passcode_screen.dart';
 import 'package:goshare/features/signup/screen/sign_up_screen.dart';
@@ -61,6 +68,7 @@ class AppRouter {
           key: state.pageKey,
         ),
       ),
+// <<<<<<< khang-branch
       GoRoute(
         path: RouteConstants.loginUrl,
         pageBuilder: (context, state) => SlideBottomTransition(
@@ -68,13 +76,22 @@ class AppRouter {
           key: state.pageKey,
         ),
       ),
-      GoRoute(
-        path: RouteConstants.homeTripUrl,
-        pageBuilder: (context, state) => SlideBottomTransition(
-          child: const FindTripScreen(),
-          key: state.pageKey,
-        ),
-      ),
+//       GoRoute(
+//         path: RouteConstants.homeTripUrl,
+//         pageBuilder: (context, state) => SlideBottomTransition(
+//           child: const FindTripScreen(),
+//           key: state.pageKey,
+//         ),
+//       ),
+// =======
+//       // GoRoute(
+//       //   path: RouteConstants.homeTripUrl,
+//       //   pageBuilder: (context, state) => SlideBottomTransition(
+//       //     child: const FindTripScreen(),
+//       //     key: state.pageKey,
+//       //   ),
+//       // ),
+// >>>>>>> main
       GoRoute(
         name: 'connect-to-driver',
         path: RouteConstants.connectToDriverUrl,
@@ -193,6 +210,17 @@ class AppRouter {
               endLatitude: endLatitude ?? '',
               endLongitude: endLongitude ?? '',
             ), // Pass the phone parameter to OtpScreen
+            key: state.pageKey,
+          );
+        },
+      ),
+      GoRoute(
+        name: 'dependent-list',
+        path: '/dependent-list',
+        pageBuilder: (context, state) {
+          return SlideRightTransition(
+            child:
+                const DependentList(), // Pass the phone parameter to OtpScreen
             key: state.pageKey,
           );
         },
