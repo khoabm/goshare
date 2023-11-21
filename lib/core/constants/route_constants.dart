@@ -28,4 +28,5 @@ class RouteConstants {
   static const findTripUrl =
       '/find-trip/:startLongitude/:startLatitude/:endLongitude/:endLatitude';
   static const dependentListUrl = '/dependent-list';
+  static const feedback = '/feedback';
 }

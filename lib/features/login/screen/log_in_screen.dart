@@ -22,6 +22,21 @@ import 'package:goshare/theme/pallet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final accessTokenProvider = StateProvider<String?>((ref) => null);
+final userProvider = StateProvider<User?>((ref) => null);
+
+class User {
+  String id;
+  String phone;
+  String name;
+  String role;
+
+  User({
+    required this.id,
+    required this.phone,
+    required this.name,
+    required this.role,
+  });
+}
 
 final tabProvider = StateProvider<int>(
   (ref) => 0,
@@ -97,11 +112,24 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
       });
       if (result.isNotEmpty) {
         Map<String, dynamic> resultMap = json.decode(result);
+        print(resultMap);
         if (resultMap.containsKey('accessToken')) {
           String accessToken = resultMap['accessToken'];
           final SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('accessToken', accessToken);
           ref.read(accessTokenProvider.notifier).state = accessToken;
+        }
+        if (resultMap.containsKey('id') &&
+            resultMap.containsKey('phone') &&
+            resultMap.containsKey('name') &&
+            resultMap.containsKey('role')) {
+          User userTmp = User(
+            id: resultMap['id'],
+            phone: resultMap['phone'],
+            name: resultMap['name'],
+            role: resultMap['role'],
+          );
+          ref.read(userProvider.notifier).state = userTmp;
         }
         navigateToOtpScreen(phone);
       } else {}
