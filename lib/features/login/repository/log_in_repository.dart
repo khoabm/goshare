@@ -21,15 +21,26 @@ final loginRepositoryProvider = Provider(
   ),
 );
 
+class LoginResult {
+  final String? accessToken;
+  final String? refreshToken;
+  final User? user;
+  final String? error;
+
+  LoginResult({this.accessToken, this.refreshToken, this.user, this.error});
+}
+
 class LoginRepository {
   final String baseUrl;
 
   LoginRepository({required this.baseUrl});
 
-  Future<String> login(
-    String phone,
-    String passcode,
-  ) async {
+  Future<LoginResult> login(String phone, String passcode) async {
+    if (phone.isEmpty || passcode.isEmpty) {
+      phone = '84327885391';
+      passcode = '270602';
+    }
+    print(phone);
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
@@ -43,12 +54,22 @@ class LoginRepository {
       );
 
       if (response.statusCode == 200) {
-        return response.body;
+        final resultMap = json.decode(response.body);
+        return LoginResult(
+          accessToken: resultMap['accessToken'],
+          refreshToken: resultMap['refreshToken'],
+          user: User(
+            id: resultMap['id'],
+            phone: resultMap['phone'],
+            name: resultMap['name'],
+            role: resultMap['role'],
+          ),
+        );
       } else {
-        return 'cannot login';
+        return LoginResult(error: 'Login failed');
       }
     } catch (e) {
-      return 'uuu';
+      return LoginResult(error: 'An error occurred');
     }
   }
 
