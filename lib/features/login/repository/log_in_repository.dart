@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -8,6 +9,9 @@ import 'package:goshare/core/failure.dart';
 import 'package:goshare/core/type_def.dart';
 import 'package:goshare/core/utils/http_utils.dart';
 import 'package:goshare/core/utils/utils.dart';
+import 'package:goshare/features/login/screen/log_in_screen.dart';
+import 'package:goshare/models/user_data_model.dart';
+import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -83,29 +87,58 @@ class LoginRepository {
     }
   }
 
-  FutureEither<String> getUserData() async {
+  FutureEither<String> getUserData(WidgetRef ref) async {
     try {
+      print('get user data');
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final accessToken = prefs.getString('accessToken');
-      final response = await http.post(
-        Uri.parse('${Constants.apiBaseUrl}/auth/refresh-token'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'AccessToken': accessToken,
-          'RefreshToken': 'igXW9entARDS9NH5Gm98TPi/kozmL018ItItFIKOAfw=',
-        }),
-      );
+      final refreshToken = prefs.getString('refreshToken');
+      final response = await http
+          .post(
+            Uri.parse('${Constants.apiBaseUrl}/auth/refresh-token'),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              'AccessToken': accessToken,
+              'RefreshToken': refreshToken,
+            }),
+          )
+          .timeout(
+            const Duration(
+              seconds: 120,
+            ),
+          );
+
       print(response.statusCode);
       print(response.body);
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
+        final userData = UserDataModel.fromMap(jsonData);
+        if (jsonData.containsKey('id') &&
+            jsonData.containsKey('phone') &&
+            jsonData.containsKey('name') &&
+            jsonData.containsKey('role')) {
+          User userTmp = User(
+            id: jsonData['id'],
+            phone: jsonData['phone'],
+            name: jsonData['name'],
+            role: jsonData['role'],
+          );
+          ref.read(userProvider.notifier).state = userTmp;
+
+          ref
+              .watch(currentOnTripIdProvider.notifier)
+              .setCurrentOnTripId(userData.currentTrip);
+        }
         return right(jsonData['accessToken']);
       } else {
         return left(UnauthorizedFailure('Fail to renew token'));
       }
+    } on TimeoutException {
+      return left(Failure(''));
     } catch (e) {
+      print(e.toString());
       return left(UnauthorizedFailure('Fail to renew token'));
     }
   }

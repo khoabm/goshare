@@ -5,11 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:goshare/core/failure.dart';
 import 'package:goshare/core/type_def.dart';
+import 'package:goshare/core/utils/http_utils.dart';
+import 'package:goshare/models/location_model.dart';
 import 'package:goshare/models/vietmap_autocomplete_model.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:goshare/core/constants/constants.dart';
 import 'package:goshare/models/search_places_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final homeRepositoryProvider = Provider((ref) {
   return HomeRepository(
@@ -54,6 +57,7 @@ class HomeRepository {
         '/api/autocomplete/v3',
         queryParameters,
       );
+
       var res = await http.get(uri);
 
       if (res.statusCode == 200) {
@@ -74,6 +78,38 @@ class HomeRepository {
         return left(
           Failure('Co loi xay ra'),
         );
+      }
+    } on TimeoutException catch (_) {
+      return left(
+        Failure('Timeout'),
+      );
+    }
+  }
+
+  FutureEither<List<LocationModel>> getUserListLocation() async {
+    List<LocationModel> list = [];
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+
+      final client = HttpClientWithAuth(accessToken ?? '');
+      final res = await client.get(
+        Uri.parse('$baseApiUrl/location'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      if (res.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(res.body);
+        print(jsonData);
+        list = jsonData.map((json) => LocationModel.fromMap(json)).toList();
+        return right(list);
+      } else if (res.statusCode == 429) {
+        return left(Failure('Too many request'));
+      } else if (res.statusCode == 401) {
+        return left(UnauthorizedFailure('Unauthorized'));
+      } else {
+        return left(Failure('Co loi xay ra'));
       }
     } on TimeoutException catch (_) {
       return left(

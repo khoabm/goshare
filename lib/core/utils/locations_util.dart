@@ -65,9 +65,9 @@ class LocationUtils {
         '/api/place/v3',
         queryParameters,
       );
-      print(uri);
+
       var res = await http.get(uri);
-      print(res.body);
+
       if (res.statusCode == 200) {
         var data = VietmapPlaceModel.fromJson(res.body);
         return right(data);

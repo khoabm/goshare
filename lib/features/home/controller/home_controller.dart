@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:goshare/core/failure.dart';
 import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/home/repositories/home_repository.dart';
+import 'package:goshare/models/location_model.dart';
 import 'package:goshare/models/search_places_model.dart';
 import 'package:goshare/models/vietmap_autocomplete_model.dart';
 
@@ -52,6 +54,28 @@ class HomeController extends StateNotifier<bool> {
         list = r;
       },
     );
+    return list;
+  }
+
+  Future<List<LocationModel>> getUserListLocation(BuildContext context) async {
+    List<LocationModel> list = [];
+
+    final result = await _homeRepository.getUserListLocation();
+    result.fold((l) {
+      if (l is UnauthorizedFailure) {
+        showLoginTimeOut(
+          context: context,
+        );
+      } else {
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      }
+    }, (r) {
+      print(r.length.toString());
+      list = r;
+    });
     return list;
   }
 

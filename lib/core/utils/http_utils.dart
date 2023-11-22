@@ -67,6 +67,7 @@ class HttpClientWithAuth extends http.BaseClient {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final accessToken = prefs.getString('accessToken');
+      final refreshToken = prefs.getString('refreshToken');
       final response = await _inner.post(
         Uri.parse('${Constants.apiBaseUrl}/auth/refresh-token'),
         headers: {
@@ -74,7 +75,7 @@ class HttpClientWithAuth extends http.BaseClient {
         },
         body: jsonEncode({
           'AccessToken': accessToken,
-          'RefreshToken': 'GNREV+2PPbJ6M7LnqIsS1EKrieMyNdlHXTJFpUAUPv0=',
+          'RefreshToken': refreshToken,
         }),
       );
       print(response.statusCode);

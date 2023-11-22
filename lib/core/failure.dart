@@ -7,3 +7,7 @@ class Failure {
 class UnauthorizedFailure extends Failure {
   UnauthorizedFailure(super.message);
 }
+
+class AlreadyInTripFailure extends Failure {
+  AlreadyInTripFailure(super.message);
+}

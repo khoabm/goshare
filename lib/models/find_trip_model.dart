@@ -9,6 +9,7 @@ class FindTripModel {
   final String? endAddress;
   final String cartypeId;
   final int paymentMethod;
+  final String? note;
   FindTripModel({
     required this.startLatitude,
     required this.startLongitude,
@@ -16,6 +17,7 @@ class FindTripModel {
     required this.endLatitude,
     required this.endLongitude,
     this.endAddress,
+    this.note,
     required this.cartypeId,
     required this.paymentMethod,
   });
@@ -28,6 +30,7 @@ class FindTripModel {
     double? endLongitude,
     String? endAddress,
     String? cartypeId,
+    String? note,
     int? paymentMethod,
   }) {
     return FindTripModel(
@@ -38,6 +41,7 @@ class FindTripModel {
       endLongitude: endLongitude ?? this.endLongitude,
       endAddress: endAddress ?? this.endAddress,
       cartypeId: cartypeId ?? this.cartypeId,
+      note: note ?? this.note,
       paymentMethod: paymentMethod ?? this.paymentMethod,
     );
   }
@@ -52,6 +56,7 @@ class FindTripModel {
       'endAddress': endAddress,
       'cartypeId': cartypeId,
       'paymentMethod': paymentMethod,
+      'note': note,
     };
   }
 
@@ -64,6 +69,7 @@ class FindTripModel {
       endLongitude: map['endLongitude']?.toDouble() ?? 0.0,
       endAddress: map['endAddress'] ?? '',
       cartypeId: map['cartypeId'] ?? '',
+      note: map['note'] ?? '',
       paymentMethod: map['paymentMethod']?.toDouble() ?? 0.0,
     );
   }

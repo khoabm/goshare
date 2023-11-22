@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:goshare/common/loader.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/features/login/controller/log_in_controller.dart';
 import 'package:goshare/firebase_options.dart';
@@ -27,11 +28,11 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return FutureBuilder<String>(
       future: ref
-          .read(LoginControllerProvider.notifier)
-          .getUserData(context), // Replace with your actual token
+          .watch(LoginControllerProvider.notifier)
+          .getUserData(context, ref), // Replace with your actual token
       builder: (BuildContext context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator(); // Show a loading spinner while waiting
+          return const Loader(); // Show a loading spinner while waiting
         } else {
           final initialLocation =
               snapshot.data != null && snapshot.data!.isNotEmpty

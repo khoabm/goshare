@@ -4,6 +4,7 @@ import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/page_navigation.dart';
 import 'package:goshare/details_screen.dart';
 import 'package:goshare/features/connect_to_driver/screen/connect_to_driver_screen.dart';
+import 'package:goshare/features/create_destination/screens/create_destination_screen.dart';
 import 'package:goshare/features/dashboard/screen/dashboard.dart';
 import 'package:goshare/features/dependent_list/screens/dependent_list_screen.dart';
 import 'package:goshare/features/feedback/feedback.dart';
@@ -16,7 +17,11 @@ import 'package:goshare/features/home/screen/home_screen.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
 
 import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
+import 'package:goshare/features/trip/screens/chat_screen.dart';
+import 'package:goshare/features/trip/screens/driver_pick_up_screen.dart';
 import 'package:goshare/features/trip/screens/find_trip_screen.dart';
+import 'package:goshare/features/trip/screens/on_trip_screen.dart';
+import 'package:goshare/features/trip/screens/route_confirm_screen.dart';
 import 'package:goshare/features/trip/screens/search_trip_route_screen.dart';
 
 import 'package:goshare/features/signup/screen/otp_screen.dart';
@@ -29,7 +34,7 @@ class AppRouter {
 
   GoRouter createRouter(String initialLocation) {
     return GoRouter(
-      initialLocation: RouteConstants.feedback, //'/find-trip',
+      initialLocation: initialLocation, //'/find-trip',
       routes: <RouteBase>[
         GoRoute(
           name: RouteConstants.dashBoard,
@@ -171,13 +176,13 @@ class AppRouter {
             return SlideBottomTransition(
               child: CarChoosingScreen(
                 //startLatitude: startLatitude ?? '10.8756434',
-                startLatitude: '10.8756434',
+                startLatitude: startLatitude ?? '0',
                 //startLongitude: startLongitude ?? '106.8006742',
-                startLongitude: '106.8006742',
+                startLongitude: startLongitude ?? '0',
                 //endLatitude: endLatitude ?? '10.682559',
-                endLatitude: '10.682559',
+                endLatitude: endLatitude ?? '0',
                 //endLongitude: endLongitude ?? '106.748967',
-                endLongitude: '106.748967',
+                endLongitude: endLongitude ?? '0',
               ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
@@ -199,31 +204,43 @@ class AppRouter {
           path: RouteConstants.findTripUrl,
           pageBuilder: (context, state) {
             // Extract the parameters from the route
-            final Map<String, dynamic> params = state.pathParameters;
+            final extras = state.extra as Map<String, dynamic>;
             // final String? longitude = params['longitude'] as String?;
             // final String? latitude = params['latitude'] as String?;
-            final String? startLatitude = params['startLatitude'] as String?;
-            final String? startLongitude = params['startLongitude'] as String?;
-            final String? endLatitude = params['endLatitude'] as String?;
-            final String? endLongitude = params['endLongitude'] as String?;
+            final String? startLatitude = extras['startLatitude'] as String?;
+            final String? startLongitude = extras['startLongitude'] as String?;
+            final String? endLatitude = extras['endLatitude'] as String?;
+            final String? endLongitude = extras['endLongitude'] as String?;
+            final String? paymentMethod = extras['paymentMethod'] as String?;
+            final String? bookerId = extras['bookerId'] as String?;
+            final String? carTypeId = extras['carTypeId'] as String?;
+            final String? driverNote = extras['driverNote'] as String?;
+            //final String? driverNote = params['driverNote'] as String?;
             return SlideBottomTransition(
               child: FindTripScreen2(
+                driverNote: driverNote,
                 startLatitude: startLatitude ?? '',
                 startLongitude: startLongitude ?? '',
                 endLatitude: endLatitude ?? '',
                 endLongitude: endLongitude ?? '',
+                bookerId: bookerId ?? '',
+                paymentMethod: paymentMethod ?? '0',
+                carTypeId: carTypeId ?? '',
               ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
           },
         ),
         GoRoute(
-          name: 'dependent-list',
-          path: '/dependent-list',
+          name: RouteConstants.dependentList,
+          path: RouteConstants.dependentListUrl,
           pageBuilder: (context, state) {
+            final extras = state.extra as Map<String, dynamic>;
+            final bool isGetLocation = extras['isGetLocation'] as bool;
             return SlideRightTransition(
-              child:
-                  const DependentList(), // Pass the phone parameter to OtpScreen
+              child: DependentList(
+                isGetLocation: isGetLocation,
+              ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
           },
@@ -234,6 +251,131 @@ class AppRouter {
             child: const FeedbackScreen(),
             key: state.pageKey,
           ),
+        ),
+        GoRoute(
+          name: RouteConstants.driverPickUp,
+          path: RouteConstants.driverPickUpUrl,
+          pageBuilder: (context, state) {
+            //final Map<String, dynamic> params = state.pathParameters;
+            final extras = state.extra as Map<String, dynamic>;
+            final String driverName = extras['driverName'] as String;
+            final String driverPhone = extras['driverPhone'] as String;
+            final String driverAvatar = extras['driverAvatar'] as String;
+            final String driverPlate = extras['driverPlate'] as String;
+            final String driverCarType = extras['driverCarType'] as String;
+            final String driverId = extras['driverId'] as String;
+            final String endLatitude = extras['endLatitude'] as String;
+            final String endLongitude = extras['endLongitude'] as String;
+            return SlideRightTransition(
+              child: DriverPickUpScreen(
+                driverId: driverId,
+                driverName: driverName,
+                driverPhone: driverPhone,
+                driverAvatar: driverAvatar,
+                driverPlate: driverPlate,
+                driverCarType: driverCarType,
+                endLatitude: endLatitude,
+                endLongitude: endLongitude,
+              ),
+              key: state.pageKey,
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteConstants.onTrip,
+          path: RouteConstants.onTripUrl,
+          pageBuilder: (context, state) {
+            //final Map<String, dynamic> params = state.pathParameters;
+            final extras = state.extra as Map<String, dynamic>;
+            final String driverName = extras['driverName'] as String;
+            final String driverPhone = extras['driverPhone'] as String;
+            final String driverAvatar = extras['driverAvatar'] as String;
+            final String driverPlate = extras['driverPlate'] as String;
+            final String driverCarType = extras['driverCarType'] as String;
+            final String driverId = extras['driverId'] as String;
+            final String endLatitude = extras['endLatitude'] as String;
+            final String endLongitude = extras['endLongitude'] as String;
+            return SlideRightTransition(
+              child: OnTripScreen(
+                driverId: driverId,
+                driverName: driverName,
+                driverPhone: driverPhone,
+                driverAvatar: driverAvatar,
+                driverPlate: driverPlate,
+                driverCarType: driverCarType,
+                endLatitude: endLatitude,
+                endLongitude: endLongitude,
+              ), // Pass the phone parameter to OtpScreen
+              key: state.pageKey,
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteConstants.chat,
+          path: RouteConstants.chatUrl,
+          pageBuilder: (context, state) {
+            final Map<String, dynamic> params = state.pathParameters;
+            final String receiver = params['receiver'] as String;
+            final String driverAvatar = params['driverAvatar'] as String;
+            return SlideRightTransition(
+              child: ChatScreen(
+                receiver: receiver,
+                driverAvatar: driverAvatar,
+              ), // Pass the phone parameter to OtpScreen
+              key: state.pageKey,
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteConstants.routeConfirm,
+          path: RouteConstants.routeConfirmUrl,
+          pageBuilder: (context, state) {
+            //final Map<String, dynamic> params = state.pathParameters;
+            final extras = state.extra as Map<String, dynamic>;
+            // final String? longitude = params['longitude'] as String?;
+            // final String? latitude = params['latitude'] as String?;
+            final String? startLatitude = extras['startLatitude'] as String?;
+            final String? startLongitude = extras['startLongitude'] as String?;
+            final String? endLatitude = extras['endLatitude'] as String?;
+            final String? endLongitude = extras['endLongitude'] as String?;
+            final String? paymentMethod = extras['paymentMethod'] as String?;
+            final String? bookerId = extras['bookerId'] as String?;
+            final String? carTypeId = extras['carTypeId'] as String?;
+            final String? driverNote = extras['driverNote'] as String?;
+            return SlideRightTransition(
+              child: RouteConfirmScreen(
+                driverNote: driverNote,
+                startLatitude: startLatitude ?? '',
+                startLongitude: startLongitude ?? '',
+                endLatitude: endLatitude ?? '',
+                endLongitude: endLongitude ?? '',
+                bookerId: bookerId ?? '',
+                paymentMethod: paymentMethod ?? '0',
+                carTypeId: carTypeId ?? '',
+              ), // Pass the phone parameter to OtpScreen
+              key: state.pageKey,
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteConstants.createDestination,
+          path: RouteConstants.createDestinationUrl,
+          pageBuilder: (context, state) {
+            final Map<String, dynamic> params = state.pathParameters;
+            final extras = state.extra as Map<String, dynamic>;
+            final String destinationAddress =
+                params['destinationAddress'] as String;
+            final double latitude = extras['latitude'] as double;
+            final double longitude = extras['longitude'] as double;
+            return SlideRightTransition(
+              child: CreateDestinationScreen(
+                destinationAddress: destinationAddress,
+                latitude: latitude,
+                longitude: longitude,
+              ), // Pass the phone parameter to OtpScreen
+              key: state.pageKey,
+            );
+          },
         ),
       ],
     );

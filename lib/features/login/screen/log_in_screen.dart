@@ -115,8 +115,10 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
         print(resultMap);
         if (resultMap.containsKey('accessToken')) {
           String accessToken = resultMap['accessToken'];
+          String refreshToken = resultMap['refreshToken'];
           final SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('accessToken', accessToken);
+          prefs.setString('refreshToken', refreshToken);
           ref.read(accessTokenProvider.notifier).state = accessToken;
         }
         if (resultMap.containsKey('id') &&
@@ -130,16 +132,16 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
             role: resultMap['role'],
           );
           ref.read(userProvider.notifier).state = userTmp;
+          setState(() {});
+          //print(ref.read(userProvider.notifier).state?.id);
         }
-        navigateToOtpScreen(phone);
+        navigateToDashBoardScreen();
       } else {}
     }
   }
 
-  void navigateToOtpScreen(String phone) {
-    context.goNamed(RouteConstants.otp, pathParameters: {
-      'phone': phone,
-    });
+  void navigateToDashBoardScreen() {
+    context.goNamed(RouteConstants.dashBoard);
   }
 
   @override

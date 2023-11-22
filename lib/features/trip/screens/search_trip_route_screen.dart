@@ -1,46 +1,15 @@
-import 'dart:developer';
-
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/utils/locations_util.dart';
 import 'package:goshare/floating_search_bar.dart';
 import 'package:goshare/models/vietmap_place_model.dart';
 import 'package:goshare/theme/pallet.dart';
+
 import 'package:location/location.dart';
-// import 'package:goshare/providers/current_location_provider.dart';
-import 'package:vietmap_flutter_navigation/embedded/controller.dart';
-import 'package:vietmap_flutter_navigation/helpers.dart';
-import 'package:vietmap_flutter_navigation/models/marker.dart';
-import 'package:vietmap_flutter_navigation/models/options.dart';
-import 'package:vietmap_flutter_navigation/models/route_progress_event.dart';
-import 'package:vietmap_flutter_navigation/models/way_point.dart';
+import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
+
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:vietmap_flutter_navigation/navigation_plugin.dart';
-// import 'package:vietmap_flutter_navigation/views/banner_instruction.dart';
-// import 'package:vietmap_flutter_navigation/views/bottom_action.dart';
-import 'package:vietmap_flutter_navigation/views/navigation_view.dart';
-
-// import 'components/bottom_sheet_address_info.dart';
-// import 'components/floating_search_bar.dart';
-// import 'data/models/vietmap_place_model.dart';
-// import 'data/models/vietmap_reverse_model.dart';
-// import 'domain/repository/vietmap_api_repositories.dart';
-// import 'domain/usecase/get_location_from_latlng_usecase.dart';
-// import 'domain/usecase/get_place_detail_usecase.dart';
-
-// void main() {
-//   runApp(MaterialApp(
-//     builder: EasyLoading.init(),
-//     title: 'VietMap Navigation example app',
-//     home: const SearchTripRouteScreen(),
-//     debugShowCheckedModeBanner: false,
-//   ));
-// }
 
 class SearchTripRouteScreen extends ConsumerStatefulWidget {
   const SearchTripRouteScreen({super.key});
@@ -51,59 +20,37 @@ class SearchTripRouteScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
-  MapNavigationViewController? _controller;
-  late MapOptions _navigationOption;
-  final _vietmapNavigationPlugin = VietMapNavigationPlugin();
-
-  List<WayPoint> wayPoints = [
-    WayPoint(name: "origin point", latitude: 10.759091, longitude: 106.675817),
-    WayPoint(
-        name: "destination point", latitude: 10.762528, longitude: 106.653099)
-  ];
-  Widget instructionImage = const SizedBox.shrink();
-  String guideDirection = "";
-  Widget recenterButton = const SizedBox.shrink();
-  RouteProgressEvent? routeProgressEvent;
-  bool _isRouteBuilt = false;
-  bool _isRunning = false;
+  // MapNavigationViewController? _controller;
+  String currentAddress = '';
+  double lat = 0.0;
+  double lon = 0.0;
+  VietmapController? _mapController;
+  List<Marker> temp = [];
+  double _containerHeight = 60.0;
+  Marker _marker = Marker(
+    child: const SizedBox.shrink(),
+    latLng: const LatLng(0, 0),
+  );
+  bool _isPlaceMarker = false;
   bool _isLoading = false;
   FocusNode focusNode = FocusNode();
   LocationData? currentLocation;
+
   @override
   void initState() {
-    super.initState();
+    if (!mounted) return;
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   setState(() {
+    //     _isLoading = true;
+    //   });
 
-    initialize();
-
-    // setState(() {
-    //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-    //     await _controller?.buildRoute(wayPoints: wayPoints);
+    //   setState(() {
+    //     _isLoading = false;
     //   });
     // });
+    super.initState();
   }
 
-  Future<void> initialize() async {
-    if (!mounted) return;
-    setState(() {
-      _isLoading = true;
-    });
-    _navigationOption = _vietmapNavigationPlugin.getDefaultOptions();
-    _navigationOption.simulateRoute = false;
-    _navigationOption.alternatives = false;
-    _navigationOption.apiKey =
-        'c3d0f188ff669f89042771a20656579073cffec5a8a69747';
-    _navigationOption.mapStyle =
-        "https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm";
-    _navigationOption.customLocationCenterIcon =
-        await VietMapHelper.getBytesFromAsset('assets/download.jpeg');
-    _vietmapNavigationPlugin.setDefaultOptions(_navigationOption);
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  MapOptions? options;
   void navigateToCarChoosingScreen(
     BuildContext context,
     double? startLatitude,
@@ -111,7 +58,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
     double? endLatitude,
     double? endLongitude,
   ) {
-    context.goNamed(RouteConstants.carChoosing, pathParameters: {
+    context.replaceNamed(RouteConstants.carChoosing, pathParameters: {
       'startLatitude': startLatitude?.toString() ?? '',
       'startLongitude': startLongitude?.toString() ?? '',
       'endLatitude': endLatitude?.toString() ?? '',
@@ -119,305 +66,302 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
     });
   }
 
+  void navigateToCreateDestination() {
+    context.pushNamed(RouteConstants.createDestination, pathParameters: {
+      'destinationAddress': currentAddress,
+    }, extra: {
+      'latitude': lat,
+      'longitude': lon
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    //final locationData = ref.read(locationStreamProvider);
-
-    return
-        // locationData.when(
-        //   data: (location) =>
-        Scaffold(
+    return Scaffold(
       body: Stack(
         children: [
-          SafeArea(
-            top: false,
-            child: Stack(
-              children: [
-                NavigationView(
-                  mapOptions: _navigationOption,
-                  onMarkerClicked: (p0) {},
-                  onNewRouteSelected: (p0) {
-                    log(p0.toString());
-                  },
-                  onMapCreated: (p0) async {
-                    _controller = p0;
-                  },
-                  onMapMove: () => _showRecenterButton(),
-                  onRouteBuilt: (p0) {
+          Stack(
+            children: [
+              SafeArea(
+                top: false,
+                child: VietmapGL(
+                  //dragEnabled: false,
+                  compassEnabled: false,
+                  myLocationEnabled: true,
+                  styleString:
+                      'https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm',
+                  initialCameraPosition: const CameraPosition(
+                    zoom: 17.5,
+                    target: LatLng(10.736657, 106.672240),
+                    //     LatLng(
+                    //   currentLocation?.latitude ?? 0,
+                    //   currentLocation?.longitude ?? 0,
+                    // ),
+                  ),
+                  onMapCreated: (VietmapController controller) {
                     setState(() {
-                      //EasyLoading.dismiss();
-                      _isRouteBuilt = true;
+                      _mapController = controller;
                     });
                   },
-                  onMapRendered: () async {
-                    _controller?.setCenterIcon(
-                      await VietMapHelper.getBytesFromAsset(
-                          'assets/download.jpeg'),
-                    );
-                    _controller?.addImageMarkers([
-                      Marker(
-                        imagePath: 'assets/download.jpeg',
-                        latLng: const LatLng(
-                            10.778825464454686, 106.68249858948148),
-                        title: 'DAY LA TITLE',
-                        snippet: 'DAY LA SNIPPET',
-                      )
-                    ]);
-                    // _controller?.buildRoute(wayPoints: wayPoints);
-                    // _controller?.buildAndStartNavigation(
-                    //   wayPoints: wayPoints,
-                    // );
-                  },
-                  onMapLongClick: (WayPoint? point) async {
-                    if (_isRunning) return;
-                    if (point != null) {
-                      wayPoints.removeWhere(
-                          (wayPoint) => wayPoint.name == 'destination point');
-
-                      wayPoints.add(
-                        WayPoint(
-                            name: 'destination point',
-                            latitude: point.latitude,
-                            longitude: point.longitude),
-                      );
-                      _controller?.buildRoute(wayPoints: wayPoints);
-                    }
-
-                    //EasyLoading.show();
-                    // var data =
-                    //     await GetLocationFromLatLngUseCase(VietmapApiRepositories())
-                    //         .call(LocationPoint(
-                    //             lat: point?.latitude ?? 0,
-                    //             long: point?.longitude ?? 0));
-                    // //EasyLoading.dismiss();
-                    // data.fold((l) {
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //       const SnackBar(content: Text('Có lỗi xảy ra')));
-                    // }, (r) => _showBottomSheetInfo(r));
-                  },
-                  onMapClick: (WayPoint? point) async {
-                    // if (_isRunning) return;
-                    // if (focusNode.hasFocus) {
-                    //   FocusScope.of(context).requestFocus(FocusNode());
-                    //   return;
-                    // }
-                    // EasyLoading.show();
-                    // var data =
-                    //     await GetLocationFromLatLngUseCase(VietmapApiRepositories())
-                    //         .call(LocationPoint(
-                    //             lat: point?.latitude ?? 0,
-                    //             long: point?.longitude ?? 0));
-                    // EasyLoading.dismiss();
-                    // data.fold((l) {
-                    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    //       content:
-                    //           Text('Không tìm thấy địa điểm gần vị trí bạn chọn')));
-                    // }, (r) => _showBottomSheetInfo(r));
-                  },
-                  onRouteProgressChange:
-                      (RouteProgressEvent routeProgressEvent) {
+                  onMapLongClick: (point, coordinates) {
                     setState(() {
-                      this.routeProgressEvent = routeProgressEvent;
-                    });
-                    _setInstructionImage(routeProgressEvent.currentModifier,
-                        routeProgressEvent.currentModifierType);
-                  },
-                  onArrival: () {
-                    _isRunning = false;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Container(
-                          height: 100,
-                          color: Colors.red,
-                          child: const Text('Bạn đã tới đích'),
+                      _marker = Marker(
+                        child: _markerWidget(Icons.location_on),
+                        latLng: LatLng(
+                          coordinates.latitude,
+                          coordinates.longitude,
                         ),
+                      );
+                      _mapController?.animateCamera(
+                        CameraUpdate.newCameraPosition(
+                          CameraPosition(
+                              target: _marker.latLng, zoom: 17.5, tilt: 0),
+                        ),
+                      );
+                      _isLoading = false;
+                      _isPlaceMarker = true;
+                    });
+                  },
+                  onMapRenderedCallback: () async {
+                    setState(() {
+                      _isLoading = true;
+                    });
+                    final location = ref.read(locationProvider);
+                    currentLocation = await location.getCurrentLocation();
+                    _mapController?.animateCamera(
+                      CameraUpdate.newCameraPosition(
+                        CameraPosition(
+                            target: LatLng(currentLocation?.latitude ?? 0,
+                                currentLocation?.longitude ?? 0),
+                            zoom: 17.5,
+                            tilt: 0),
                       ),
                     );
+
+                    setState(() {
+                      _isLoading = false;
+                    });
                   },
                 ),
-                // Positioned(
-                //     top: MediaQuery.of(context).viewPadding.top,
-                //     left: 0,
-                //     child: BannerInstructionView(
-                //       routeProgressEvent: routeProgressEvent,
-                //       instructionIcon: instructionImage,
-                //     )),
-                // Positioned(
-                //     bottom: 0,
-                //     child: BottomActionView(
-                //       recenterButton: recenterButton,
-                //       controller: _controller,
-                //       onOverviewCallback: _showRecenterButton,
-                //       onStopNavigationCallback: _onStopNavigation,
-                //       routeProgressEvent: routeProgressEvent,
-                //     )),
-                _isRunning
-                    ? const SizedBox.shrink()
-                    : Positioned(
-                        width: MediaQuery.of(context).size.width * .95,
-                        top: MediaQuery.of(context).viewPadding.top + 20,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+              Positioned(
+                top: MediaQuery.of(context).viewInsets.top + 80,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        context.pop(context);
+                      },
+                      child: RichText(
+                        text: const TextSpan(
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Row(
-                                  children: [
-                                    Icon(
-                                      Icons.arrow_back_ios,
-                                      color:
-                                          Colors.black, // Customize the color
-                                    ),
-                                    SizedBox(
-                                        width: 8), // Adjust spacing as needed
-                                    Text(
-                                      'Quay lại',
-                                      style: TextStyle(
-                                        fontSize: 16, // Customize the font size
-                                        color:
-                                            Colors.black, // Customize the color
-                                      ),
-                                    ),
-                                  ],
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: Padding(
+                                padding: EdgeInsets.only(right: 8.0),
+                                child: Icon(
+                                  Icons.arrow_back_ios_new_outlined,
+                                  color: Colors.black,
                                 ),
                               ),
                             ),
-                            // IconButton(
-                            //   onPressed: () {
-                            //     context.pop();
-                            //   },
-                            //   icon: SizedBox(
-                            //     width: MediaQuery.of(context).size.width * .95,
-                            //     child: const Row(
-                            //       children: [
-                            //         Icon(Icons.arrow_back_ios_new_outlined),
-                            //         SizedBox(
-                            //           width: 10,
-                            //         ),
-                            //         Text(
-                            //           'Quay lại',
-                            //         ),
-                            //       ],
-                            //     ),
-                            //   ),
-                            // ),
-                            FloatingSearchBar(
-                              focusNode: focusNode,
-                              onSearchItemClick: (p0) async {
-                                //EasyLoading.show();
-
-                                VietmapPlaceModel? data;
-                                var res = await LocationUtils.getPlaceDetail(
-                                    p0.refId ?? '');
-
-                                // GetPlaceDetailUseCase(VietmapApiRepositories())
-                                //     .call(p0.refId ?? '');
-                                res.fold((l) {
-                                  print(l.message);
-                                  //EasyLoading.dismiss();
-                                  return;
-                                }, (r) {
-                                  print(r.address);
-                                  data = r;
-                                });
-                                wayPoints.clear();
-                                // var location = await Geolocator.getCurrentPosition(
-                                //   desiredAccuracy: LocationAccuracy.bestForNavigation,
-                                // );
-                                final location = ref.watch(locationProvider);
-                                currentLocation =
-                                    await location.getCurrentLocation();
-                                wayPoints.add(
-                                  WayPoint(
-                                    name: 'origin point',
-                                    latitude: currentLocation?.latitude,
-                                    longitude: currentLocation?.longitude,
-                                  ),
-                                );
-                                if (data?.lat != null) {
-                                  wayPoints.add(WayPoint(
-                                      name: 'destination point',
-                                      latitude: data?.lat,
-                                      longitude: data?.lng));
-                                }
-                                _controller?.buildRoute(wayPoints: wayPoints);
-                              },
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: Text(
+                                'Quay lại',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
                           ],
-                        )),
-                _isRouteBuilt && !_isRunning
-                    ? Positioned(
-                        bottom: 0,
-                        left: 0,
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(50),
-                            ),
+                        ),
+                      ),
+                    ),
+                    FloatingSearchBar(
+                      focusNode: focusNode,
+                      onSearchItemClick: (p0) async {
+                        //EasyLoading.show();
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        VietmapPlaceModel? data;
+                        var res =
+                            await LocationUtils.getPlaceDetail(p0.refId ?? '');
+
+                        // GetPlaceDetailUseCase(VietmapApiRepositories())
+                        //     .call(p0.refId ?? '');
+                        res.fold((l) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          //EasyLoading.dismiss();
+                          return;
+                        }, (r) {
+                          data = r;
+
+                          setState(() {
+                            currentAddress =
+                                '${data?.address}, ${data?.ward}, ${data?.district}, ${data?.city}';
+                            lat = data?.lat ?? 0.0;
+                            lon = data?.lng ?? 0.0;
+                            _marker = Marker(
+                              child: _markerWidget(Icons.location_on),
+                              latLng: LatLng(
+                                data?.lat ?? 0,
+                                data?.lng ?? 0,
+                              ),
+                            );
+                            _mapController?.animateCamera(
+                              CameraUpdate.newCameraPosition(
+                                CameraPosition(
+                                    target: _marker.latLng,
+                                    zoom: 17.5,
+                                    tilt: 0),
+                              ),
+                            );
+                            _isLoading = false;
+                            _isPlaceMarker = true;
+                          });
+                        });
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // _mapController == null
+              //     ? const SizedBox.shrink()
+              //     : MarkerLayer(
+              //         ignorePointer: true,
+              //         mapController: _mapController!,
+              //         markers: temp,
+              //       ),
+              _mapController == null
+                  ? const SizedBox.shrink()
+                  : MarkerLayer(
+                      ignorePointer: true,
+                      mapController: _mapController!,
+                      markers: [
+                        _marker,
+                      ],
+                    ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: GestureDetector(
+                  onVerticalDragUpdate: (details) {
+                    // Adjust height based on the swipe direction
+                    setState(() {
+                      _containerHeight += details.primaryDelta!;
+                      // Clamp the height between 60 and 300
+                      _containerHeight = _containerHeight.clamp(60.0, 230.0);
+                    });
+                  },
+                  onVerticalDragEnd: (details) {
+                    // Determine whether to fully reveal or hide the container based on the gesture velocity
+                    if (details.primaryVelocity! > 0) {
+                      // Swipe down
+                      setState(() {
+                        _containerHeight = 60.0;
+                      });
+                    } else {
+                      // Swipe up
+                      setState(() {
+                        _containerHeight = 230.0;
+                      });
+                    }
+                  },
+                  child: AnimatedContainer(
+                      padding: const EdgeInsets.all(12.0),
+                      duration: const Duration(milliseconds: 400),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(
+                            30,
                           ),
-                          width: MediaQuery.of(context).size.width,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              ElevatedButton(
-                                  style: ButtonStyle(
-                                    shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(18.0),
-                                        side: const BorderSide(
-                                          color: Pallete.primaryColor,
+                        ),
+                      ),
+                      height: _containerHeight,
+                      //color: Pallete.primaryColor,
+                      child: _containerHeight == 230
+                          ? _isPlaceMarker
+                              ? Column(
+                                  children: [
+                                    const Text(
+                                      'Lựa chọn ',
+                                      style: TextStyle(
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const Text(
+                                      'Chọn hành động bạn muốn với địa điểm này',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          .5,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          focusNode.unfocus();
+                                          navigateToCarChoosingScreen(
+                                            context,
+                                            currentLocation?.latitude,
+                                            currentLocation?.longitude,
+                                            _marker.latLng.latitude,
+                                            _marker.latLng.longitude,
+                                          );
+                                        },
+                                        child: const Text('Đặt xe'),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          .5,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          print(currentAddress);
+                                          navigateToCreateDestination();
+                                        },
+                                        child: const Text(
+                                          'Lưu điểm đến',
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  onPressed: () {
-                                    // _isRunning = true;
-                                    // _controller?.startNavigation();
-
-                                    navigateToCarChoosingScreen(
-                                      context,
-                                      wayPoints[0].latitude,
-                                      wayPoints[0].longitude,
-                                      wayPoints[1].latitude,
-                                      wayPoints[1].longitude,
-                                    );
-                                  },
-                                  child: const Text('Đặt xe')),
-                              ElevatedButton(
-                                  style: ButtonStyle(
-                                    shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(18.0),
-                                        side: const BorderSide(
-                                            color: Pallete.primaryColor),
-                                      ),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    _controller?.clearRoute();
-                                    setState(() {
-                                      _isRouteBuilt = false;
-                                    });
-                                  },
-                                  child: const Text('Xoá tuyến đường')),
-                            ],
-                          ),
-                        ),
-                      )
-                    : const SizedBox.shrink()
-              ],
-            ),
+                                  ],
+                                )
+                              : const Center(
+                                  child: Text('Vui lòng chọn điểm đến'),
+                                )
+                          : Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal:
+                                    MediaQuery.of(context).size.width * .4,
+                              ),
+                              child: const Divider(
+                                //height: 1,
+                                color: Colors.grey,
+                                thickness: 5,
+                              ),
+                            )),
+                ),
+              ),
+            ],
           ),
           if (_isLoading)
             Container(
@@ -429,116 +373,23 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
         ],
       ),
     );
-    //   error: (e, st) {
-    //     return Center(
-    //       child: Text(e.toString()),
-    //     );
-    //   },
-    //   loading: () => const Loader(),
-    // );
   }
-
-  _showRecenterButton() {
-    recenterButton = TextButton(
-        onPressed: () {
-          _controller?.recenter();
-          setState(() {
-            recenterButton = const SizedBox.shrink();
-          });
-        },
-        child: Container(
-            height: 50,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-                color: Colors.white,
-                border: Border.all(color: Colors.black45, width: 1)),
-            child: const Row(
-              children: [
-                Icon(
-                  Icons.keyboard_double_arrow_up_sharp,
-                  color: Colors.lightBlue,
-                  size: 35,
-                ),
-                Text(
-                  'Về giữa',
-                  style: TextStyle(fontSize: 18, color: Colors.lightBlue),
-                )
-              ],
-            )));
-    setState(() {});
-  }
-
-  _setInstructionImage(String? modifier, String? type) {
-    if (modifier != null && type != null) {
-      List<String> data = [
-        type.replaceAll(' ', '_'),
-        modifier.replaceAll(' ', '_')
-      ];
-      String path = 'assets/navigation_symbol/${data.join('_')}.svg';
-      setState(() {
-        instructionImage = SvgPicture.asset(path, color: Colors.white);
-      });
-    }
-  }
-
-  _onStopNavigation() {
-    setState(() {
-      routeProgressEvent = null;
-      _isRunning = false;
-    });
-  }
-
-  // _showBottomSheetInfo(VietmapReverseModel data) {
-  //   showModalBottomSheet(
-  //       isScrollControlled: true,
-  //       context: context,
-  //       builder: (_) => AddressInfo(
-  //             data: data,
-  //             buildRoute: () async {
-  //               EasyLoading.show();
-  //               wayPoints.clear();
-  //               var location = await Geolocator.getCurrentPosition();
-
-  //               wayPoints.add(WayPoint(
-  //                   name: 'destination',
-  //                   latitude: location.latitude,
-  //                   longitude: location.longitude));
-  //               if (data.lat != null) {
-  //                 wayPoints.add(WayPoint(
-  //                     name: '', latitude: data.lat, longitude: data.lng));
-  //               }
-  //               _controller?.buildRoute(wayPoints: wayPoints);
-  //               if (!mounted) return;
-  //               Navigator.pop(context);
-  //             },
-  //             buildAndStartRoute: () async {
-  //               EasyLoading.show();
-  //               wayPoints.clear();
-  //               var location = await Geolocator.getCurrentPosition();
-  //               wayPoints.add(WayPoint(
-  //                   name: 'destination',
-  //                   latitude: location.latitude,
-  //                   longitude: location.longitude));
-  //               if (data.lat != null) {
-  //                 wayPoints.add(WayPoint(
-  //                     name: '', latitude: data.lat, longitude: data.lng));
-  //               }
-  //               _controller?.buildAndStartNavigation(
-  //                   wayPoints: wayPoints,
-  //                   profile: DrivingProfile.drivingTraffic);
-  //               setState(() {
-  //                 _isRunning = true;
-  //               });
-  //               if (!mounted) return;
-  //               Navigator.pop(context);
-  //             },
-  //           ));
-  // }
 
   @override
   void dispose() {
-    _controller?.onDispose();
+    try {
+      _mapController?.dispose();
+    } catch (_) {}
     super.dispose();
+  }
+
+  _markerWidget(IconData icon) {
+    return Container(
+      width: 40,
+      height: 40,
+      // decoration:
+      //     const BoxDecoration(shape: BoxShape.circle, color: Colors.green),
+      child: Icon(icon, color: Pallete.primaryColor, size: 40),
+    );
   }
 }

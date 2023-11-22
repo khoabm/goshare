@@ -8,6 +8,7 @@ import 'package:goshare/features/trip/repository/trip_repository.dart';
 
 import 'package:goshare/models/car_model.dart';
 import 'package:goshare/models/find_trip_model.dart';
+import 'package:goshare/models/trip_model.dart';
 
 final tripControllerProvider = StateNotifierProvider<TripController, bool>(
   (ref) => TripController(
@@ -22,9 +23,9 @@ class TripController extends StateNotifier<bool> {
   })  : _tripRepository = tripRepository,
         super(false);
 
-  Future<String> findDriver(
+  Future<TripModel?> findDriver(
       BuildContext context, FindTripModel tripModel) async {
-    String id = '';
+    TripModel? trip;
     final endAddress = await placemarkFromCoordinates(
       tripModel.endLatitude,
       tripModel.endLongitude,
@@ -40,14 +41,61 @@ class TripController extends StateNotifier<bool> {
     final result = await _tripRepository.findDriver(tripModel);
     result.fold((l) {
       state = false;
-      showSnackBar(
-        context: context,
-        message: l.message,
-      );
+      if (l is UnauthorizedFailure) {
+        showLoginTimeOut(
+          context: context,
+        );
+      } else {
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      }
     }, (r) {
-      id = r;
+      trip = r;
     });
-    return id;
+    return trip;
+  }
+
+  Future<TripModel?> findDriverForDependent(
+    BuildContext context,
+    FindTripModel tripModel,
+    String dependentId,
+  ) async {
+    TripModel? trip;
+    final endAddress = await placemarkFromCoordinates(
+      tripModel.endLatitude,
+      tripModel.endLongitude,
+    );
+    final startAddress = await placemarkFromCoordinates(
+      tripModel.startLatitude,
+      tripModel.startLongitude,
+    );
+    tripModel.copyWith(
+      endAddress: endAddress.first.name,
+      startAddress: startAddress.first.name,
+    );
+    final result = await _tripRepository.findDriverForDependent(
+      tripModel,
+      dependentId,
+    );
+    result.fold((l) {
+      state = false;
+      if (l is UnauthorizedFailure) {
+        showLoginTimeOut(
+          context: context,
+        );
+      } else if (l is AlreadyInTripFailure) {
+      } else {
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      }
+    }, (r) {
+      trip = r;
+    });
+    return trip;
   }
 
   Future<List<CarModel>> getCarDetails(
@@ -86,13 +134,43 @@ class TripController extends StateNotifier<bool> {
     bool isCanceled = false;
     final result = await _tripRepository.cancelTrip(tripId);
     result.fold((l) {
-      showSnackBar(
-        context: context,
-        message: l.message,
-      );
+      if (l is UnauthorizedFailure) {
+        showLoginTimeOut(
+          context: context,
+        );
+      } else {
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      }
     }, (r) {
       isCanceled = r;
     });
     return isCanceled;
+  }
+
+  Future<bool> sendChat(
+      BuildContext context, String content, String receiver) async {
+    bool isSent = false;
+    final result = await _tripRepository.sendChat(
+      content,
+      receiver,
+    );
+    result.fold((l) {
+      if (l is UnauthorizedFailure) {
+        showLoginTimeOut(
+          context: context,
+        );
+      } else {
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      }
+    }, (r) {
+      isSent = r;
+    });
+    return isSent;
   }
 }

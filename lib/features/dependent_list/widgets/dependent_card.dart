@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:goshare/features/dependent_list/controllers/dependent_controller.dart';
+import 'package:goshare/features/login/screen/log_in_screen.dart';
+import 'package:goshare/models/dependent_location_model.dart';
+
 import 'package:goshare/models/dependent_model.dart';
 import 'package:goshare/theme/pallet.dart';
 
-class DependentCard extends StatelessWidget {
+class DependentCard extends ConsumerWidget {
   final DependentModel? dependentModel;
+  final bool isGetLocation;
   const DependentCard({
     super.key,
     this.dependentModel,
+    this.isGetLocation = false,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       color: const Color(0xFFD9D9D9),
       child: Row(
@@ -29,8 +36,23 @@ class DependentCard extends StatelessWidget {
             ),
           ),
           InkWell(
-            onTap: () {
-              context.pop(dependentModel);
+            onTap: () async {
+              DependentLocationModel? dependentLocationData;
+              if (isGetLocation) {
+                if (dependentModel?.id !=
+                    ref.watch(userProvider.notifier).state?.id) {
+                  dependentLocationData = await ref
+                      .watch(dependentControllerProvider.notifier)
+                      .getDependentsLocation(context, dependentModel?.id ?? '');
+                }
+              }
+
+              if (context.mounted) {
+                context.pop({
+                  'dependentModel': dependentModel,
+                  'dependentLocationData': dependentLocationData
+                });
+              }
             },
             splashColor: Colors.white,
             child: Container(

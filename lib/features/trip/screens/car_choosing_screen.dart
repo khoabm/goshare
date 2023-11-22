@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
+import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/car_model.dart';
+import 'package:goshare/models/dependent_location_model.dart';
+import 'package:goshare/models/dependent_model.dart';
 import 'package:goshare/theme/pallet.dart';
 import 'package:intl/intl.dart';
 
 final selectedCarIndexProvider = StateProvider<int>((ref) => 0);
-final selectedPaymentMethodProvider = StateProvider<String>((ref) => "Ví");
+final selectedPaymentMethodProvider = StateProvider<int>((ref) => 0);
 
 class CarChoosingScreen extends ConsumerStatefulWidget {
   final String startLongitude;
@@ -30,7 +33,9 @@ class CarChoosingScreen extends ConsumerStatefulWidget {
 
 class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
   List<CarModel> cars = [];
-
+  DependentModel? passenger;
+  DependentLocationModel? passengerLocation;
+  String driverNote = '';
   @override
   void initState() {
     initialize();
@@ -53,25 +58,33 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
     });
   }
 
-  void navigateToFindTripScreen(
+  void navigateToRouteConfirmScreen(
     BuildContext context,
     String startLatitude,
     String startLongitude,
     String endLatitude,
     String endLongitude,
+    int paymentMethod,
+    String bookerId,
+    String carTypeId,
+    String? driverNote,
   ) {
-    context.pushNamed(RouteConstants.findTrip, pathParameters: {
+    context.replaceNamed(RouteConstants.routeConfirm, extra: {
       'startLatitude': startLatitude,
       'startLongitude': startLongitude,
       'endLatitude': endLatitude,
       'endLongitude': endLongitude,
+      'paymentMethod': paymentMethod.toString(),
+      'bookerId': bookerId,
+      'carTypeId': carTypeId,
+      'driverNote': driverNote,
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final oCcy = NumberFormat("#,##0", "vi_VN");
-
+    //String passenger = 'Tôi';
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -79,7 +92,9 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  context.pop();
+                },
                 child: RichText(
                   text: const TextSpan(
                     children: [
@@ -142,7 +157,7 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 0.8,
+                          childAspectRatio: 0.75,
                           mainAxisSpacing: 30,
                         ),
                         itemBuilder: (BuildContext context, int index) {
@@ -179,7 +194,8 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                     borderRadius: BorderRadius.circular(15.0),
                                   ),
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: <Widget>[
@@ -211,8 +227,9 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                           fontWeight: FontWeight.bold,
                                           color: ref
                                                       .watch(
-                                                          selectedCarIndexProvider
-                                                              .notifier)
+                                                        selectedCarIndexProvider
+                                                            .notifier,
+                                                      )
                                                       .state ==
                                                   index
                                               ? Colors.white
@@ -228,78 +245,221 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                         },
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Phương thức thanh toán',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: Pallete.primaryColor,
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Phương thức thanh toán',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Pallete.primaryColor,
+                            ),
                           ),
-                        ),
-                        PopupMenuButton<String>(
-                          onSelected: (String result) {
-                            ref
-                                .watch(selectedPaymentMethodProvider.notifier)
-                                .state = result;
-                            setState(() {});
-                          },
-                          itemBuilder: (BuildContext context) =>
-                              <PopupMenuEntry<String>>[
-                            const PopupMenuItem<String>(
-                              value: 'Ví',
-                              child: Text('Ví'),
-                            ),
-                            const PopupMenuItem<String>(
-                              value: 'Tiền Mặt',
-                              child: Text('Tiền Mặt'),
-                            ),
-                          ],
-                          child: Consumer(
-                            builder: (context, ref, child) => RichText(
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: ref
-                                        .watch(selectedPaymentMethodProvider
-                                            .notifier)
-                                        .state,
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Pallete.primaryColor,
-                                    ),
-                                  ),
-                                  const WidgetSpan(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(left: 8.0),
-                                      child: Icon(
-                                        Icons.arrow_drop_down,
+                          PopupMenuButton<int>(
+                            onSelected: (int result) {
+                              ref
+                                  .watch(selectedPaymentMethodProvider.notifier)
+                                  .state = result;
+                              setState(() {});
+                            },
+                            itemBuilder: (BuildContext context) =>
+                                <PopupMenuEntry<int>>[
+                              const PopupMenuItem<int>(
+                                value: 0,
+                                child: Text('Ví'),
+                              ),
+                              const PopupMenuItem<int>(
+                                value: 2,
+                                child: Text('Tiền Mặt'),
+                              ),
+                            ],
+                            child: Consumer(
+                              builder: (context, ref, child) => RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: ref
+                                                  .watch(
+                                                      selectedPaymentMethodProvider
+                                                          .notifier)
+                                                  .state ==
+                                              0
+                                          ? 'Ví'
+                                          : 'Tiền mặt',
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Pallete.primaryColor,
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    const WidgetSpan(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(left: 8.0),
+                                        child: Icon(
+                                          Icons.arrow_drop_down,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    Row(
-                      children: [
-                        GestureDetector(
-                            child: const Text(
-                              'Tôi',
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Lời nhắn',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Pallete.primaryColor,
                             ),
-                            onTap: () async {
-                              final result = await context
-                                  .pushNamed(RouteConstants.dependentList);
-                              print(result);
-                            }),
-                      ],
+                          ),
+                          GestureDetector(
+                            child: Container(
+                              width: 181,
+                              height: 42,
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                color: const Color.fromARGB(255, 178, 175, 175),
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  driverNote,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  final controller =
+                                      TextEditingController(text: driverNote);
+                                  return AlertDialog(
+                                    title: const Text('Lời nhắn cho tài xế'),
+                                    content: TextField(
+                                      keyboardType: TextInputType.multiline,
+                                      controller: controller,
+                                      maxLines:
+                                          null, // Allows for multiple lines
+                                      onChanged: (value) {
+                                        setState(() {
+                                          driverNote = value;
+                                        });
+                                      },
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: const Text('OK'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Người đặt xe',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Pallete.primaryColor,
+                            ),
+                          ),
+                          ref.watch(userProvider.notifier).state?.role ==
+                                  'dependent'
+                              ? const SizedBox.shrink()
+                              : GestureDetector(
+                                  child: Container(
+                                    width: 181,
+                                    height: 42,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(),
+                                      color: const Color.fromARGB(
+                                          255, 237, 224, 224),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.person_2_outlined,
+                                              ),
+                                              Text(
+                                                passenger?.name ?? 'Tôi',
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const Icon(
+                                          Icons.arrow_forward_ios_outlined,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    final result = await context.pushNamed(
+                                      RouteConstants.dependentList,
+                                      extra: {
+                                        'isGetLocation': true,
+                                      },
+                                    );
+                                    if (result != null) {
+                                      Map<String, dynamic> resultMap =
+                                          result as Map<String, dynamic>;
+                                      var dependentModel =
+                                          resultMap['dependentModel'];
+                                      var dependentLocationData =
+                                          resultMap['dependentLocationData'];
+                                      // Handle the returned data
+                                      setState(() {
+                                        passenger =
+                                            (dependentModel as DependentModel?);
+                                        passengerLocation =
+                                            (dependentLocationData
+                                                as DependentLocationModel?);
+                                      });
+                                    }
+
+                                    print(result);
+                                  },
+                                ),
+                        ],
+                      ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -308,13 +468,28 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                       width: MediaQuery.of(context).size.width * .5,
                       child: ElevatedButton(
                         onPressed: () {
-                          // ref.invalidate(selectedPaymentMethodProvider);
-                          navigateToFindTripScreen(
+                          print(
+                            passenger?.id ??
+                                ref.watch(userProvider.notifier).state?.id,
+                          );
+                          //ref.invalidate(selectedPaymentMethodProvider);
+                          navigateToRouteConfirmScreen(
                             context,
                             widget.startLatitude,
                             widget.startLongitude,
                             widget.endLatitude,
                             widget.endLongitude,
+                            ref
+                                .watch(selectedPaymentMethodProvider.notifier)
+                                .state,
+                            passenger == null
+                                ? ref.watch(userProvider.notifier).state!.id
+                                : passenger!.id,
+                            cars[ref
+                                    .watch(selectedCarIndexProvider.notifier)
+                                    .state]
+                                .cartypeId,
+                            driverNote,
                           );
                         },
                         child: const Text("Đặt xe"),

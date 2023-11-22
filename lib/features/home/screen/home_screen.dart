@@ -1,3 +1,4 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,14 +8,20 @@ import 'package:goshare/common/app_button.dart';
 import 'package:goshare/core/constants/constants.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/utils/locations_util.dart';
+import 'package:goshare/features/home/controller/home_controller.dart';
 import 'package:goshare/features/home/repositories/home_repository.dart';
+
 // import 'package:goshare/features/home/widgets/home_tab_bar.dart';
 import 'package:goshare/features/home/widgets/location_card.dart';
+import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
 
 import 'package:goshare/models/car_model.dart';
 import 'package:goshare/models/dependent_model.dart';
+import 'package:goshare/models/location_model.dart';
+import 'package:goshare/providers/current_on_trip_provider.dart';
+import 'package:goshare/providers/user_locations_provider.dart';
 // import 'package:goshare/providers/current_location_provider.dart';
 // import 'package:goshare/providers/current_location_provider.dart';
 import 'package:goshare/theme/pallet.dart';
@@ -75,14 +82,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   // LocationData? locationData;
   // final location = Location();
   bool _isLoading = false;
+  List<LocationModel> locations = [];
+
   @override
   void initState() {
+    //loadLocations();
     super.initState();
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (mounted) {
+          await getUserLocationList();
+          // Check mounted again before updating state
+          //
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<void> getUserLocationList() async {
+    if (context.mounted) {
+      try {
+        print("INIT O HOME NE");
+        locations = await ref
+            .watch(homeControllerProvider.notifier)
+            .getUserListLocation(context);
+        ref.read(userLocationProvider.notifier).loadLocations(locations);
+      } catch (e) {
+        print(e.toString());
+        // Handle any errors here
+      }
+    }
   }
 
   void navigateToSearchTripRoute(BuildContext context) {
@@ -92,6 +126,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<DependentModel?> navigateToDependentList(BuildContext context) async {
     DependentModel? dependent = await context.pushNamed('dependent-list');
     return dependent;
+  }
+
+  void navigateToFindTrip(String startLat, String startLon, String endLat,
+      String endLon, String carTypeId) {
+    context.replaceNamed(RouteConstants.findTrip, pathParameters: {
+      'startLatitude': startLat,
+      'startLongitude': startLon,
+      'endLatitude': endLat,
+      'endLongitude': endLon,
+      'paymentMethod': '0',
+      'bookerId': ref.watch(userProvider.notifier).state?.id ?? '',
+      'carTypeId': carTypeId,
+      //'driverNote': driverNote ?? '',
+    });
   }
 
   void _showBottomModal(
@@ -140,7 +188,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     top: Radius.circular(50),
                   ),
                 ),
-                height: MediaQuery.of(context).size.height * .5,
+                height: MediaQuery.of(context).size.height * .6,
                 child: Column(
                   children: [
                     const Text(
@@ -207,7 +255,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 children: <Widget>[
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Image.network(cars[index].image),
+                                    child: Image.network(
+                                      cars[index].image,
+                                      width: 200,
+                                      fit: BoxFit.contain,
+                                    ),
                                   ),
                                   Text(
                                     "Xe ${cars[index].capacity} chỗ",
@@ -250,15 +302,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     ElevatedButton(
                       onPressed: () async {
-                        final data = await navigateToDependentList(context);
-                        print(data);
+                        //final data = await navigateToDependentList(context);
+                        //print(data);
+                        navigateToFindTrip(
+                          currentLocation?.latitude?.toString() ?? '',
+                          currentLocation?.longitude?.toString() ?? '',
+                          latitude?.toString() ?? '',
+                          longitude?.toString() ?? '',
+                          cars[ref
+                                  .watch(selectedCarIndexProvider.notifier)
+                                  .state]
+                              .cartypeId,
+                        );
                       },
-                      child: const Text(
-                        'Xác nhận',
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {},
                       child: const Text(
                         'Xác nhận',
                       ),
@@ -275,9 +331,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  void navigateToDriverPickupScreen(
+    String driverName,
+    String driverCarType,
+    String driverPlate,
+    String driverPhone,
+    String driverAvatar,
+    String driverId,
+    String endLatitude,
+    String endLongitude,
+  ) {
+    context.replaceNamed(RouteConstants.driverPickUp, extra: {
+      'driverName': driverName,
+      'driverCarType': driverCarType,
+      'driverPlate': driverPlate,
+      'driverPhone': driverPhone,
+      'driverAvatar': driverAvatar,
+      'driverId': driverId,
+      'endLatitude': endLatitude,
+      'endLongitude': endLongitude,
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final homeRepository = ref.read(homeRepositoryProvider);
+
     return Scaffold(
       body: Stack(
         children: [
@@ -297,24 +376,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ],
                 ),
-                // SliverAppBar(
-                //   expandedHeight: 200.0,
-                //   floating: false,
-                //   pinned: true,
-                //   flexibleSpace: FlexibleSpaceBar(
-                //     title: Text('Header'),
-                //     background: Image.network(
-                //       'https://example.com/your_image_url.jpg',
-                //       fit: BoxFit.cover,
-                //     ),
-                //   ),
-                // ),
               ];
             },
             body: SafeArea(
               child: ListView(
                 children: [
-                  // Your other widgets
+                  ref.watch(currentOnTripIdProvider) != null
+                      ? const HomeCenterContainer(
+                          child: Center(
+                            child: Text('Bạn đang có 1 chuyến đi'),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                   Stack(
                     children: <Widget>[
                       Container(
@@ -327,10 +400,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                       ),
                       Positioned(
-                        top: MediaQuery.of(context).size.height * .05,
+                        top: MediaQuery.of(context).size.height * .08,
                         left: MediaQuery.of(context).size.width * .1,
                         child: Text(
-                          'Chào Khải, \n${homeRepository.greeting()}',
+                          'Chào ${ref.watch(userProvider)?.name ?? 'Người dùng'}, \n${homeRepository.greeting()}',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -339,62 +412,128 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ],
                   ),
-                  Center(
-                    child: InkWell(
-                      onTap: () {},
-                      child: RichText(
-                        text: const TextSpan(
+                  ref.watch(userLocationProvider).isNotEmpty
+                      ? Column(
                           children: [
-                            WidgetSpan(
-                              alignment: PlaceholderAlignment.middle,
-                              child: Padding(
-                                padding: EdgeInsets.only(right: 8.0),
-                                child: Icon(
-                                  IconData(0xe050, fontFamily: 'MaterialIcons'),
-                                  color: Colors.white,
+                            Center(
+                              child: InkWell(
+                                onTap: () {
+                                  navigateToSearchTripRoute(context);
+                                },
+                                child: RichText(
+                                  text: const TextSpan(
+                                    children: [
+                                      WidgetSpan(
+                                        alignment: PlaceholderAlignment.middle,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(right: 8.0),
+                                          child: Icon(
+                                            IconData(0xe050,
+                                                fontFamily: 'MaterialIcons'),
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                      WidgetSpan(
+                                        alignment: PlaceholderAlignment.middle,
+                                        child: Text(
+                                          'Tạo điểm đến',
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                            WidgetSpan(
-                              alignment: PlaceholderAlignment.middle,
-                              child: Text(
-                                'Tạo điểm đến',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
+
+                            // List of scrollable widgets
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount:
+                                    ref.watch(userLocationProvider).length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
+                                    child: LocationCard(
+                                      locationModel: ref
+                                          .watch(userLocationProvider)[index],
+                                      onClick: (latitude, longitude) async {
+                                        _showBottomModal(
+                                          latitude,
+                                          longitude,
+                                          ref,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // List of scrollable widgets
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: 4,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          child: LocationCard(
-                            onClick: (latitude, longitude) async {
-                              _showBottomModal(
-                                latitude,
-                                longitude,
-                                ref,
-                              );
-                            },
+                        )
+                      : GestureDetector(
+                          onTap: () {
+                            navigateToSearchTripRoute(context);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: DottedBorder(
+                              color: Colors.white,
+                              strokeWidth: 2.0,
+                              dashPattern: const [6, 3, 2, 3],
+                              borderType: BorderType.RRect,
+                              radius: const Radius.circular(12),
+                              padding: const EdgeInsets.all(6),
+                              child: ClipRRect(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(12)),
+                                child: Center(
+                                  heightFactor: 5,
+                                  child: RichText(
+                                    text: const TextSpan(
+                                      children: [
+                                        WidgetSpan(
+                                          alignment:
+                                              PlaceholderAlignment.middle,
+                                          child: Padding(
+                                            padding:
+                                                EdgeInsets.only(right: 8.0),
+                                            child: Icon(
+                                              IconData(0xe050,
+                                                  fontFamily: 'MaterialIcons'),
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                        WidgetSpan(
+                                          alignment:
+                                              PlaceholderAlignment.middle,
+                                          child: Text(
+                                            'Tạo điểm đến',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
-                        );
-                      },
-                    ),
-                  ),
+                        ),
 
                   // Other widgets
                   const SizedBox(
@@ -437,7 +576,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             AppButton(
                               buttonText: 'Đóng góp',
                               fontSize: 16,
-                              onPressed: () {},
+                              onPressed: () {
+                                navigateToDriverPickupScreen(
+                                  '',
+                                  '',
+                                  '',
+                                  '',
+                                  '',
+                                  '',
+                                  '0',
+                                  '0',
+                                );
+                              },
                             ),
                           ],
                         ),

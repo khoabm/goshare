@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:goshare/models/location_model.dart';
 
 class LocationCard extends ConsumerWidget {
+  final LocationModel? locationModel;
   final Function(double latitude, double longitude) onClick;
   const LocationCard({
     super.key,
     required this.onClick,
+    this.locationModel,
   });
 
   @override
@@ -28,33 +31,33 @@ class LocationCard extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Expanded(
+          Expanded(
             flex: 1,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Nhà ngoại',
-                  style: TextStyle(
+                  locationModel?.name ?? '',
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
+                // SizedBox(height: 8),
+                // Text(
+                //   'Cách đây 5km',
+                //   style: TextStyle(
+                //     fontStyle: FontStyle.italic,
+                //     fontWeight: FontWeight.w400,
+                //     fontSize: 13,
+                //   ),
+                // ),
                 SizedBox(height: 8),
                 Text(
-                  'Cách đây 5km',
-                  style: TextStyle(
-                    fontStyle: FontStyle.italic,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 13,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  '75C Cách mạng tháng 8 phường 1, Tân An, Long An',
+                  locationModel?.address ?? '',
                   maxLines: 2,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 15,
                   ),
                 ),
@@ -68,9 +71,10 @@ class LocationCard extends ConsumerWidget {
                 elevation: 0,
               ),
               onPressed: () async {
+                print(locationModel);
                 await onClick(
-                  10.94738262463184,
-                  106.97866792995985,
+                  locationModel?.latitude ?? 0.0,
+                  locationModel?.longitude ?? 0.0,
                 );
               },
               child: const Text(
