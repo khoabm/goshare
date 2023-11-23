@@ -102,41 +102,23 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
       String phone = _phoneNumberTextController.text;
       String passcode = _passcodeTextController.text;
 
-      final result = await ref.read(LoginControllerProvider.notifier).login(
-            phone,
-            passcode,
-            context,
-          );
+      final result = await ref
+          .read(LoginControllerProvider.notifier)
+          .login(phone, passcode, context);
+
       setState(() {
         _isLoading = false;
       });
-      if (result.isNotEmpty) {
-        Map<String, dynamic> resultMap = json.decode(result);
-        print(resultMap);
-        if (resultMap.containsKey('accessToken')) {
-          String accessToken = resultMap['accessToken'];
-          String refreshToken = resultMap['refreshToken'];
-          final SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setString('accessToken', accessToken);
-          prefs.setString('refreshToken', refreshToken);
-          ref.read(accessTokenProvider.notifier).state = accessToken;
-        }
-        if (resultMap.containsKey('id') &&
-            resultMap.containsKey('phone') &&
-            resultMap.containsKey('name') &&
-            resultMap.containsKey('role')) {
-          User userTmp = User(
-            id: resultMap['id'],
-            phone: resultMap['phone'],
-            name: resultMap['name'],
-            role: resultMap['role'],
-          );
-          ref.read(userProvider.notifier).state = userTmp;
-          setState(() {});
-          //print(ref.read(userProvider.notifier).state?.id);
-        }
+
+      if (result.error != null) {
+        print('Error: ${result.error}');
+      } else {
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('accessToken', result.accessToken!);
+        prefs.setString('refreshToken', result.refreshToken!);
+        ref.read(userProvider.notifier).state = result.user;
         navigateToDashBoardScreen();
-      } else {}
+      }
     }
   }
 
