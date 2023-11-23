@@ -40,4 +40,8 @@ class RouteConstants {
   static const routeConfirmUrl = '/route-confirm';
   static const onTripUrl = '/on-trip';
   static const createDestinationUrl = '/create-destination/:destinationAddress';
+
+  static const editProfileUrl = 'edit-profile';
+  static const moneyTopupUrl = '/money-topup';
+  static const moneyHistoryUrl = '/money-history';
 }

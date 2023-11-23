@@ -9,6 +9,7 @@ import 'package:goshare/core/locations_util.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
 import 'package:goshare/features/login/controller/log_in_controller.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
+import 'package:goshare/features/menu_user/menu-user-screen.dart';
 import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
 import 'package:goshare/features/trip/screens/chat_screen.dart';
 import 'package:goshare/providers/current_on_trip_provider.dart';
@@ -35,9 +36,13 @@ class _DashBoardState extends ConsumerState<DashBoard> {
       endLongitude: "106.748967",
       endLatitude: "10.682559",
     ), //Text('Second screen'),
-    const Center(
-      child: Text('heheh'),
-    ),
+    // const Center(
+    //   child: Text(
+    //     'hehe',
+    //     style: TextStyle(color: Colors.white),
+    //   ),
+    // ),
+    const UserMenuPage(),
   ];
   void onTabTapped(int index) {
     setState(() {
