@@ -17,6 +17,7 @@ import 'package:goshare/features/menu_user/menu-user-screen.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 
 import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
+import 'package:goshare/features/trip/screens/guardian_orbserve_dependent_trip_screen.dart';
 import 'package:goshare/models/trip_model.dart';
 
 import 'package:goshare/providers/current_on_trip_provider.dart';
@@ -35,15 +36,27 @@ class DashBoard extends ConsumerStatefulWidget {
 
 class _DashBoardState extends ConsumerState<DashBoard> {
   int _currentIndex = 0;
-  int _stage = 0;
+
   bool _isLoading = false;
   final List<Widget> _children = [
     const HomeScreen(),
-    const CarChoosingScreen(
-      startLongitude: "106.8006742",
-      startLatitude: "10.8756434",
-      endLongitude: "106.748967",
-      endLatitude: "10.682559",
+
+    const GuardianObserveDependentTripScreen(
+      driverName: 'Khoa',
+      driverPhone: '01245153531',
+      driverAvatar: '',
+      driverPlate: '123456',
+      driverCarType: 'Xe hoi',
+      driverId: '123',
+      endLatitude: '',
+      endLongitude: '',
+    ),
+    // CarChoosingScreen(
+    //   startLongitude: "106.8006742",
+    //   startLatitude: "10.8756434",
+    //   endLongitude: "106.748967",
+    //   endLatitude: "10.682559",
+    // ), //Text('Second screen'),
     ), //Text('Second screen'),
     // const Center(
     //   child: Text(
@@ -52,6 +65,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
     //   ),
     // ),
     const UserMenuPage(),
+
   ];
   void onTabTapped(int index) {
     setState(() {
@@ -141,6 +155,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         } else {
           print('fcmTokenError');
         }
+
         setState(() {
           _isLoading = false;
         });

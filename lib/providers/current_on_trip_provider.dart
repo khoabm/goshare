@@ -6,7 +6,7 @@ final currentOnTripIdProvider =
 
 class CurrentOnTripIdNotifier extends StateNotifier<String?> {
   CurrentOnTripIdNotifier() : super(null);
-
+  String? get currentTripId => state;
   void setCurrentOnTripId(String? id) {
     state = id;
   }

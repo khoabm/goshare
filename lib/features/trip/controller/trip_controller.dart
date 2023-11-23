@@ -98,6 +98,34 @@ class TripController extends StateNotifier<bool> {
     return trip;
   }
 
+  Future<TripModel?> getTripInfo(
+    BuildContext context,
+    String tripId,
+  ) async {
+    TripModel? trip;
+
+    final result = await _tripRepository.getTripInfo(
+      tripId,
+    );
+    result.fold((l) {
+      state = false;
+      if (l is UnauthorizedFailure) {
+        showLoginTimeOut(
+          context: context,
+        );
+      } else if (l is AlreadyInTripFailure) {
+      } else {
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      }
+    }, (r) {
+      trip = r;
+    });
+    return trip;
+  }
+
   Future<List<CarModel>> getCarDetails(
     BuildContext context,
     double startLatitude,
