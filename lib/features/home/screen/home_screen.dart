@@ -14,6 +14,7 @@ import 'package:goshare/features/home/widgets/dependent_widgets/waiting_for_trip
 
 // import 'package:goshare/features/home/widgets/home_tab_bar.dart';
 import 'package:goshare/features/home/widgets/location_card.dart';
+import 'package:goshare/features/home/widgets/on_trip_going_widget.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
@@ -408,12 +409,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ],
                   ),
                   ref.watch(currentOnTripIdProvider) != null
-                      ? const HomeCenterContainer(
-                          child: Center(
-                            child: Text(
-                              'Bạn đang có 1 chuyến đi',
-                            ),
-                          ),
+                      ? GestureDetector(
+                          onTap: () async {
+                            if (ref
+                                    .watch(currentOnTripIdProvider.notifier)
+                                    .currentTripId !=
+                                null) {
+                              final result = await ref
+                                  .watch(tripControllerProvider.notifier)
+                                  .getTripInfo(
+                                    context,
+                                    ref
+                                        .watch(currentOnTripIdProvider.notifier)
+                                        .currentTripId!,
+                                  );
+                            }
+                          },
+                          child: const OnTripGoing(),
                         )
                       : const SizedBox.shrink(),
                   () {

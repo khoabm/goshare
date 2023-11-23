@@ -35,7 +35,7 @@ class AppRouter {
 
   GoRouter createRouter(String initialLocation) {
     return GoRouter(
-      initialLocation: RouteConstants.loginUrl, //'/find-trip',
+      initialLocation: initialLocation, //'/find-trip',
       routes: <RouteBase>[
         GoRoute(
           name: RouteConstants.dashBoard,
@@ -387,6 +387,35 @@ class AppRouter {
             return SlideRightTransition(
               child:
                   const RateDriverScreen(), // Pass the phone parameter to OtpScreen
+              key: state.pageKey,
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteConstants.guardianObserveDependentTrip,
+          path: RouteConstants.guardianObserveDependentTripUrl,
+          pageBuilder: (context, state) {
+            //final Map<String, dynamic> params = state.pathParameters;
+            final extras = state.extra as Map<String, dynamic>;
+            final String driverName = extras['driverName'] as String;
+            final String driverPhone = extras['driverPhone'] as String;
+            final String driverAvatar = extras['driverAvatar'] as String;
+            final String driverPlate = extras['driverPlate'] as String;
+            final String driverCarType = extras['driverCarType'] as String;
+            final String driverId = extras['driverId'] as String;
+            final String endLatitude = extras['endLatitude'] as String;
+            final String endLongitude = extras['endLongitude'] as String;
+            return SlideRightTransition(
+              child: DriverPickUpScreen(
+                driverId: driverId,
+                driverName: driverName,
+                driverPhone: driverPhone,
+                driverAvatar: driverAvatar,
+                driverPlate: driverPlate,
+                driverCarType: driverCarType,
+                endLatitude: endLatitude,
+                endLongitude: endLongitude,
+              ),
               key: state.pageKey,
             );
           },

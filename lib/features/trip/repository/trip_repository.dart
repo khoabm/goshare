@@ -161,10 +161,8 @@ class TripRepository {
     String tripId,
   ) async {
     try {
-      // Map<String, dynamic> tripModelMap = tripModel.toMap();
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final accessToken = prefs.getString('accessToken');
-      //String tripModelJson = tripModel.toJson();
       final client = HttpClientWithAuth(accessToken ?? '');
       final response = await client.get(
         Uri.parse('$baseApiUrl/trip/$tripId'),

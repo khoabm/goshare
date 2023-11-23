@@ -31,6 +31,7 @@ class RouteConstants {
   static const carChoosingUrl =
       '/car-choosing/:startLongitude/:startLatitude/:endLongitude/:endLatitude';
   static const searchTripRouteUrl = '/search-trip-route';
+  static const guardianObserveDependentTrip = 'guardian-observe';
 
   static const findTripUrl = '/find-trip';
   static const dependentListUrl = '/dependent-list';
@@ -42,4 +43,5 @@ class RouteConstants {
   static const onTripUrl = '/on-trip';
   static const createDestinationUrl = '/create-destination/:destinationAddress';
   static const ratingUrl = '/rating';
+  static const guardianObserveDependentTripUrl = '/guardian-observe';
 }
