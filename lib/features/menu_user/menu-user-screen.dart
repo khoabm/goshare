@@ -30,7 +30,7 @@ class _UserMenuPageState extends State<UserMenuPage> {
               title: const Text('Edit Profile'),
               onTap: () {
                 // Navigator.goN(context, '/edit-profile');
-                context.goNamed(RouteConstants.editProfileUrl);
+                context.go(RouteConstants.editProfileUrl);
               },
             ),
           ),
