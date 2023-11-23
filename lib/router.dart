@@ -15,6 +15,7 @@ import 'package:goshare/features/home/screen/home_screen.dart';
 // import 'package:goshare/features/search_trip_route/screens/find_trip_screen.dart';
 // import 'package:goshare/features/search_trip_route/screens/search_trip_route_screen.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
+import 'package:goshare/features/menu_user/edit-profile/edit-profile-screen.dart';
 
 import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
 import 'package:goshare/features/trip/screens/chat_screen.dart';
@@ -35,7 +36,7 @@ class AppRouter {
 
   GoRouter createRouter(String initialLocation) {
     return GoRouter(
-      initialLocation: RouteConstants.loginUrl, //'/find-trip',
+      initialLocation: RouteConstants.dashBoardUrl, //'/find-trip',
       routes: <RouteBase>[
         GoRoute(
           name: RouteConstants.dashBoard,
@@ -85,22 +86,14 @@ class AppRouter {
             key: state.pageKey,
           ),
         ),
-//       GoRoute(
-//         path: RouteConstants.homeTripUrl,
-//         pageBuilder: (context, state) => SlideBottomTransition(
-//           child: const FindTripScreen(),
-//           key: state.pageKey,
-//         ),
-//       ),
-// =======
-//       // GoRoute(
-//       //   path: RouteConstants.homeTripUrl,
-//       //   pageBuilder: (context, state) => SlideBottomTransition(
-//       //     child: const FindTripScreen(),
-//       //     key: state.pageKey,
-//       //   ),
-//       // ),
-// >>>>>>> main
+        GoRoute(
+          path: RouteConstants.editProfileUrl,
+          pageBuilder: (context, state) => SlideRightTransition(
+            child: const EditProfilePage(),
+            key: state.pageKey,
+          ),
+        ),
+
         GoRoute(
           name: 'connect-to-driver',
           path: RouteConstants.connectToDriverUrl,

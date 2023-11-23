@@ -17,7 +17,7 @@ class LoginController extends StateNotifier<bool> {
     required LoginRepository loginRepository,
   })  : _loginRepository = loginRepository,
         super(false);
-  Future<String> login(
+  Future<LoginResult> login(
     String phone,
     String passcode,
     BuildContext context,

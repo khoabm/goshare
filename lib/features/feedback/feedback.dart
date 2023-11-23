@@ -7,7 +7,6 @@ import 'package:goshare/common/loader.dart';
 import 'package:goshare/core/constants/constants.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/features/feedback/controller/feedback_controller.dart';
-import 'package:goshare/theme/pallet.dart';
 
 final ratingProvider = StateProvider<int?>((ref) => null);
 final feedbackTextProvider = StateProvider<String?>((ref) => null);
@@ -23,18 +22,13 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
   bool _isLoading = false;
 
   void _submitFeedback(WidgetRef ref) {
-    // Get the selected rating and feedback text
     final int? rating = ref.read(ratingProvider.notifier).state;
     final String? feedbackText = ref.read(feedbackTextProvider.notifier).state;
 
     if (rating != null && feedbackText != null) {
-      // You can perform any additional logic or send the feedback to the server
-      // For now, print the values
       print('Rating: $rating');
       print('Feedback Text: $feedbackText');
     } else {
-      // Handle the case where either rating or feedback text is not provided
-      // This could be displayed as an error message to the user
       print('Please provide both rating and feedback text.');
     }
   }
@@ -65,13 +59,10 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                       
                         RatingStars(),
                         const SizedBox(height: 20),
-                  
                         FeedbackTextInput(),
                         const SizedBox(height: 20),
-                   
                         Container(
                           padding: const EdgeInsets.all(8.0),
                           width: MediaQuery.of(context).size.width * .9,
