@@ -10,6 +10,7 @@ import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/utils/locations_util.dart';
 import 'package:goshare/features/home/controller/home_controller.dart';
 import 'package:goshare/features/home/repositories/home_repository.dart';
+import 'package:goshare/features/home/widgets/dependent_widgets/waiting_for_trip_card.dart';
 
 // import 'package:goshare/features/home/widgets/home_tab_bar.dart';
 import 'package:goshare/features/home/widgets/location_card.dart';
@@ -21,6 +22,7 @@ import 'package:goshare/models/car_model.dart';
 import 'package:goshare/models/dependent_model.dart';
 import 'package:goshare/models/location_model.dart';
 import 'package:goshare/providers/current_on_trip_provider.dart';
+import 'package:goshare/providers/dependent_booking_stage_provider.dart';
 import 'package:goshare/providers/user_locations_provider.dart';
 // import 'package:goshare/providers/current_location_provider.dart';
 // import 'package:goshare/providers/current_location_provider.dart';
@@ -381,13 +383,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             body: SafeArea(
               child: ListView(
                 children: [
-                  ref.watch(currentOnTripIdProvider) != null
-                      ? const HomeCenterContainer(
-                          child: Center(
-                            child: Text('Bạn đang có 1 chuyến đi'),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
                   Stack(
                     children: <Widget>[
                       Container(
@@ -412,6 +407,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ],
                   ),
+                  ref.watch(currentOnTripIdProvider) != null
+                      ? const HomeCenterContainer(
+                          child: Center(
+                            child: Text(
+                              'Bạn đang có 1 chuyến đi',
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                  () {
+                    switch (ref.watch(stageProvider)) {
+                      case Stage.stage1:
+                        return const FindingDriverCard();
+                      case Stage.stage2:
+                        return const Text('Stage 2');
+                      case Stage.stage3:
+                        return const Text('Stage 3');
+                      default:
+                        return const Text('Unknown stage');
+                    }
+                  }(),
                   ref.watch(userLocationProvider).isNotEmpty
                       ? Column(
                           children: [

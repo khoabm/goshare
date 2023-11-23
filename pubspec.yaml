@@ -57,6 +57,7 @@ dependencies:
   signalr_core: ^1.1.1
   shared_preferences: ^2.2.2
   dotted_border: ^2.1.0
+  flutter_local_notifications: ^16.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

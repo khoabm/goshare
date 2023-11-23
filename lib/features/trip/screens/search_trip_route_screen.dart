@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/utils/locations_util.dart';
+import 'package:goshare/features/home/controller/home_controller.dart';
 import 'package:goshare/floating_search_bar.dart';
 import 'package:goshare/models/vietmap_place_model.dart';
 import 'package:goshare/theme/pallet.dart';
@@ -103,8 +104,19 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                       _mapController = controller;
                     });
                   },
-                  onMapLongClick: (point, coordinates) {
+                  onMapLongClick: (point, coordinates) async {
+                    final res = await ref
+                        .watch(homeControllerProvider.notifier)
+                        .searchLocationReverse(
+                          context,
+                          coordinates.longitude,
+                          coordinates.latitude,
+                        );
                     setState(() {
+                      currentAddress = res.address ?? '';
+
+                      lat = coordinates.latitude;
+                      lon = coordinates.longitude;
                       _marker = Marker(
                         child: _markerWidget(Icons.location_on),
                         latLng: LatLng(

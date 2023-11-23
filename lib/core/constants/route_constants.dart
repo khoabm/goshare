@@ -15,6 +15,7 @@ class RouteConstants {
   static const routeConfirm = 'route-confirm';
   static const onTrip = 'on-trip';
   static const createDestination = 'create-destination';
+  static const rating = 'rating';
 
   ///**
   ///Route url constants
@@ -40,4 +41,5 @@ class RouteConstants {
   static const routeConfirmUrl = '/route-confirm';
   static const onTripUrl = '/on-trip';
   static const createDestinationUrl = '/create-destination/:destinationAddress';
+  static const ratingUrl = '/rating';
 }
