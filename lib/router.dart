@@ -21,6 +21,7 @@ import 'package:goshare/features/trip/screens/chat_screen.dart';
 import 'package:goshare/features/trip/screens/driver_pick_up_screen.dart';
 import 'package:goshare/features/trip/screens/find_trip_screen.dart';
 import 'package:goshare/features/trip/screens/on_trip_screen.dart';
+import 'package:goshare/features/trip/screens/rate_driver_screen.dart';
 import 'package:goshare/features/trip/screens/route_confirm_screen.dart';
 import 'package:goshare/features/trip/screens/search_trip_route_screen.dart';
 
@@ -34,7 +35,7 @@ class AppRouter {
 
   GoRouter createRouter(String initialLocation) {
     return GoRouter(
-      initialLocation: initialLocation, //'/find-trip',
+      initialLocation: RouteConstants.loginUrl, //'/find-trip',
       routes: <RouteBase>[
         GoRoute(
           name: RouteConstants.dashBoard,
@@ -215,6 +216,7 @@ class AppRouter {
             final String? bookerId = extras['bookerId'] as String?;
             final String? carTypeId = extras['carTypeId'] as String?;
             final String? driverNote = extras['driverNote'] as String?;
+            final bool? isFindingTrip = extras['isFindingTrip'] as bool?;
             //final String? driverNote = params['driverNote'] as String?;
             return SlideBottomTransition(
               child: FindTripScreen2(
@@ -226,6 +228,7 @@ class AppRouter {
                 bookerId: bookerId ?? '',
                 paymentMethod: paymentMethod ?? '0',
                 carTypeId: carTypeId ?? '',
+                isFindingTrip: isFindingTrip,
               ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
@@ -373,6 +376,17 @@ class AppRouter {
                 latitude: latitude,
                 longitude: longitude,
               ), // Pass the phone parameter to OtpScreen
+              key: state.pageKey,
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteConstants.rating,
+          path: RouteConstants.ratingUrl,
+          pageBuilder: (context, state) {
+            return SlideRightTransition(
+              child:
+                  const RateDriverScreen(), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
           },

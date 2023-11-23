@@ -86,6 +86,56 @@ class HomeRepository {
     }
   }
 
+  FutureEither<VietmapAutocompleteModel> searchLocationReverse(
+    double lat,
+    double lng,
+  ) async {
+    try {
+      final queryParameters = {
+        'apikey': Constants.vietMapApiKey,
+        'lng': lng.toString(),
+        'lat': lat.toString(),
+      };
+      await Future.delayed(
+        const Duration(
+          seconds: 1,
+        ),
+      );
+      final uri = Uri.https(
+        'maps.vietmap.vn',
+        '/api/reverse/v3',
+        queryParameters,
+      );
+      print(uri.toString());
+
+      var res = await http.get(uri);
+      print(res.statusCode);
+      print(res.body);
+      if (res.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(
+          res.body,
+        );
+        final List<VietmapAutocompleteModel> places = jsonData
+            .map((json) => VietmapAutocompleteModel.fromMap(json))
+            .toList();
+        final place = places.first;
+        return right(place);
+      } else if (res.statusCode == 429) {
+        return left(
+          Failure('Too many request'),
+        );
+      } else {
+        return left(
+          Failure('Co loi xay ra'),
+        );
+      }
+    } on TimeoutException catch (_) {
+      return left(
+        Failure('Timeout'),
+      );
+    }
+  }
+
   FutureEither<List<LocationModel>> getUserListLocation() async {
     List<LocationModel> list = [];
     try {

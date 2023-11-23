@@ -7,7 +7,7 @@ final hubConnectionProvider = FutureProvider<HubConnection>((ref) async {
   try {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken');
-
+    print('signalR HUB');
     return HubConnectionBuilder()
         .withUrl(
           "https://goshareapi.azurewebsites.net/goshareHub?access_token=$accessToken",

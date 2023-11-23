@@ -28,6 +28,7 @@ class FindTripScreen2 extends ConsumerStatefulWidget {
   final String bookerId;
   final String carTypeId;
   final String? driverNote;
+  final bool? isFindingTrip;
   const FindTripScreen2({
     this.driverNote,
     super.key,
@@ -38,6 +39,7 @@ class FindTripScreen2 extends ConsumerStatefulWidget {
     required this.paymentMethod,
     required this.bookerId,
     required this.carTypeId,
+    this.isFindingTrip = true,
   });
 
   @override

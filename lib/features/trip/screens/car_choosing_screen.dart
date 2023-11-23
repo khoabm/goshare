@@ -380,87 +380,98 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'Người đặt xe',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                              color: Pallete.primaryColor,
-                            ),
-                          ),
-                          ref.watch(userProvider.notifier).state?.role ==
-                                  'dependent'
-                              ? const SizedBox.shrink()
-                              : GestureDetector(
-                                  child: Container(
-                                    width: 181,
-                                    height: 42,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(),
-                                      color: const Color.fromARGB(
-                                          255, 237, 224, 224),
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(10),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Expanded(
+                    ref
+                                .watch(userProvider.notifier)
+                                .state
+                                ?.role
+                                .toLowerCase() ==
+                            'dependent'
+                        ? const SizedBox.shrink()
+                        : Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'Người đặt xe',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                    color: Pallete.primaryColor,
+                                  ),
+                                ),
+                                ref.watch(userProvider.notifier).state?.role ==
+                                        'dependent'
+                                    ? const SizedBox.shrink()
+                                    : GestureDetector(
+                                        child: Container(
+                                          width: 181,
+                                          height: 42,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(),
+                                            color: const Color.fromARGB(
+                                                255, 237, 224, 224),
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                              Radius.circular(10),
+                                            ),
+                                          ),
                                           child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
                                             children: [
+                                              Expanded(
+                                                child: Row(
+                                                  children: [
+                                                    const Icon(
+                                                      Icons.person_2_outlined,
+                                                    ),
+                                                    Text(
+                                                      passenger?.name ?? 'Tôi',
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
                                               const Icon(
-                                                Icons.person_2_outlined,
-                                              ),
-                                              Text(
-                                                passenger?.name ?? 'Tôi',
-                                              ),
+                                                Icons
+                                                    .arrow_forward_ios_outlined,
+                                              )
                                             ],
                                           ),
                                         ),
-                                        const Icon(
-                                          Icons.arrow_forward_ios_outlined,
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  onTap: () async {
-                                    final result = await context.pushNamed(
-                                      RouteConstants.dependentList,
-                                      extra: {
-                                        'isGetLocation': true,
-                                      },
-                                    );
-                                    if (result != null) {
-                                      Map<String, dynamic> resultMap =
-                                          result as Map<String, dynamic>;
-                                      var dependentModel =
-                                          resultMap['dependentModel'];
-                                      var dependentLocationData =
-                                          resultMap['dependentLocationData'];
-                                      // Handle the returned data
-                                      setState(() {
-                                        passenger =
-                                            (dependentModel as DependentModel?);
-                                        passengerLocation =
-                                            (dependentLocationData
-                                                as DependentLocationModel?);
-                                      });
-                                    }
+                                        onTap: () async {
+                                          final result =
+                                              await context.pushNamed(
+                                            RouteConstants.dependentList,
+                                            extra: {
+                                              'isGetLocation': true,
+                                            },
+                                          );
+                                          if (result != null) {
+                                            Map<String, dynamic> resultMap =
+                                                result as Map<String, dynamic>;
+                                            var dependentModel =
+                                                resultMap['dependentModel'];
+                                            var dependentLocationData =
+                                                resultMap[
+                                                    'dependentLocationData'];
+                                            // Handle the returned data
+                                            setState(() {
+                                              passenger = (dependentModel
+                                                  as DependentModel?);
+                                              passengerLocation =
+                                                  (dependentLocationData
+                                                      as DependentLocationModel?);
+                                            });
+                                          }
 
-                                    print(result);
-                                  },
-                                ),
-                        ],
-                      ),
-                    ),
+                                          print(result);
+                                        },
+                                      ),
+                              ],
+                            ),
+                          ),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         vertical: 15.0,
