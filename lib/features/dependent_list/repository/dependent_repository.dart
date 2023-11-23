@@ -68,7 +68,7 @@ class DependentRepository {
     double longitude,
     String address,
     String name,
-    String userId,
+    String? userId,
   ) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -87,7 +87,8 @@ class DependentRepository {
           "userId": userId,
         }),
       );
-
+      print(res.statusCode);
+      print(res.body);
       if (res.statusCode == 200) {
         final data = LocationModel.fromJson(res.body);
         return right(data);

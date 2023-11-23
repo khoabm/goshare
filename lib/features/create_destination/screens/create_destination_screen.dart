@@ -100,66 +100,70 @@ class _CreateDestinationScreenState
               const SizedBox(
                 height: 15,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Tài khoản',
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  GestureDetector(
-                    child: Container(
-                      width: 181,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        border: Border.all(),
-                        color: const Color.fromARGB(255, 237, 224, 224),
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(10),
+              ref.watch(userProvider.notifier).state?.role.toLowerCase() ==
+                      'dependent'
+                  ? const SizedBox.shrink()
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Tài khoản',
                         ),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        GestureDetector(
+                          child: Container(
+                            width: 181,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              border: Border.all(),
+                              color: const Color.fromARGB(255, 237, 224, 224),
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                            ),
                             child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.person_2_outlined,
+                                      ),
+                                      Text(
+                                        passenger?.name ?? 'Tôi',
+                                      ),
+                                    ],
+                                  ),
+                                ),
                                 const Icon(
-                                  Icons.person_2_outlined,
-                                ),
-                                Text(
-                                  passenger?.name ?? 'Tôi',
-                                ),
+                                  Icons.arrow_forward_ios_outlined,
+                                )
                               ],
                             ),
                           ),
-                          const Icon(
-                            Icons.arrow_forward_ios_outlined,
-                          )
-                        ],
-                      ),
-                    ),
-                    onTap: () async {
-                      final result = await context
-                          .pushNamed(RouteConstants.dependentList, extra: {
-                        'isGetLocation': false,
-                      });
-                      if (result != null) {
-                        Map<String, dynamic> resultMap =
-                            result as Map<String, dynamic>;
-                        var dependentModel = resultMap['dependentModel'];
-                        setState(() {
-                          passenger = (dependentModel as DependentModel?);
-                        });
-                      }
+                          onTap: () async {
+                            final result = await context.pushNamed(
+                                RouteConstants.dependentList,
+                                extra: {
+                                  'isGetLocation': false,
+                                });
+                            if (result != null) {
+                              Map<String, dynamic> resultMap =
+                                  result as Map<String, dynamic>;
+                              var dependentModel = resultMap['dependentModel'];
+                              setState(() {
+                                passenger = (dependentModel as DependentModel?);
+                              });
+                            }
 
-                      print(result);
-                    },
-                  ),
-                ],
-              ),
+                            print(result);
+                          },
+                        ),
+                      ],
+                    ),
               const SizedBox(
                 height: 15,
               ),
@@ -176,14 +180,16 @@ class _CreateDestinationScreenState
                           widget.longitude,
                           widget.destinationAddress,
                           locationNameTextController.text,
-                          passenger?.id ??
-                              ref.watch(userProvider.notifier).state!.id,
+                          passenger?.id,
                         );
                     if (check != null) {
                       if (check.id.isNotEmpty) {
-                        ref
-                            .watch(userLocationProvider.notifier)
-                            .addLocation(check);
+                        if (check.userId ==
+                            ref.watch(userProvider.notifier).state?.id) {
+                          ref
+                              .watch(userLocationProvider.notifier)
+                              .addLocation(check);
+                        }
                       }
                     }
                     if (context.mounted) {

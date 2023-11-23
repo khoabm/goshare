@@ -57,6 +57,28 @@ class HomeController extends StateNotifier<bool> {
     return list;
   }
 
+  Future<VietmapAutocompleteModel> searchLocationReverse(
+      BuildContext context, double lng, double lat) async {
+    VietmapAutocompleteModel list = VietmapAutocompleteModel();
+
+    final result = await _homeRepository.searchLocationReverse(
+      lat,
+      lng,
+    );
+    result.fold(
+      (l) {
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      },
+      (r) {
+        list = r;
+      },
+    );
+    return list;
+  }
+
   Future<List<LocationModel>> getUserListLocation(BuildContext context) async {
     List<LocationModel> list = [];
 

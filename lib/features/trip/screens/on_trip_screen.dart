@@ -75,7 +75,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
         setState(() {
           ref.watch(currentOnTripIdProvider.notifier).setCurrentOnTripId(null);
         });
-        context.goNamed(RouteConstants.dashBoard);
+        context.goNamed(RouteConstants.rating);
       });
 
       hubConnection.onclose((exception) async {
