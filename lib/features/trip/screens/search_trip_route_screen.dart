@@ -79,6 +79,30 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          setState(() {
+            _isLoading = true;
+          });
+          final location = ref.read(locationProvider);
+          currentLocation = await location.getCurrentLocation();
+          setState(() {
+            _isLoading = false;
+          });
+          _mapController?.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                  target: LatLng(currentLocation?.latitude ?? 0,
+                      currentLocation?.longitude ?? 0),
+                  zoom: 17.5,
+                  tilt: 0),
+            ),
+          );
+        },
+        child: const Icon(
+          Icons.location_on,
+        ),
+      ),
       body: Stack(
         children: [
           Stack(
@@ -93,7 +117,10 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                       'https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm',
                   initialCameraPosition: const CameraPosition(
                     zoom: 17.5,
-                    target: LatLng(10.736657, 106.672240),
+                    target: LatLng(
+                      10.736657,
+                      106.672240,
+                    ),
                     //     LatLng(
                     //   currentLocation?.latitude ?? 0,
                     //   currentLocation?.longitude ?? 0,
@@ -214,7 +241,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                           return;
                         }, (r) {
                           data = r;
-
+                          print('${data?.lat} + ${data?.lng}');
                           setState(() {
                             currentAddress =
                                 '${data?.address}, ${data?.ward}, ${data?.district}, ${data?.city}';

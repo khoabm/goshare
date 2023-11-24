@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
+//import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 
 import 'package:vietmap_flutter_navigation/embedded/controller.dart';
 import 'package:vietmap_flutter_navigation/helpers.dart';
@@ -232,6 +233,16 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
                     longitude: double.parse(widget.endLongitude),
                   ),
                 );
+                // _controller?.addImageMarkers([
+                //   Marker(
+                //     imagePath: 'assets/images/icon.png',
+                //     latLng: LatLng(
+                //       double.parse(widget.endLatitude),
+                //       double.parse(widget.endLongitude),
+                //     ),
+                //   ),
+                // ]);
+                // _controller?.addImageMarkers(Marker(child: child, latLng: latLng));
                 _controller?.buildRoute(wayPoints: wayPoints);
               },
               // onRouteProgressChange: (RouteProgressEvent routeProgressEvent) {

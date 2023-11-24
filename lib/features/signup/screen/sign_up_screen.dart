@@ -61,6 +61,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       TextEditingController();
   final TextEditingController _birthDateTextController =
       TextEditingController();
+
   bool _isLoading = false;
   @override
   void dispose() {

@@ -10,6 +10,7 @@ import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/utils/locations_util.dart';
 import 'package:goshare/features/home/controller/home_controller.dart';
 import 'package:goshare/features/home/repositories/home_repository.dart';
+import 'package:goshare/features/home/widgets/dependent_widgets/driver_pick_up_card.dart';
 import 'package:goshare/features/home/widgets/dependent_widgets/waiting_for_trip_card.dart';
 
 // import 'package:goshare/features/home/widgets/home_tab_bar.dart';
@@ -22,8 +23,10 @@ import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
 import 'package:goshare/models/car_model.dart';
 import 'package:goshare/models/dependent_model.dart';
 import 'package:goshare/models/location_model.dart';
+import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:goshare/providers/dependent_booking_stage_provider.dart';
+import 'package:goshare/providers/dependent_trip_provider.dart';
 import 'package:goshare/providers/user_locations_provider.dart';
 // import 'package:goshare/providers/current_location_provider.dart';
 // import 'package:goshare/providers/current_location_provider.dart';
@@ -82,8 +85,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  // LocationData? locationData;
-  // final location = Location();
   bool _isLoading = false;
   List<LocationModel> locations = [];
 
@@ -95,6 +96,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (mounted) {
           await getUserLocationList();
+
           // Check mounted again before updating state
           //
         }
@@ -112,7 +114,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       try {
         print("INIT O HOME NE");
         locations = await ref
-            .watch(homeControllerProvider.notifier)
+            .read(homeControllerProvider.notifier)
             .getUserListLocation(context);
         ref.read(userLocationProvider.notifier).loadLocations(locations);
       } catch (e) {
@@ -133,7 +135,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void navigateToFindTrip(String startLat, String startLon, String endLat,
       String endLon, String carTypeId) {
-    context.replaceNamed(RouteConstants.findTrip, pathParameters: {
+    context.replaceNamed(RouteConstants.findTrip, extra: {
       'startLatitude': startLat,
       'startLongitude': startLon,
       'endLatitude': endLat,
@@ -142,6 +144,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       'bookerId': ref.watch(userProvider.notifier).state?.id ?? '',
       'carTypeId': carTypeId,
       //'driverNote': driverNote ?? '',
+    });
+  }
+
+  void navigateToOnTripScreen(
+    TripModel trip,
+  ) {
+    context.replaceNamed(RouteConstants.onTrip, extra: {
+      'trip': trip,
     });
   }
 
@@ -423,90 +433,114 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         .watch(currentOnTripIdProvider.notifier)
                                         .currentTripId!,
                                   );
+                              if (result?.status == 1) {
+                                navigateToDriverPickupScreen(
+                                  result?.driver?.name ?? 'Không rõ',
+                                  result?.driver?.car.make ?? '',
+                                  result?.driver?.car.licensePlate ?? '',
+                                  result?.driver?.phone ?? '',
+                                  result?.driver?.avatarUrl ?? '',
+                                  result?.driver?.id ?? '',
+                                  result?.endLocation.latitude.toString() ?? '',
+                                  result?.endLocation.latitude.toString() ?? '',
+                                );
+                              }
+                              if (result?.status == 2) {
+                                navigateToOnTripScreen(result!);
+                              }
+                              print(result);
                             }
                           },
                           child: const OnTripGoing(),
                         )
                       : const SizedBox.shrink(),
-                  () {
-                    switch (ref.watch(stageProvider)) {
-                      case Stage.stage1:
-                        return const FindingDriverCard();
-                      case Stage.stage2:
-                        return const Text('Stage 2');
-                      case Stage.stage3:
-                        return const Text('Stage 3');
-                      default:
-                        return const Text('Unknown stage');
-                    }
-                  }(),
+
+                  ref.watch(stageProvider) == Stage.stage1
+                      ? const FindingDriverCard()
+                      : const SizedBox.shrink(),
+                  ref.watch(stageProvider) == Stage.stage2
+                      ? DriverInfoCard(
+                          driver:
+                              ref.watch(driverProvider.notifier).driverData!,
+                        )
+                      : const SizedBox.shrink(),
+                  ref.watch(stageProvider) == Stage.stage3
+                      ? const FindingDriverCard()
+                      : const SizedBox.shrink(),
+
                   ref.watch(userLocationProvider).isNotEmpty
-                      ? Column(
-                          children: [
-                            Center(
-                              child: InkWell(
-                                onTap: () {
-                                  navigateToSearchTripRoute(context);
-                                },
-                                child: RichText(
-                                  text: const TextSpan(
-                                    children: [
-                                      WidgetSpan(
-                                        alignment: PlaceholderAlignment.middle,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(right: 8.0),
-                                          child: Icon(
-                                            IconData(0xe050,
-                                                fontFamily: 'MaterialIcons'),
-                                            color: Colors.white,
+                      ? Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Center(
+                                child: InkWell(
+                                  onTap: () {
+                                    navigateToSearchTripRoute(context);
+                                  },
+                                  child: RichText(
+                                    text: const TextSpan(
+                                      children: [
+                                        WidgetSpan(
+                                          alignment:
+                                              PlaceholderAlignment.middle,
+                                          child: Padding(
+                                            padding:
+                                                EdgeInsets.only(right: 8.0),
+                                            child: Icon(
+                                              IconData(0xe050,
+                                                  fontFamily: 'MaterialIcons'),
+                                              color: Colors.white,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      WidgetSpan(
-                                        alignment: PlaceholderAlignment.middle,
-                                        child: Text(
-                                          'Tạo điểm đến',
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
+                                        WidgetSpan(
+                                          alignment:
+                                              PlaceholderAlignment.middle,
+                                          child: Text(
+                                            'Tạo điểm đến',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
 
-                            // List of scrollable widgets
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount:
-                                    ref.watch(userLocationProvider).length,
-                                itemBuilder: (context, index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 12),
-                                    child: LocationCard(
-                                      locationModel: ref
-                                          .watch(userLocationProvider)[index],
-                                      onClick: (latitude, longitude) async {
-                                        _showBottomModal(
-                                          latitude,
-                                          longitude,
-                                          ref,
-                                        );
-                                      },
-                                    ),
-                                  );
-                                },
+                              // List of scrollable widgets
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount:
+                                      ref.watch(userLocationProvider).length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 12),
+                                      child: LocationCard(
+                                        locationModel: ref
+                                            .watch(userLocationProvider)[index],
+                                        onClick: (latitude, longitude) async {
+                                          _showBottomModal(
+                                            latitude,
+                                            longitude,
+                                            ref,
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         )
                       : GestureDetector(
                           onTap: () {

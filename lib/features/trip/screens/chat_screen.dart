@@ -37,7 +37,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   void _handleSubmitted(String text) {
     _textController.clear();
-    ref.watch(tripControllerProvider.notifier).sendChat(
+    ref.read(tripControllerProvider.notifier).sendChat(
           context,
           text,
           widget.receiver,
@@ -50,7 +50,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   Future<void> initSignalR(WidgetRef ref) async {
     try {
-      final hubConnection = await ref.watch(
+      final hubConnection = await ref.read(
         hubConnectionProvider.future,
       );
 

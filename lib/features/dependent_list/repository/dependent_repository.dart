@@ -137,7 +137,7 @@ class DependentRepository {
         );
       } else {
         return left(
-          Failure('Co loi xay ra'),
+          Failure('Có lỗi! Không lấy được vị trí người thân'),
         );
       }
     } on TimeoutException catch (_) {

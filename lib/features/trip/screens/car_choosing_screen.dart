@@ -36,6 +36,7 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
   DependentModel? passenger;
   DependentLocationModel? passengerLocation;
   String driverNote = '';
+  bool _isLoading = false;
   @override
   void initState() {
     initialize();
@@ -478,30 +479,41 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                       ),
                       width: MediaQuery.of(context).size.width * .5,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           print(
                             passenger?.id ??
                                 ref.watch(userProvider.notifier).state?.id,
                           );
-                          //ref.invalidate(selectedPaymentMethodProvider);
-                          navigateToRouteConfirmScreen(
-                            context,
-                            widget.startLatitude,
-                            widget.startLongitude,
-                            widget.endLatitude,
-                            widget.endLongitude,
-                            ref
-                                .watch(selectedPaymentMethodProvider.notifier)
-                                .state,
-                            passenger == null
-                                ? ref.watch(userProvider.notifier).state!.id
-                                : passenger!.id,
-                            cars[ref
-                                    .watch(selectedCarIndexProvider.notifier)
-                                    .state]
-                                .cartypeId,
-                            driverNote,
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          await Future.delayed(
+                            const Duration(seconds: 2),
                           );
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          if (context.mounted) {
+                            //ref.invalidate(selectedPaymentMethodProvider);
+                            navigateToRouteConfirmScreen(
+                              context,
+                              widget.startLatitude,
+                              widget.startLongitude,
+                              widget.endLatitude,
+                              widget.endLongitude,
+                              ref
+                                  .watch(selectedPaymentMethodProvider.notifier)
+                                  .state,
+                              passenger == null
+                                  ? ref.watch(userProvider.notifier).state!.id
+                                  : passenger!.id,
+                              cars[ref
+                                      .watch(selectedCarIndexProvider.notifier)
+                                      .state]
+                                  .cartypeId,
+                              driverNote,
+                            );
+                          }
                         },
                         child: const Text("Đặt xe"),
                       ),
@@ -510,6 +522,13 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                 ),
               ),
             ),
+            if (_isLoading)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
           ],
         ),
       ),

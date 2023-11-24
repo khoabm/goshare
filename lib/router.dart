@@ -21,6 +21,7 @@ import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
 import 'package:goshare/features/trip/screens/chat_screen.dart';
 import 'package:goshare/features/trip/screens/driver_pick_up_screen.dart';
 import 'package:goshare/features/trip/screens/find_trip_screen.dart';
+import 'package:goshare/features/trip/screens/guardian_orbserve_dependent_trip_screen.dart';
 import 'package:goshare/features/trip/screens/on_trip_screen.dart';
 import 'package:goshare/features/trip/screens/rate_driver_screen.dart';
 import 'package:goshare/features/trip/screens/route_confirm_screen.dart';
@@ -30,13 +31,13 @@ import 'package:goshare/features/signup/screen/otp_screen.dart';
 import 'package:goshare/features/signup/screen/set_passcode_screen.dart';
 import 'package:goshare/features/signup/screen/sign_up_screen.dart';
 import 'package:goshare/location_display_demo.dart';
+import 'package:goshare/models/trip_model.dart';
 
 class AppRouter {
   /// The route configuration.
 
   GoRouter createRouter(String initialLocation) {
     return GoRouter(
-
       initialLocation: initialLocation, //'/find-trip',
 
       routes: <RouteBase>[
@@ -138,24 +139,24 @@ class AppRouter {
             );
           },
         ),
-        GoRoute(
-          name: 'location-display',
-          path: '/location-display/:refId',
-          pageBuilder: (context, state) {
-            // Extract the parameters from the route
-            final Map<String, dynamic> params = state.pathParameters;
-            // final String? longitude = params['longitude'] as String?;
-            // final String? latitude = params['latitude'] as String?;
-            final String? refId = params['refId'] as String?;
+        // GoRoute(
+        //   name: 'location-display',
+        //   path: '/location-display/:refId',
+        //   pageBuilder: (context, state) {
+        //     // Extract the parameters from the route
+        //     final Map<String, dynamic> params = state.pathParameters;
+        //     // final String? longitude = params['longitude'] as String?;
+        //     // final String? latitude = params['latitude'] as String?;
+        //     final String? refId = params['refId'] as String?;
 
-            return SlideBottomTransition(
-              child: LocationDisplayDemo(
-                refId: refId ?? '',
-              ), // Pass the phone parameter to OtpScreen
-              key: state.pageKey,
-            );
-          },
-        ),
+        //     return SlideBottomTransition(
+        //       child: LocationDisplayDemo(
+        //         refId: refId ?? '',
+        //       ), // Pass the phone parameter to OtpScreen
+        //       key: state.pageKey,
+        //     );
+        //   },
+        // ),
         GoRoute(
           name: RouteConstants.carChoosing,
           path: RouteConstants.carChoosingUrl,
@@ -284,25 +285,19 @@ class AppRouter {
           path: RouteConstants.onTripUrl,
           pageBuilder: (context, state) {
             //final Map<String, dynamic> params = state.pathParameters;
-            final extras = state.extra as Map<String, dynamic>;
-            final String driverName = extras['driverName'] as String;
-            final String driverPhone = extras['driverPhone'] as String;
-            final String driverAvatar = extras['driverAvatar'] as String;
-            final String driverPlate = extras['driverPlate'] as String;
-            final String driverCarType = extras['driverCarType'] as String;
-            final String driverId = extras['driverId'] as String;
-            final String endLatitude = extras['endLatitude'] as String;
-            final String endLongitude = extras['endLongitude'] as String;
+            final extra = state.extra as Map<String, TripModel>;
+            final trip = extra['trip'] as TripModel;
+            // final String driverName = extras['driverName'] as String;
+            // final String driverPhone = extras['driverPhone'] as String;
+            // final String driverAvatar = extras['driverAvatar'] as String;
+            // final String driverPlate = extras['driverPlate'] as String;
+            // final String driverCarType = extras['driverCarType'] as String;
+            // final String driverId = extras['driverId'] as String;
+            // final String endLatitude = extras['endLatitude'] as String;
+            // final String endLongitude = extras['endLongitude'] as String;
             return SlideRightTransition(
               child: OnTripScreen(
-                driverId: driverId,
-                driverName: driverName,
-                driverPhone: driverPhone,
-                driverAvatar: driverAvatar,
-                driverPlate: driverPlate,
-                driverCarType: driverCarType,
-                endLatitude: endLatitude,
-                endLongitude: endLongitude,
+                trip: trip,
               ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
@@ -391,25 +386,11 @@ class AppRouter {
           path: RouteConstants.guardianObserveDependentTripUrl,
           pageBuilder: (context, state) {
             //final Map<String, dynamic> params = state.pathParameters;
-            final extras = state.extra as Map<String, dynamic>;
-            final String driverName = extras['driverName'] as String;
-            final String driverPhone = extras['driverPhone'] as String;
-            final String driverAvatar = extras['driverAvatar'] as String;
-            final String driverPlate = extras['driverPlate'] as String;
-            final String driverCarType = extras['driverCarType'] as String;
-            final String driverId = extras['driverId'] as String;
-            final String endLatitude = extras['endLatitude'] as String;
-            final String endLongitude = extras['endLongitude'] as String;
+            final extra = state.extra as Map<String, TripModel>;
+            final trip = extra['trip'] as TripModel;
             return SlideRightTransition(
-              child: DriverPickUpScreen(
-                driverId: driverId,
-                driverName: driverName,
-                driverPhone: driverPhone,
-                driverAvatar: driverAvatar,
-                driverPlate: driverPlate,
-                driverCarType: driverCarType,
-                endLatitude: endLatitude,
-                endLongitude: endLongitude,
+              child: GuardianObserveDependentTripScreen(
+                trip: trip,
               ),
               key: state.pageKey,
             );

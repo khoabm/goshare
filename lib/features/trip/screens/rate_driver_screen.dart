@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:goshare/core/constants/route_constants.dart';
 
 class RateDriverScreen extends StatefulWidget {
   const RateDriverScreen({super.key});
@@ -55,7 +57,7 @@ class _RateDriverScreenState extends State<RateDriverScreen> {
             const SizedBox(height: 16.0),
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                context.goNamed(RouteConstants.dashBoard);
               },
               child: const Text('Quay lại'),
             ),

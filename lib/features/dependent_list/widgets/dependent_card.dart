@@ -11,11 +11,14 @@ import 'package:goshare/theme/pallet.dart';
 class DependentCard extends ConsumerWidget {
   final DependentModel? dependentModel;
   final bool isGetLocation;
-  const DependentCard({
-    super.key,
+  final ValueNotifier<bool> isLoading;
+  DependentCard({
+    Key? key,
     this.dependentModel,
     this.isGetLocation = false,
-  });
+    ValueNotifier<bool>? isLoading,
+  })  : isLoading = isLoading ?? ValueNotifier<bool>(false),
+        super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -41,9 +44,11 @@ class DependentCard extends ConsumerWidget {
               if (isGetLocation) {
                 if (dependentModel?.id !=
                     ref.watch(userProvider.notifier).state?.id) {
+                  isLoading.value = true;
                   dependentLocationData = await ref
                       .watch(dependentControllerProvider.notifier)
                       .getDependentsLocation(context, dependentModel?.id ?? '');
+                  isLoading.value = true;
                 }
               }
 
