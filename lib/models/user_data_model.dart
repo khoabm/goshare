@@ -53,7 +53,7 @@ class UserDataModel {
       'name': name,
       'role': role,
       'currentTrip': currentTrip,
-      'dependentTrips': dependentTrips?.map((x) => x?.toMap())?.toList(),
+      'dependentTrips': dependentTrips?.map((x) => x.toMap()).toList(),
     };
   }
 

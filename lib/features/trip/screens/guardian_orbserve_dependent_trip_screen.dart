@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:goshare/theme/pallet.dart';
 import 'package:location/location.dart';
 import 'package:signalr_core/signalr_core.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
@@ -10,27 +9,15 @@ import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 import 'package:goshare/common/loader.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/locations_util.dart';
+import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/providers/signalr_providers.dart';
+import 'package:goshare/theme/pallet.dart';
 
 class GuardianObserveDependentTripScreen extends ConsumerStatefulWidget {
-  final String driverName;
-  final String driverPhone;
-  final String driverAvatar;
-  final String driverPlate;
-  final String driverCarType;
-  final String driverId;
-  final String endLatitude;
-  final String endLongitude;
+  final TripModel trip;
   const GuardianObserveDependentTripScreen({
     super.key,
-    required this.driverName,
-    required this.driverPhone,
-    required this.driverAvatar,
-    required this.driverPlate,
-    required this.driverCarType,
-    required this.driverId,
-    required this.endLatitude,
-    required this.endLongitude,
+    required this.trip,
   });
 
   @override
@@ -73,7 +60,7 @@ class _GuardianObserveDependentTripScreenState
         hubConnectionProvider.future,
       );
 
-      hubConnection.on('', (message) {
+      hubConnection.on('NotifyPassengerTripEnded', (message) {
         print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
         _handleNotifyPassengerDriverPickUp(message);
       });
@@ -95,21 +82,24 @@ class _GuardianObserveDependentTripScreenState
   }
 
   void _handleNotifyPassengerDriverPickUp(dynamic message) {
-    _showDriverInfoDialog();
+    final data = message as List<dynamic>;
+    final tripData = data.cast<Map<String, dynamic>>().first;
+    final trip = TripModel.fromMap(tripData);
+    _showDriverInfoDialog(trip);
   }
 
-  void _showDriverInfoDialog() {
+  void _showDriverInfoDialog(TripModel trip) {
     showDialog(
       barrierDismissible: true,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Center(
+          title: Center(
             child: Text(
-              'Tài xế đã đến',
+              'Chuyến đi của người thân, ${trip.passenger.name} đã hoàn thành',
             ),
           ),
-          content: const Row(
+          content: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Expanded(
@@ -118,7 +108,12 @@ class _GuardianObserveDependentTripScreenState
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Vui lòng tìm tài xế của bạn gần đó'),
+                    Text(
+                      'Tài xế ${trip.passenger} đã hoàn thành chuyến cho người thần ${trip.passenger.name}',
+                    ),
+                    Text(
+                      'Số tiền thanh toán là ${trip.price} qua hình thức trả bằng ${trip.paymentMethod == 0 ? 'Ví' : 'Tiền mặt'}',
+                    ),
                   ],
                 ),
               ),
@@ -339,7 +334,7 @@ class _GuardianObserveDependentTripScreenState
                             ? Column(
                                 children: [
                                   Text(
-                                    widget.driverName,
+                                    widget.trip.driver?.name ?? 'Không rõ',
                                     style: const TextStyle(
                                       fontSize: 25,
                                       fontWeight: FontWeight.bold,
@@ -363,7 +358,8 @@ class _GuardianObserveDependentTripScreenState
                                               height: 8,
                                             ),
                                             Text(
-                                              widget.driverCarType,
+                                              widget.trip.driver?.car.make ??
+                                                  'Không rõ',
                                               style: const TextStyle(
                                                 fontSize: 25,
                                                 fontWeight: FontWeight.w500,
@@ -373,7 +369,9 @@ class _GuardianObserveDependentTripScreenState
                                               height: 8,
                                             ),
                                             Text(
-                                              widget.driverPlate,
+                                              widget.trip.driver?.car
+                                                      .licensePlate ??
+                                                  'Không rõ',
                                               style: const TextStyle(
                                                 fontSize: 25,
                                                 fontWeight: FontWeight.w500,
@@ -383,7 +381,8 @@ class _GuardianObserveDependentTripScreenState
                                               height: 8,
                                             ),
                                             Text(
-                                              widget.driverPhone,
+                                              widget.trip.driver?.phone ??
+                                                  'Không rõ',
                                               style: const TextStyle(
                                                 fontSize: 25,
                                                 fontWeight: FontWeight.w500,
@@ -399,7 +398,7 @@ class _GuardianObserveDependentTripScreenState
                                         child: CircleAvatar(
                                           radius: 50.0,
                                           backgroundImage: NetworkImage(
-                                            widget.driverAvatar,
+                                            widget.trip.driver?.avatarUrl ?? '',
                                           ),
                                           backgroundColor: Colors.transparent,
                                         ),
