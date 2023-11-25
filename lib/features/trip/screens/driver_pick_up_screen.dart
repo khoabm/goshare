@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:goshare/core/utils/locations_util.dart';
 import 'package:goshare/models/trip_model.dart';
 import 'package:location/location.dart';
 import 'package:signalr_core/signalr_core.dart';
@@ -10,7 +11,6 @@ import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 
 import 'package:goshare/common/loader.dart';
 import 'package:goshare/core/constants/route_constants.dart';
-import 'package:goshare/core/locations_util.dart';
 import 'package:goshare/providers/signalr_providers.dart';
 
 class DriverPickUpScreen extends ConsumerStatefulWidget {
@@ -624,12 +624,18 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   }
 
   _markerWidget(IconData icon) {
-    return Container(
+    return SizedBox(
       width: 20,
       height: 20,
-      decoration:
-          const BoxDecoration(shape: BoxShape.circle, color: Colors.green),
-      child: Icon(icon, color: Colors.red, size: 13),
+      child: Center(
+        child: CircleAvatar(
+          radius: 20.0,
+          backgroundImage: NetworkImage(
+            widget.driverAvatar,
+          ),
+          backgroundColor: Colors.transparent,
+        ),
+      ),
     );
   }
 }

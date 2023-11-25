@@ -69,6 +69,7 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
     String bookerId,
     String carTypeId,
     String? driverNote,
+    int capacity,
   ) {
     context.replaceNamed(RouteConstants.routeConfirm, extra: {
       'startLatitude': startLatitude,
@@ -79,6 +80,7 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
       'bookerId': bookerId,
       'carTypeId': carTypeId,
       'driverNote': driverNote,
+      'capacity': capacity,
     });
   }
 
@@ -512,6 +514,10 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                       .state]
                                   .cartypeId,
                               driverNote,
+                              cars[ref
+                                      .watch(selectedCarIndexProvider.notifier)
+                                      .state]
+                                  .capacity,
                             );
                           }
                         },

@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/common/loader.dart';
 import 'package:goshare/core/constants/route_constants.dart';
-import 'package:goshare/core/locations_util.dart';
+import 'package:goshare/core/utils/locations_util.dart';
 import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
 import 'package:goshare/features/login/controller/log_in_controller.dart';
