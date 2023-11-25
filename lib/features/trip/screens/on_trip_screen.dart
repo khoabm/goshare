@@ -91,13 +91,13 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
               ref
                   .read(currentOnTripIdProvider.notifier)
                   .setCurrentOnTripId(null);
-              context.goNamed(RouteConstants.rating);
+              context.replaceNamed(RouteConstants.rating);
             } else {
               print('self booking false');
               if (isNotifyToGuardian == false) {
                 print('not notify for guardian booking');
                 ref.read(stageProvider.notifier).setStage(Stage.stage0);
-                context.goNamed(RouteConstants.rating);
+                context.replaceNamed(RouteConstants.rating);
               } else {
                 print('notify for guardian booking');
                 _showNavigateDashBoardDialog(trip);

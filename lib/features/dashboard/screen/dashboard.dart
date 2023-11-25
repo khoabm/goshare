@@ -125,7 +125,6 @@ class _DashBoardState extends ConsumerState<DashBoard> {
     if (user?.role.toLowerCase() == 'dependent') {
       final currentLocation = await location.getCurrentLocation();
       connection.on("RequestLocation", (message) {
-        print('hehehehehe GET LOCATION DEP');
         final location = {
           "latitude": currentLocation?.latitude,
           "longitude":
@@ -149,7 +148,6 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         'NotifyDependentNewTripBooked',
         (arguments) {
           try {
-            print("SIGNAL R DEP TRIP BOOK" + arguments.toString());
             final tripData =
                 (arguments as List<dynamic>).cast<Map<String, dynamic>>().first;
             final trip = TripModel.fromMap(tripData);
@@ -168,18 +166,18 @@ class _DashBoardState extends ConsumerState<DashBoard> {
       'NotifyPassengerDriverOnTheWay',
       (message) {
         try {
-          print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
           final driverData =
               (message as List<dynamic>).cast<Map<String, dynamic>>().first;
           bool isSelfBook = message.cast<bool>()[1];
-          print(isSelfBook);
+          bool isNotifyToGuardian = message.cast<bool>()[2];
           if (isSelfBook == false) {
-            print('not self book');
-            final driver = Driver.fromMap(driverData);
-            ref.read(driverProvider.notifier).addDriverData(driver);
-            ref.read(stageProvider.notifier).setStage(
-                  Stage.stage2,
-                );
+            if (isNotifyToGuardian == false) {
+              final driver = Driver.fromMap(driverData);
+              ref.read(driverProvider.notifier).addDriverData(driver);
+              ref.read(stageProvider.notifier).setStage(
+                    Stage.stage2,
+                  );
+            }
           }
         } catch (e) {
           print(
@@ -192,17 +190,14 @@ class _DashBoardState extends ConsumerState<DashBoard> {
       'NotifyPassengerDriverPickup',
       (message) {
         try {
-          print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
           final data = message as List<dynamic>;
           final tripData = data.cast<Map<String, dynamic>>().first;
           final trip = TripModel.fromMap(tripData);
           bool isSelfBook = data.cast<bool>()[1];
           bool isNotifyToGuardian = data.cast<bool>()[2];
-          print(isSelfBook);
-          print(isNotifyToGuardian);
+
           if (isSelfBook == false) {
             if (isNotifyToGuardian == false) {
-              print('đúng rồi nè');
               showDialogInfoPickUp(
                 trip,
                 context,
@@ -211,9 +206,10 @@ class _DashBoardState extends ConsumerState<DashBoard> {
             }
           }
         } catch (e) {
-          print(
-            e.toString(),
-          );
+          rethrow;
+          // print(
+          //   e.toString(),
+          // );
         }
       },
     );
@@ -229,25 +225,20 @@ class _DashBoardState extends ConsumerState<DashBoard> {
           bool isSelfBook = data.cast<bool>()[1];
           bool isNotifyToGuardian = data.cast<bool>()[2];
           ref.read(currentOnTripIdProvider.notifier).setCurrentOnTripId(null);
-          print(isSelfBook);
-          print(isNotifyToGuardian);
           if (isSelfBook == true) {
-            print('self booking');
             ref.read(currentOnTripIdProvider.notifier).setCurrentOnTripId(null);
-            context.goNamed(RouteConstants.rating);
+            context.replaceNamed(RouteConstants.rating);
           } else {
-            print('self booking false');
             if (isNotifyToGuardian == false) {
-              print('not notify for guardian booking');
               ref.read(stageProvider.notifier).setStage(Stage.stage0);
-              context.goNamed(RouteConstants.rating);
+              context.replaceNamed(RouteConstants.rating);
             } else {
-              print('notify for guardian booking');
               showNavigateDashBoardDialog(trip, context);
             }
           }
         } catch (e) {
-          print(e.toString());
+          rethrow;
+          // print(e.toString());
         }
       },
     );

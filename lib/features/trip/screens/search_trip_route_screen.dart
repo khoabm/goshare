@@ -113,6 +113,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                   //dragEnabled: false,
                   compassEnabled: false,
                   myLocationEnabled: true,
+
                   styleString:
                       'https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm',
                   initialCameraPosition: const CameraPosition(

@@ -3,6 +3,8 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/utils/locations_util.dart';
+import 'package:goshare/core/utils/utils.dart';
+import 'package:goshare/models/vietmap_route_model.dart';
 import 'package:location/location.dart';
 import 'package:signalr_core/signalr_core.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
@@ -34,6 +36,7 @@ class _GuardianObserveDependentTripScreenState
   LocationData? currentLocation;
   bool _isLoading = false;
   PolylinePoints polylinePoints = PolylinePoints();
+  VietMapRouteModel? routeModel;
   @override
   void dispose() {
     _mapController?.dispose();
@@ -45,7 +48,7 @@ class _GuardianObserveDependentTripScreenState
     if (!mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // await initSignalR(ref);
-      final location = ref.watch(locationProvider);
+      final location = ref.read(locationProvider);
       currentLocation = await location.getCurrentLocation();
       //updateMarker();
 
@@ -209,28 +212,47 @@ class _GuardianObserveDependentTripScreenState
                         setState(() {
                           _isLoading = true;
                         });
-                        List<PointLatLng> pointLatLngList =
-                            polylinePoints.decodePolyline(
-                                "}s{`Ac_hjSjAkCFQRu@Lu@F_@D]Ng@ZaALa@JY~AoDDEmBiBe@[WMg@M_@KmA]uA_@a@KkA]qA[[Gs@MUE_AKu@Co@Ew@CYAmAGeBKaAEsAKCQMQUGM?KBIFGHCJoBO{@Ck@AQ@MZAJAjAG|ACz@MnCEnAGlBCx@EjA?\\EvAEjBE~@Cr@F?HqBv@DBSDIBAl@HFADAVSD@JLB@h@BDADEDAJ@");
 
-                        List<LatLng> latLngList = pointLatLngList
-                            .map((point) =>
-                                LatLng(point.latitude, point.longitude))
-                            .toList();
-
-                        print(latLngList);
-                        print(latLngList.length);
-
-                        await _mapController?.addPolyline(
-                          PolylineOptions(
-                            //polylineGapWidth: 0,
-                            geometry: latLngList,
-                            polylineColor: Pallete.primaryColor,
-                            polylineWidth: 8.0,
-                            polylineOpacity: 1,
-                            draggable: false,
-                          ),
+                        // print(latLngList);
+                        // print(latLngList.length);
+                        final data = await LocationUtils.getRoute(
+                          widget.trip.startLocation.latitude,
+                          widget.trip.startLocation.longitude,
+                          widget.trip.endLocation.latitude,
+                          widget.trip.endLocation.longitude,
                         );
+                        data.fold(
+                          (l) {
+                            showSnackBar(
+                                context: context,
+                                message: 'Có lỗi khi lấy tuyến đường tài xế');
+                          },
+                          (r) => routeModel = r,
+                        );
+                        if (routeModel != null) {
+                          List<PointLatLng> pointLatLngList =
+                              polylinePoints.decodePolyline(
+                            routeModel!.paths[0].points,
+                          );
+                          List<LatLng> latLngList = pointLatLngList
+                              .map(
+                                (point) =>
+                                    LatLng(point.latitude, point.longitude),
+                              )
+                              .toList();
+                          await _mapController?.addPolyline(
+                            PolylineOptions(
+                              //polylineGapWidth: 0,
+                              geometry: latLngList,
+                              polylineColor: Pallete.primaryColor,
+                              polylineWidth: 6.5,
+                              polylineOpacity: 1,
+                              draggable: false,
+                              polylineBlur: 0.8,
+                            ),
+                          );
+                        }
+
                         setState(() {
                           _isLoading = false;
                         });

@@ -113,7 +113,6 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
       });
 
       hubConnection.onclose((exception) async {
-        print(exception.toString() + "LOI CUA SIGNALR ON CLOSE");
         await Future.delayed(
           const Duration(seconds: 3),
           () async {
@@ -125,7 +124,8 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
         );
       });
     } catch (e) {
-      print(e.toString());
+      rethrow;
+      //print(e.toString());
     }
   }
 
@@ -226,16 +226,16 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () async {
-                setState(() {
-                  _isLoading = true;
-                });
-                await Future.delayed(
-                  const Duration(seconds: 2),
-                );
-                setState(() {
-                  _isLoading = false;
-                });
+              onPressed: () {
+                // setState(() {
+                //   _isLoading = true;
+                // });
+                // await Future.delayed(
+                //   const Duration(seconds: 2),
+                // );
+                // setState(() {
+                //   _isLoading = false;
+                // });
                 navigateToGuardianObserverScreen(trip);
               },
               child: const Text(

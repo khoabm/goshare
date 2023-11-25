@@ -111,7 +111,7 @@ void showNavigateDashBoardDialog(TripModel trip, BuildContext context) {
         actions: [
           TextButton(
             onPressed: () {
-              context.replaceNamed(RouteConstants.dashBoard);
+              context.goNamed(RouteConstants.dashBoard);
             },
             child: const Text(
               'Xác nhận',
@@ -167,7 +167,7 @@ void showDialogInfo(TripModel? trip, BuildContext context, WidgetRef ref) {
 
 void showDialogInfoPickUp(TripModel trip, BuildContext context) {
   showDialog(
-    barrierDismissible: false,
+    barrierDismissible: true,
     context: context,
     builder: (BuildContext abcContext) {
       return AlertDialog(
@@ -176,10 +176,29 @@ void showDialogInfoPickUp(TripModel trip, BuildContext context) {
             'Tài xế ${trip.driver?.name} đã đến',
           ),
         ),
-        content: const SizedBox.shrink(),
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                      'Bạn đã đặt xe: ${trip.driver?.car.make} ${trip.driver?.car.model}'),
+                  Text('Biển số xe: ${trip.driver?.car.licensePlate}'),
+                  Text('Số điện thoại tài xế: ${trip.driver?.phone}'),
+                  const Text('Vui lòng tìm tài xế của bạn gần đó'),
+                ],
+              ),
+            ),
+          ],
+        ),
         actions: [
-          ElevatedButton(
+          TextButton(
             onPressed: () {
+              //context.pop();
               abcContext.goNamed(
                 RouteConstants.onTrip,
                 extra: {
@@ -196,3 +215,35 @@ void showDialogInfoPickUp(TripModel trip, BuildContext context) {
     },
   );
 }
+
+// void showDialogInfoPickUp(TripModel trip, BuildContext context) {
+//   showDialog(
+//     barrierDismissible: false,
+//     context: context,
+//     builder: (BuildContext abcContext) {
+//       return AlertDialog(
+//         title: Center(
+//           child: Text(
+//             'Tài xế ${trip.driver?.name} đã đến',
+//           ),
+//         ),
+//         content: const SizedBox.shrink(),
+//         actions: [
+//           ElevatedButton(
+//             onPressed: () {
+//               abcContext.goNamed(
+//                 RouteConstants.onTrip,
+//                 extra: {
+//                   'trip': trip,
+//                 },
+//               );
+//             },
+//             child: const Text(
+//               'Xác nhận',
+//             ),
+//           ),
+//         ],
+//       );
+//     },
+//   );
+// }

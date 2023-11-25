@@ -4,6 +4,7 @@ import 'package:goshare/core/constants/constants.dart';
 import 'package:goshare/core/failure.dart';
 import 'package:goshare/core/type_def.dart';
 import 'package:goshare/models/vietmap_place_model.dart';
+import 'package:goshare/models/vietmap_route_model.dart';
 import 'package:location/location.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
@@ -83,7 +84,7 @@ class LocationUtils {
     }
   }
 
-  static FutureEither<VietmapPlaceModel> getRoute(
+  static FutureEither<VietMapRouteModel> getRoute(
     double startLatitude,
     double startLongitude,
     double endLatitude,
@@ -106,7 +107,7 @@ class LocationUtils {
       var res = await http.get(url);
 
       if (res.statusCode == 200) {
-        var data = VietmapPlaceModel.fromJson(res.body);
+        var data = VietMapRouteModel.fromJson(res.body);
         return right(data);
       } else {
         return left(
