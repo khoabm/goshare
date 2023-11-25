@@ -115,11 +115,11 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
   //MapOptions? options;
 
   void navigateToSearchTripRoute() {
-    context.replaceNamed(RouteConstants.searchTripRoute);
+    context.goNamed(RouteConstants.searchTripRoute);
   }
 
   void navigateToFindTrip() {
-    context.replaceNamed(RouteConstants.findTrip, extra: {
+    context.goNamed(RouteConstants.findTrip, extra: {
       'startLatitude': widget.startLatitude,
       'startLongitude': widget.startLongitude,
       'endLatitude': widget.endLatitude,

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +10,7 @@ import 'package:goshare/common/app_button.dart';
 import 'package:goshare/core/constants/constants.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/utils/locations_util.dart';
+import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/home/controller/home_controller.dart';
 import 'package:goshare/features/home/repositories/home_repository.dart';
 import 'package:goshare/features/home/widgets/dependent_widgets/driver_pick_up_card.dart';
@@ -27,6 +30,7 @@ import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:goshare/providers/dependent_booking_stage_provider.dart';
 import 'package:goshare/providers/dependent_trip_provider.dart';
+import 'package:goshare/providers/signalr_providers.dart';
 import 'package:goshare/providers/user_locations_provider.dart';
 // import 'package:goshare/providers/current_location_provider.dart';
 // import 'package:goshare/providers/current_location_provider.dart';
@@ -94,7 +98,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     if (mounted) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (mounted) {
+        if (context.mounted) {
+          //await initSignalR(ref);
           await getUserLocationList();
 
           // Check mounted again before updating state
@@ -106,17 +111,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void dispose() {
+    //revokeHub(ref);
     super.dispose();
   }
 
   Future<void> getUserLocationList() async {
     if (context.mounted) {
       try {
-        print("INIT O HOME NE");
-        locations = await ref
-            .read(homeControllerProvider.notifier)
-            .getUserListLocation(context);
-        ref.read(userLocationProvider.notifier).loadLocations(locations);
+        if (mounted) {
+          print("INIT O HOME NE");
+          locations = await ref
+              .read(homeControllerProvider.notifier)
+              .getUserListLocation(context);
+          ref.read(userLocationProvider.notifier).loadLocations(locations);
+        }
       } catch (e) {
         print(e.toString());
         // Handle any errors here
@@ -125,7 +133,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void navigateToSearchTripRoute(BuildContext context) {
-    context.pushNamed(RouteConstants.searchTripRoute);
+    context.goNamed(RouteConstants.searchTripRoute);
   }
 
   Future<DependentModel?> navigateToDependentList(BuildContext context) async {
@@ -135,7 +143,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void navigateToFindTrip(String startLat, String startLon, String endLat,
       String endLon, String carTypeId) {
-    context.replaceNamed(RouteConstants.findTrip, extra: {
+    context.goNamed(RouteConstants.findTrip, extra: {
       'startLatitude': startLat,
       'startLongitude': startLon,
       'endLatitude': endLat,
@@ -364,6 +372,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       'endLatitude': endLatitude,
       'endLongitude': endLongitude,
     });
+  }
+
+  void revokeHub(WidgetRef widgetRef) async {
+    if (mounted) {
+      final connection = await widgetRef.read(
+        hubConnectionProvider.future,
+      );
+      final user = widgetRef.read(userProvider.notifier).state;
+      if (user?.role.toLowerCase() == 'dependent') {
+        connection.off('RequestLocation');
+        connection.off('SendLocation');
+        connection.off('NotifyDependentNewTripBooked');
+      }
+      connection.off('NotifyPassengerDriverOnTheWay');
+      connection.off('NotifyPassengerDriverPickup');
+      connection.off('NotifyPassengerTripEnded');
+    }
   }
 
   @override

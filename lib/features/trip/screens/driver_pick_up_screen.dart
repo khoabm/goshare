@@ -46,6 +46,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   UserLocation? userLocation;
   LocationData? currentLocation;
   bool _isLoading = false;
+
   // List<LatLng> latLngList = [
   //   const LatLng(10.736657, 106.672240),
   //   const LatLng(10.766543, 106.742378),
@@ -58,7 +59,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
 
   @override
   void dispose() {
-    revokeHub();
+    //revokeHub();
     _mapController?.dispose();
     super.dispose();
   }
@@ -113,7 +114,6 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
       });
 
       hubConnection.onclose((exception) async {
-        print(exception.toString() + "LOI CUA SIGNALR ON CLOSE");
         await Future.delayed(
           const Duration(seconds: 3),
           () async {
@@ -125,7 +125,8 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
         );
       });
     } catch (e) {
-      print(e.toString());
+      rethrow;
+      //print(e.toString());
     }
   }
 
@@ -136,10 +137,13 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
       final trip = TripModel.fromMap(tripData);
       bool isSelfBook = data.cast<bool>()[1];
       bool isNotifyToGuardian = data.cast<bool>()[2];
-      if (isSelfBook) {
+      if (isSelfBook == true) {
+        print('TỰ ĐẶT TRONG PICKUP');
         _showDriverInfoDialog(trip);
       } else {
-        if (isNotifyToGuardian) {
+        print('KHÔNG PHẢI TỰ ĐẶT TRONG PICKUP');
+        if (isNotifyToGuardian == true) {
+          print('NOTIFY CHO GUARDIAN TRONG PICKUP');
           _showDependentDriverInfoDialog(trip);
         }
       }
@@ -226,16 +230,16 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () async {
-                setState(() {
-                  _isLoading = true;
-                });
-                await Future.delayed(
-                  const Duration(seconds: 2),
-                );
-                setState(() {
-                  _isLoading = false;
-                });
+              onPressed: () {
+                // setState(() {
+                //   _isLoading = true;
+                // });
+                // await Future.delayed(
+                //   const Duration(seconds: 2),
+                // );
+                // setState(() {
+                //   _isLoading = false;
+                // });
                 navigateToGuardianObserverScreen(trip);
               },
               child: const Text(
@@ -245,16 +249,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           ],
         );
       },
-    ).then((value) async {
-      setState(() {
-        _isLoading = true;
-      });
-      await Future.delayed(
-        const Duration(seconds: 2),
-      );
-      setState(() {
-        _isLoading = false;
-      });
+    ).then((value) {
       navigateToGuardianObserverScreen(trip);
     });
   }
@@ -262,7 +257,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   void navigateToOnTripScreen(
     TripModel trip,
   ) {
-    context.replaceNamed(RouteConstants.onTrip, extra: {
+    context.goNamed(RouteConstants.onTrip, extra: {
       'trip': trip,
     });
   }
@@ -270,7 +265,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   void navigateToGuardianObserverScreen(
     TripModel trip,
   ) {
-    context.replaceNamed(RouteConstants.guardianObserveDependentTrip, extra: {
+    context.goNamed(RouteConstants.guardianObserveDependentTrip, extra: {
       'trip': trip,
     });
   }

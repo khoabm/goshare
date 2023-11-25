@@ -71,7 +71,7 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
     String? driverNote,
     int capacity,
   ) {
-    context.replaceNamed(RouteConstants.routeConfirm, extra: {
+    context.goNamed(RouteConstants.routeConfirm, extra: {
       'startLatitude': startLatitude,
       'startLongitude': startLongitude,
       'endLatitude': endLatitude,
@@ -499,8 +499,14 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                             //ref.invalidate(selectedPaymentMethodProvider);
                             navigateToRouteConfirmScreen(
                               context,
-                              widget.startLatitude,
-                              widget.startLongitude,
+                              passengerLocation != null
+                                  ? (passengerLocation?.latitude.toString() ??
+                                      '0')
+                                  : widget.startLatitude,
+                              passengerLocation != null
+                                  ? (passengerLocation?.longitude.toString() ??
+                                      '0')
+                                  : widget.startLongitude,
                               widget.endLatitude,
                               widget.endLongitude,
                               ref

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geocoding/geocoding.dart';
 
 import 'package:goshare/core/failure.dart';
 import 'package:goshare/core/utils/utils.dart';
+import 'package:goshare/features/home/controller/home_controller.dart';
 import 'package:goshare/features/trip/repository/trip_repository.dart';
 
 import 'package:goshare/models/car_model.dart';
@@ -13,31 +13,44 @@ import 'package:goshare/models/trip_model.dart';
 final tripControllerProvider = StateNotifierProvider<TripController, bool>(
   (ref) => TripController(
     tripRepository: ref.watch(tripRepositoryProvider),
+    ref: ref,
   ),
 );
 
 class TripController extends StateNotifier<bool> {
   final TripRepository _tripRepository;
+  final Ref _ref;
   TripController({
     required tripRepository,
+    required Ref ref,
   })  : _tripRepository = tripRepository,
+        _ref = ref,
         super(false);
 
   Future<TripModel?> findDriver(
       BuildContext context, FindTripModel tripModel) async {
     TripModel? trip;
-    final endAddress = await placemarkFromCoordinates(
-      tripModel.endLatitude,
-      tripModel.endLongitude,
-    );
-    final startAddress = await placemarkFromCoordinates(
-      tripModel.startLatitude,
-      tripModel.startLongitude,
-    );
-    tripModel.copyWith(
-      endAddress: endAddress.first.name,
-      startAddress: startAddress.first.name,
-    );
+
+    final res =
+        await _ref.watch(homeControllerProvider.notifier).searchLocationReverse(
+              context,
+              tripModel.startLongitude,
+              tripModel.startLatitude,
+            );
+    if (context.mounted) {
+      final res2 = await _ref
+          .watch(homeControllerProvider.notifier)
+          .searchLocationReverse(
+            context,
+            tripModel.startLongitude,
+            tripModel.startLatitude,
+          );
+      tripModel.copyWith(
+        endAddress: res.address,
+        startAddress: res2.address,
+      );
+    }
+
     final result = await _tripRepository.findDriver(tripModel);
     result.fold((l) {
       state = false;
@@ -63,18 +76,26 @@ class TripController extends StateNotifier<bool> {
     String dependentId,
   ) async {
     TripModel? trip;
-    final endAddress = await placemarkFromCoordinates(
-      tripModel.endLatitude,
-      tripModel.endLongitude,
-    );
-    final startAddress = await placemarkFromCoordinates(
-      tripModel.startLatitude,
-      tripModel.startLongitude,
-    );
-    tripModel.copyWith(
-      endAddress: endAddress.first.name,
-      startAddress: startAddress.first.name,
-    );
+    final res =
+        await _ref.watch(homeControllerProvider.notifier).searchLocationReverse(
+              context,
+              tripModel.startLongitude,
+              tripModel.startLatitude,
+            );
+    if (context.mounted) {
+      final res2 = await _ref
+          .watch(homeControllerProvider.notifier)
+          .searchLocationReverse(
+            context,
+            tripModel.startLongitude,
+            tripModel.startLatitude,
+          );
+      tripModel.copyWith(
+        endAddress: res.address,
+        startAddress: res2.address,
+      );
+    }
+
     final result = await _tripRepository.findDriverForDependent(
       tripModel,
       dependentId,

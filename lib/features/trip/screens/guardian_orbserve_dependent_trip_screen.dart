@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/utils/locations_util.dart';
+import 'package:goshare/core/utils/utils.dart';
+import 'package:goshare/models/vietmap_route_model.dart';
 import 'package:location/location.dart';
 import 'package:signalr_core/signalr_core.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
@@ -34,8 +38,10 @@ class _GuardianObserveDependentTripScreenState
   LocationData? currentLocation;
   bool _isLoading = false;
   PolylinePoints polylinePoints = PolylinePoints();
+  VietMapRouteModel? routeModel;
   @override
   void dispose() {
+    //revokeHub();
     _mapController?.dispose();
     super.dispose();
   }
@@ -45,13 +51,56 @@ class _GuardianObserveDependentTripScreenState
     if (!mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // await initSignalR(ref);
-      final location = ref.watch(locationProvider);
+      await initSignalR(ref);
+      final location = ref.read(locationProvider);
       currentLocation = await location.getCurrentLocation();
       //updateMarker();
-
       setState(() {});
     });
     super.initState();
+  }
+
+  void revokeHub() async {
+    final hubConnection = await ref.read(
+      hubConnectionProvider.future,
+    );
+    hubConnection.off('NotifyPassengerTripEnded');
+  }
+
+  void updateMarker(double latitude, double longitude) async {
+    if (mounted) {
+      List<Marker> tempMarkers = []; // Temporary list to hold the new markers
+
+      // Wait for a while before updating the marker
+      await Future.delayed(const Duration(seconds: 1));
+      print('did update marker');
+      // Add the new marker to the temporary list
+      tempMarkers.clear();
+      temp.clear();
+      tempMarkers.add(
+        Marker(
+          child: _markerWidget(
+            const IconData(0xe1d7, fontFamily: 'MaterialIcons'),
+          ),
+          latLng: LatLng(
+            latitude,
+            longitude,
+          ),
+        ),
+      );
+      setState(() {
+        temp = tempMarkers;
+        _mapController?.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: temp.first.latLng,
+              zoom: 15.5,
+              tilt: 0,
+            ),
+          ),
+        );
+      });
+    }
   }
 
   Future<void> initSignalR(WidgetRef ref) async {
@@ -59,10 +108,23 @@ class _GuardianObserveDependentTripScreenState
       final hubConnection = await ref.watch(
         hubConnectionProvider.future,
       );
+      hubConnection.on(
+        'UpdateDriverLocation',
+        (arguments) {
+          final stringData = arguments?.first as String;
+          final data = jsonDecode(stringData) as Map<String, dynamic>;
+          updateMarker(
+            data['latitude'],
+            data['longitude'],
+          );
+        },
+      );
 
       hubConnection.on('NotifyPassengerTripEnded', (message) {
         print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
-        _handleNotifyPassengerDriverPickUp(message);
+        if (mounted) {
+          _handleNotifyPassengerDriverPickUp(message);
+        }
       });
 
       hubConnection.onclose((exception) async {
@@ -82,10 +144,12 @@ class _GuardianObserveDependentTripScreenState
   }
 
   void _handleNotifyPassengerDriverPickUp(dynamic message) {
-    final data = message as List<dynamic>;
-    final tripData = data.cast<Map<String, dynamic>>().first;
-    final trip = TripModel.fromMap(tripData);
-    _showDriverInfoDialog(trip);
+    if (mounted) {
+      final data = message as List<dynamic>;
+      final tripData = data.cast<Map<String, dynamic>>().first;
+      final trip = TripModel.fromMap(tripData);
+      _showDriverInfoDialog(trip);
+    }
   }
 
   void _showDriverInfoDialog(TripModel trip) {
@@ -109,7 +173,7 @@ class _GuardianObserveDependentTripScreenState
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Tài xế ${trip.passenger} đã hoàn thành chuyến cho người thần ${trip.passenger.name}',
+                      'Tài xế ${trip.passenger.name} đã hoàn thành chuyến cho người thân ${trip.passenger.name}',
                     ),
                     Text(
                       'Số tiền thanh toán là ${trip.price} qua hình thức trả bằng ${trip.paymentMethod == 0 ? 'Ví' : 'Tiền mặt'}',
@@ -209,28 +273,56 @@ class _GuardianObserveDependentTripScreenState
                         setState(() {
                           _isLoading = true;
                         });
-                        List<PointLatLng> pointLatLngList =
-                            polylinePoints.decodePolyline(
-                                "}s{`Ac_hjSjAkCFQRu@Lu@F_@D]Ng@ZaALa@JY~AoDDEmBiBe@[WMg@M_@KmA]uA_@a@KkA]qA[[Gs@MUE_AKu@Co@Ew@CYAmAGeBKaAEsAKCQMQUGM?KBIFGHCJoBO{@Ck@AQ@MZAJAjAG|ACz@MnCEnAGlBCx@EjA?\\EvAEjBE~@Cr@F?HqBv@DBSDIBAl@HFADAVSD@JLB@h@BDADEDAJ@");
 
-                        List<LatLng> latLngList = pointLatLngList
-                            .map((point) =>
-                                LatLng(point.latitude, point.longitude))
-                            .toList();
-
-                        print(latLngList);
-                        print(latLngList.length);
-
-                        await _mapController?.addPolyline(
-                          PolylineOptions(
-                            //polylineGapWidth: 0,
-                            geometry: latLngList,
-                            polylineColor: Pallete.primaryColor,
-                            polylineWidth: 8.0,
-                            polylineOpacity: 1,
-                            draggable: false,
+                        final data = await LocationUtils.getRoute(
+                          widget.trip.startLocation.latitude,
+                          widget.trip.startLocation.longitude,
+                          widget.trip.endLocation.latitude,
+                          widget.trip.endLocation.longitude,
+                        );
+                        data.fold(
+                          (l) {
+                            showSnackBar(
+                                context: context,
+                                message: 'Có lỗi khi lấy tuyến đường tài xế');
+                          },
+                          (r) => routeModel = r,
+                        );
+                        if (routeModel != null) {
+                          List<PointLatLng> pointLatLngList =
+                              polylinePoints.decodePolyline(
+                            routeModel!.paths[0].points,
+                          );
+                          List<LatLng> latLngList = pointLatLngList
+                              .map(
+                                (point) =>
+                                    LatLng(point.latitude, point.longitude),
+                              )
+                              .toList();
+                          await _mapController?.addPolyline(
+                            PolylineOptions(
+                              //polylineGapWidth: 0,
+                              geometry: latLngList,
+                              polylineColor: Pallete.primaryColor,
+                              polylineWidth: 6.5,
+                              polylineOpacity: 1,
+                              draggable: false,
+                              polylineBlur: 0.8,
+                            ),
+                          );
+                        }
+                        _mapController?.animateCamera(
+                          CameraUpdate.newCameraPosition(
+                            CameraPosition(
+                                target: LatLng(
+                                  widget.trip.startLocation.latitude,
+                                  widget.trip.startLocation.longitude,
+                                ),
+                                zoom: 15.5,
+                                tilt: 0),
                           ),
                         );
+
                         setState(() {
                           _isLoading = false;
                         });
