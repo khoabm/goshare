@@ -57,98 +57,93 @@ class _DependentListState extends ConsumerState<DependentList> {
     return Scaffold(
       body: list == null
           ? const Loader()
-          : Stack(
-              children: [
-                Positioned(
-                  top: MediaQuery.of(context).viewInsets.top + 50,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            context.pop();
-                          },
-                          child: const Icon(
-                            Icons.arrow_back_ios_new_outlined,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 60,
-                        ),
-                        const Text(
-                          'Danh sách người quen',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    height: MediaQuery.of(context).size.height * .85,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(
-                          50,
+          : ValueListenableBuilder(
+              valueListenable: isLoading,
+              builder: (context, isLoadingValue, child) {
+                return Stack(
+                  children: [
+                    Positioned(
+                      top: MediaQuery.of(context).viewInsets.top + 50,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                context.pop();
+                              },
+                              child: const Icon(
+                                Icons.arrow_back_ios_new_outlined,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 60,
+                            ),
+                            const Text(
+                              'Danh sách người quen',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      color: Colors.white,
                     ),
-                    child: Column(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(
-                            'Danh sách các người mà bạn có liên hệ',
-                          ),
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 12.0,
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        height: MediaQuery.of(context).size.height * .85,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(
+                              50,
                             ),
-                            itemCount: list?.items.length,
-                            itemBuilder: (context, index) => DependentCard(
-                                dependentModel: list?.items[index]),
                           ),
+                          color: Colors.white,
                         ),
-                      ],
+                        child: Column(
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'Danh sách các người mà bạn có liên hệ',
+                              ),
+                            ),
+                            Expanded(
+                              child: ListView.builder(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 12.0,
+                                ),
+                                itemCount: list?.items.length,
+                                itemBuilder: (context, index) => DependentCard(
+                                  dependentModel: list?.items[index],
+                                  isGetLocation: widget.isGetLocation,
+                                  isLoading: isLoading,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                // Loading indicator
-                // ValueListenableBuilder<bool>(
-                //   valueListenable: isLoading,
-                //   builder: (context, isLoading, child) {
-                //     if (isLoading) {
-                //       return Container(
-                //         color:
-                //             Colors.black.withOpacity(0.5), // Opacity background
-                //         child: const Center(
-                //           child:
-                //               CircularProgressIndicator(), // Loading indicator
-                //         ),
-                //       );
-                //     } else {
-                //       return const SizedBox
-                //           .shrink(); // Empty widget when not loading
-                //     }
-                //   },
-                // ),
-              ],
-            ),
+                    if (isLoadingValue)
+                      Container(
+                        color: Colors.black.withOpacity(0.5),
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                  ],
+                );
+              }),
     );
   }
 }

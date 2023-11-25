@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +14,7 @@ import 'package:signalr_core/signalr_core.dart';
 import 'package:goshare/providers/signalr_providers.dart';
 import 'package:vietmap_flutter_navigation/embedded/controller.dart';
 import 'package:vietmap_flutter_navigation/helpers.dart';
+import 'package:vietmap_flutter_navigation/models/marker.dart';
 import 'package:vietmap_flutter_navigation/models/options.dart';
 import 'package:vietmap_flutter_navigation/models/route_progress_event.dart';
 import 'package:vietmap_flutter_navigation/models/way_point.dart';
@@ -81,50 +83,34 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           _isLoading = true;
         });
         await initSignalR(ref);
-        print('DAY LA CHO INITTTTTTTTTTTTT');
-        print(widget.bookerId);
-        print(widget.paymentMethod);
-        print(widget.startLatitude);
-        print(widget.startLongitude);
-        print(widget.carTypeId);
-        print(widget.endLatitude);
-        print(widget.endLongitude);
-        bool check =
-            widget.bookerId == ref.watch(userProvider.notifier).state?.id;
-        print(check);
-        print(
-            '===================================================================');
-        if (widget.bookerId == ref.watch(userProvider.notifier).state?.id) {
+        if (widget.bookerId == ref.read(userProvider.notifier).state?.id) {
           if (context.mounted) {
             print('ĐẶT XE CHO MÌNH NÈ');
-            result =
-                await ref.watch(tripControllerProvider.notifier).findDriver(
-                      context,
-                      FindTripModel(
-                        startLatitude: double.parse(widget.startLatitude),
-                        startLongitude: double.parse(widget.startLongitude),
-                        startAddress: 'Nha Nguyen',
-                        endLatitude: double.parse(widget.endLatitude),
-                        endLongitude: double.parse(widget.endLongitude),
-                        endAddress: 'Nga 3',
-                        cartypeId: widget.carTypeId,
-                        paymentMethod: int.parse(widget.paymentMethod),
-                      ),
-                    );
+            result = await ref.read(tripControllerProvider.notifier).findDriver(
+                  context,
+                  FindTripModel(
+                    startLatitude: double.parse(widget.startLatitude),
+                    startLongitude: double.parse(widget.startLongitude),
+                    startAddress: 'Nha Nguyen',
+                    endLatitude: double.parse(widget.endLatitude),
+                    endLongitude: double.parse(widget.endLongitude),
+                    endAddress: 'Nga 3',
+                    cartypeId: widget.carTypeId,
+                    paymentMethod: int.parse(widget.paymentMethod),
+                  ),
+                );
           }
 
           if (result != null) {
-            setState(() {
-              ref
-                  .watch(currentOnTripIdProvider.notifier)
-                  .setCurrentOnTripId(result?.id);
-            });
+            ref
+                .read(currentOnTripIdProvider.notifier)
+                .setCurrentOnTripId(result?.id);
           }
         } else {
           if (context.mounted) {
             print('ĐẶT XE CHO NGƯỜI TA');
             result = await ref
-                .watch(tripControllerProvider.notifier)
+                .read(tripControllerProvider.notifier)
                 .findDriverForDependent(
                   context,
                   FindTripModel(
@@ -155,6 +141,22 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    //revokeHub();
+    _controller?.onDispose();
+    super.dispose();
+  }
+
+  void revokeHub() async {
+    final hubConnection = await ref.read(
+      hubConnectionProvider.future,
+    );
+    hubConnection.off('NotifyPassengerTripCanceled');
+    hubConnection.off('NotifyPassengerDriverOnTheWay');
+    hubConnection.off('NotifyPassengerTripTimedOut');
+  }
+
   Future<void> initialize() async {
     if (!mounted) return;
 
@@ -174,14 +176,51 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
 
   Future<void> initSignalR(WidgetRef ref) async {
     try {
-      final hubConnection = await ref.watch(
+      final hubConnection = await ref.read(
         hubConnectionProvider.future,
       );
 
-      hubConnection.on('NotifyPassengerDriverOnTheWay', (message) {
+      hubConnection.on('NotifyPassengerDriverOnTheWay', (message) async {
         try {
           print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
+          setState(() {
+            _isLoading = true;
+          });
+          await Future.delayed(
+            const Duration(seconds: 1),
+          );
+          setState(() {
+            _isLoading = false;
+          });
+          HapticFeedback.vibrate();
           _handleNotifyPassengerDriverOnTheWay(message);
+        } catch (e) {
+          print(e.toString());
+        }
+      });
+      hubConnection.on('NotifyPassengerTripCanceled', (message) async {
+        try {
+          print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
+
+          setState(() {
+            _isLoading = true;
+          });
+          await Future.delayed(
+            const Duration(seconds: 2),
+          );
+          setState(() {
+            _isLoading = false;
+          });
+          _handleNotifyPassengerTripCanceled(message);
+        } catch (e) {
+          print(e.toString());
+        }
+      });
+      hubConnection.on('NotifyPassengerTripTimedOut', (message) {
+        try {
+          print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
+          _handleNotifyPassengerTripTimedOut(message);
+          //_handleNotifyPassengerDriverOnTheWay(message);
         } catch (e) {
           print(e.toString());
         }
@@ -204,27 +243,41 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
   }
 
   void _handleNotifyPassengerDriverOnTheWay(dynamic message) {
-    // Parse the response and update the state with passenger information
-    print('bên trong handle data');
-    final passengerData =
+    final driverData =
         (message as List<dynamic>).cast<Map<String, dynamic>>().first;
 
     setState(() {
-      driverName = passengerData['name'];
-      driverId = passengerData['id'];
-      driverPhone = passengerData['phone'];
-      driverAvatar = passengerData['avatarUrl'];
-      driverPlate = passengerData['car']['licensePlate'];
+      driverName = driverData['name'];
+      driverId = driverData['id'];
+      driverPhone = driverData['phone'];
+      driverAvatar = driverData['avatarUrl'];
+      driverPlate = driverData['car']['licensePlate'];
       driverCarType =
-          passengerData['car']['model'] + " " + passengerData['car']['make'];
+          driverData['car']['model'] + " " + driverData['car']['make'];
     });
 
     _showDriverInfoDialog();
   }
 
+  void _handleNotifyPassengerTripTimedOut(dynamic message) {
+    _showFindTripTimeOutDialog();
+  }
+
+  void _handleNotifyPassengerTripCanceled(dynamic message) {
+    print('bên trong handle data');
+    final data = message as List<dynamic>;
+    final tripData = data.cast<Map<String, dynamic>>().first;
+    final trip = TripModel.fromMap(tripData);
+    bool isSelfBook = data.cast<bool>()[1];
+    //bool isNotifyToGuardian = data.cast<bool>()[2];
+    if (isSelfBook == false) {
+      _showCanceledTripDialog(trip);
+    }
+  }
+
   void _showDriverInfoDialog() {
     showDialog(
-      barrierDismissible: false,
+      barrierDismissible: true,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -267,7 +320,16 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
+              onPressed: () async {
+                // setState(() {
+                //   _isLoading = true;
+                // });
+                // await Future.delayed(
+                //   const Duration(seconds: 2),
+                // );
+                // setState(() {
+                //   _isLoading = false;
+                // });
                 navigateToDriverPickupScreen(
                   driverName,
                   driverCarType,
@@ -286,6 +348,158 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           ],
         );
       },
+    ).then((value) {
+      // setState(() {
+      //   _isLoading = true;
+      // });
+      // await Future.delayed(
+      //   const Duration(seconds: 2),
+      // );
+      // setState(() {
+      //   _isLoading = false;
+      // });
+      navigateToDriverPickupScreen(
+        driverName,
+        driverCarType,
+        driverPlate,
+        driverPhone,
+        driverAvatar,
+        driverId,
+        widget.endLatitude,
+        widget.endLongitude,
+      );
+    });
+  }
+
+  void _showFindTripTimeOutDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Center(
+            child: Text(
+              'Thời gian tìm xe đã hết',
+            ),
+          ),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 200.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                          'Đã quá hạn tìm xe mà chúng tôi không tìm được tài xế cho bạn. Vui lòng thử lại')
+                    ],
+                  ),
+                ),
+                Center(
+                  child: CircleAvatar(
+                    radius: 50.0,
+                    backgroundImage: NetworkImage(
+                      driverAvatar,
+                    ),
+                    backgroundColor: Colors.transparent,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                setState(() {
+                  _isLoading = true;
+                });
+                await Future.delayed(
+                  const Duration(seconds: 2),
+                );
+                setState(() {
+                  _isLoading = false;
+                });
+                navigateToDashBoardScreen();
+              },
+              child: const Text(
+                'Xác nhận',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showCanceledTripDialog(TripModel trip) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Center(
+            child: Text(
+              'Thời gian tìm xe đã hết',
+            ),
+          ),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 200.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                          'Đã quá hạn tìm xe mà chúng tôi không tìm được tài xế cho bạn. Vui lòng thử lại')
+                    ],
+                  ),
+                ),
+                Center(
+                  child: CircleAvatar(
+                    radius: 50.0,
+                    backgroundImage: NetworkImage(
+                      driverAvatar,
+                    ),
+                    backgroundColor: Colors.transparent,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // setState(() {
+                //   _isLoading = true;
+                // });
+                // await Future.delayed(
+                //   const Duration(seconds: 2),
+                // );
+                // setState(() {
+                //   _isLoading = false;
+                // });
+                navigateToDashBoardScreen();
+              },
+              child: const Text(
+                'Xác nhận',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void navigateToDashBoardScreen() {
+    context.goNamed(
+      RouteConstants.dashBoard,
     );
   }
 
@@ -299,7 +513,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     String endLatitude,
     String endLongitude,
   ) {
-    context.replaceNamed(RouteConstants.driverPickUp, extra: {
+    context.goNamed(RouteConstants.driverPickUp, extra: {
       'driverName': driverName,
       'driverCarType': driverCarType,
       'driverPlate': driverPlate,
@@ -362,29 +576,27 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
               child: ElevatedButton(
                 onPressed: () async {
                   if (result != null) {
-                    if (result!.id != null) {
-                      if (result!.id!.isNotEmpty) {
-                        setState(() {
-                          _isLoading = true;
-                        });
-                        final check = await ref
-                            .watch(tripControllerProvider.notifier)
-                            .cancelTrip(
-                              context,
-                              result!.id!,
-                            );
-                        setState(() {
-                          _isLoading = false;
-                        });
-                        if (check) {
-                          if (context.mounted) {
-                            setState(() {
-                              ref
-                                  .watch(currentOnTripIdProvider.notifier)
-                                  .setCurrentOnTripId(null);
-                            });
-                            context.goNamed(RouteConstants.dashBoard);
-                          }
+                    if (result!.id.isNotEmpty) {
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      final check = await ref
+                          .watch(tripControllerProvider.notifier)
+                          .cancelTrip(
+                            context,
+                            result!.id,
+                          );
+                      setState(() {
+                        _isLoading = false;
+                      });
+                      if (check) {
+                        if (context.mounted) {
+                          setState(() {
+                            ref
+                                .watch(currentOnTripIdProvider.notifier)
+                                .setCurrentOnTripId(null);
+                          });
+                          context.goNamed(RouteConstants.dashBoard);
                         }
                       }
                     }
@@ -433,6 +645,15 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                     longitude: double.parse(widget.endLongitude),
                   ),
                 );
+                _controller?.addImageMarkers([
+                  Marker(
+                    imagePath: 'assets/download.png',
+                    latLng: LatLng(
+                      double.parse(widget.endLatitude),
+                      double.parse(widget.endLongitude),
+                    ),
+                  ),
+                ]);
                 _controller?.buildRoute(wayPoints: wayPoints);
                 // _controller?.buildAndStartNavigation(
                 //   wayPoints: wayPoints,
@@ -488,35 +709,33 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                           child: InkWell(
                             onTap: () async {
                               if (result != null) {
-                                if (result!.id != null) {
-                                  if (result!.id!.isNotEmpty) {
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
-                                    final check = await ref
-                                        .watch(tripControllerProvider.notifier)
-                                        .cancelTrip(
-                                          context,
-                                          result!.id!,
-                                        );
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
-                                    if (check) {
-                                      if (context.mounted) {
-                                        setState(() {
-                                          ref
-                                              .watch(currentOnTripIdProvider
-                                                  .notifier)
-                                              .setCurrentOnTripId(null);
-                                        });
-                                        context
-                                            .goNamed(RouteConstants.dashBoard);
-                                      }
+                                if (result!.id.isNotEmpty) {
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
+                                  final check = await ref
+                                      .watch(tripControllerProvider.notifier)
+                                      .cancelTrip(
+                                        context,
+                                        result!.id,
+                                      );
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                  if (check) {
+                                    if (context.mounted) {
+                                      setState(() {
+                                        ref
+                                            .watch(currentOnTripIdProvider
+                                                .notifier)
+                                            .setCurrentOnTripId(null);
+                                      });
+                                      context.goNamed(RouteConstants.dashBoard);
                                     }
                                   }
                                 }
                               }
+
                               if (context.mounted) {
                                 context.goNamed(RouteConstants.dashBoard);
                               }
@@ -598,7 +817,8 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                         //   },
                         // ),
                       ],
-                    )),
+                    ),
+                  ),
             // _isRouteBuilt && !_isRunning
             //     ? Positioned(
             //         bottom: 20,
@@ -759,10 +979,4 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
   //             },
   //           ));
   // }
-
-  @override
-  void dispose() {
-    _controller?.onDispose();
-    super.dispose();
-  }
 }

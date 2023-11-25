@@ -36,6 +36,7 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
   DependentModel? passenger;
   DependentLocationModel? passengerLocation;
   String driverNote = '';
+  bool _isLoading = false;
   @override
   void initState() {
     initialize();
@@ -68,8 +69,9 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
     String bookerId,
     String carTypeId,
     String? driverNote,
+    int capacity,
   ) {
-    context.replaceNamed(RouteConstants.routeConfirm, extra: {
+    context.goNamed(RouteConstants.routeConfirm, extra: {
       'startLatitude': startLatitude,
       'startLongitude': startLongitude,
       'endLatitude': endLatitude,
@@ -78,6 +80,7 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
       'bookerId': bookerId,
       'carTypeId': carTypeId,
       'driverNote': driverNote,
+      'capacity': capacity,
     });
   }
 
@@ -478,30 +481,51 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                       ),
                       width: MediaQuery.of(context).size.width * .5,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           print(
                             passenger?.id ??
                                 ref.watch(userProvider.notifier).state?.id,
                           );
-                          //ref.invalidate(selectedPaymentMethodProvider);
-                          navigateToRouteConfirmScreen(
-                            context,
-                            widget.startLatitude,
-                            widget.startLongitude,
-                            widget.endLatitude,
-                            widget.endLongitude,
-                            ref
-                                .watch(selectedPaymentMethodProvider.notifier)
-                                .state,
-                            passenger == null
-                                ? ref.watch(userProvider.notifier).state!.id
-                                : passenger!.id,
-                            cars[ref
-                                    .watch(selectedCarIndexProvider.notifier)
-                                    .state]
-                                .cartypeId,
-                            driverNote,
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          await Future.delayed(
+                            const Duration(seconds: 2),
                           );
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          if (context.mounted) {
+                            //ref.invalidate(selectedPaymentMethodProvider);
+                            navigateToRouteConfirmScreen(
+                              context,
+                              passengerLocation != null
+                                  ? (passengerLocation?.latitude.toString() ??
+                                      '0')
+                                  : widget.startLatitude,
+                              passengerLocation != null
+                                  ? (passengerLocation?.longitude.toString() ??
+                                      '0')
+                                  : widget.startLongitude,
+                              widget.endLatitude,
+                              widget.endLongitude,
+                              ref
+                                  .watch(selectedPaymentMethodProvider.notifier)
+                                  .state,
+                              passenger == null
+                                  ? ref.watch(userProvider.notifier).state!.id
+                                  : passenger!.id,
+                              cars[ref
+                                      .watch(selectedCarIndexProvider.notifier)
+                                      .state]
+                                  .cartypeId,
+                              driverNote,
+                              cars[ref
+                                      .watch(selectedCarIndexProvider.notifier)
+                                      .state]
+                                  .capacity,
+                            );
+                          }
                         },
                         child: const Text("Đặt xe"),
                       ),
@@ -510,6 +534,13 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                 ),
               ),
             ),
+            if (_isLoading)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
           ],
         ),
       ),

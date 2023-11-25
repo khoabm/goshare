@@ -9,10 +9,10 @@ class OnTripGoing extends StatelessWidget {
       child: Row(
         children: <Widget>[
           SizedBox(
-            width: 100,
+            width: 160,
             height: 100,
             child: Image.network(
-              'https://your-image-url.com',
+              'https://firebasestorage.googleapis.com/v0/b/goshare-bc3c4.appspot.com/o/banner.png?alt=media&token=5d75a6a5-9d09-4d58-afc1-a800bf8cde96&fbclid=IwAR0j7kkgWROmbOPD72LkqSrCy9uQVikmxtnWTIgzPhyyhWxWB_9Q8JqWLFE',
               fit: BoxFit.cover,
             ),
           ),

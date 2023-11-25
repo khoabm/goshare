@@ -7,21 +7,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/common/loader.dart';
 import 'package:goshare/core/constants/route_constants.dart';
-import 'package:goshare/core/locations_util.dart';
+import 'package:goshare/core/utils/locations_util.dart';
+import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
 import 'package:goshare/features/login/controller/log_in_controller.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
 
 import 'package:goshare/features/menu_user/menu-user-screen.dart';
 
-import 'package:goshare/features/trip/controller/trip_controller.dart';
-
 import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
-import 'package:goshare/features/trip/screens/guardian_orbserve_dependent_trip_screen.dart';
 import 'package:goshare/models/trip_model.dart';
 
 import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:goshare/providers/dependent_booking_stage_provider.dart';
+import 'package:goshare/providers/dependent_trip_provider.dart';
 
 import 'package:goshare/providers/signalr_providers.dart';
 import 'package:goshare/theme/pallet.dart';
@@ -41,22 +40,15 @@ class _DashBoardState extends ConsumerState<DashBoard> {
   final List<Widget> _children = [
     const HomeScreen(),
 
-    const GuardianObserveDependentTripScreen(
-      driverName: 'Khoa',
-      driverPhone: '01245153531',
-      driverAvatar: '',
-      driverPlate: '123456',
-      driverCarType: 'Xe hoi',
-      driverId: '123',
-      endLatitude: '',
-      endLongitude: '',
-    ),
-    // CarChoosingScreen(
-    //   startLongitude: "106.8006742",
-    //   startLatitude: "10.8756434",
-    //   endLongitude: "106.748967",
-    //   endLatitude: "10.682559",
-    // ), //Text('Second screen'),
+    // const GuardianObserveDependentTripScreen(
+
+    // ),
+    CarChoosingScreen(
+      startLongitude: "106.8006742",
+      startLatitude: "10.8756434",
+      endLongitude: "106.748967",
+      endLatitude: "10.682559",
+    ), //Text('Second screen'),
     //Text('Second screen'),
     // const Center(
     //   child: Text(
@@ -80,75 +72,9 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         setState(() {
           _isLoading = true;
         });
-        final connection = await ref.watch(
-          hubConnectionProvider.future,
-        );
-        final location = ref.read(locationProvider);
-        final user = ref.watch(userProvider.notifier).state;
-        if (user?.role.toLowerCase() == 'dependent') {
-          final currentLocation = await location.getCurrentLocation();
-          connection.on("RequestLocation", (message) {
-            print('hehehehehe GET LOCATION DEP');
-            final location = {
-              "latitude": currentLocation?.latitude,
-              "longitude": currentLocation
-                  ?.longitude, // Replace with the actual longitude
-              "address": "" // Replace with the actual address
-            };
-
-            connection.invoke(
-              "SendLocation",
-              args: <Object>[
-                user!.id,
-                jsonEncode(location),
-              ],
-            ).then((value) {
-              print("Location sent to server: $location");
-            }).catchError((error) {
-              print("Error sending location to server: $error");
-            });
-          });
-          connection.on(
-            'NotifyDependentNewTripBooked',
-            (arguments) {
-              print("SIGNAL R DEP TRIP BOOK" + arguments.toString());
-              final tripData = (arguments as List<dynamic>)
-                  .cast<Map<String, dynamic>>()
-                  .first;
-              final trip = TripModel.fromJson(tripData);
-              ref.watch(stageProvider.notifier).setStage(
-                    Stage.stage1,
-                  );
-              showDialogInfo(trip);
-              //navigateToFindTrip(trip);
-            },
-          );
-        }
-        connection.on('NotifyPassengerTripEnded', (message) {
-          print(" DAY ROI SIGNAL R DAY ROI ${message.toString()}");
-          setState(() {
-            ref
-                .watch(currentOnTripIdProvider.notifier)
-                .setCurrentOnTripId(null);
-          });
-        });
-        if (connection.state == HubConnectionState.disconnected) {
-          await connection.start()?.then(
-                (value) => {
-                  print('Start thanh cong'),
-                },
-              );
-        }
-
-        connection.onclose(
-          (exception) {
-            print(
-              exception.toString(),
-            );
-          },
-        );
+        await initSignalR(ref);
         final isFcmTokenUpdated =
-            await ref.watch(LoginControllerProvider.notifier).updateFcmToken();
+            await ref.read(LoginControllerProvider.notifier).updateFcmToken();
         if (isFcmTokenUpdated) {
           print('fcmToken updated');
         } else {
@@ -168,50 +94,177 @@ class _DashBoardState extends ConsumerState<DashBoard> {
     super.initState();
   }
 
-  void showDialogInfo(TripModel? trip) {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(
-            child: Text(
-              'Anh/chị ${trip?.booker?.name} đang tìm xe cho bạn',
-            ),
-          ),
-          content: const SizedBox.shrink(),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                context.pop();
+  // void initSignalR() async {
+
+  // }
+
+  Future<void> initSignalR(WidgetRef ref) async {
+    if (mounted) {
+      final connection = await ref.read(
+        hubConnectionProvider.future,
+      );
+      if (connection.state == HubConnectionState.disconnected) {
+        await connection.start()?.then(
+              (value) => {
+                print('Start thanh cong'),
               },
-              child: const Text(
-                'Xác nhận',
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                ref.watch(tripControllerProvider.notifier).cancelTrip(
-                      context,
-                      trip?.id ?? '',
-                    );
-              },
-              child: const Text(
-                'Hủy',
-              ),
-            ),
-          ],
+            );
+      }
+      final location = ref.read(locationProvider);
+      final user = ref.read(userProvider.notifier).state;
+      if (user?.role.toLowerCase() == 'dependent') {
+        final currentLocation = await location.getCurrentLocation();
+        connection.on("RequestLocation", (message) {
+          final location = {
+            "latitude": currentLocation?.latitude,
+            "longitude":
+                currentLocation?.longitude, // Replace with the actual longitude
+            "address": "" // Replace with the actual address
+          };
+
+          connection.invoke(
+            "SendLocation",
+            args: <Object>[
+              user!.id,
+              jsonEncode(location),
+            ],
+          ).then((value) {
+            print("Location sent to server: $location");
+          }).catchError((error) {
+            print("Error sending location to server: $error");
+          });
+        });
+
+        connection.on(
+          'NotifyDependentNewTripBooked',
+          (arguments) {
+            try {
+              final tripData = (arguments as List<dynamic>)
+                  .cast<Map<String, dynamic>>()
+                  .first;
+              final trip = TripModel.fromMap(tripData);
+              ref.read(stageProvider.notifier).setStage(
+                    Stage.stage1,
+                  );
+
+              showDialogInfo(trip, context, ref);
+            } catch (e) {
+              print("Error in SignalR callback: $e");
+            }
+          },
         );
-      },
-    );
+      }
+
+      connection.on(
+        'NotifyPassengerDriverOnTheWay',
+        (message) {
+          try {
+            final driverData =
+                (message as List<dynamic>).cast<Map<String, dynamic>>().first;
+            bool isSelfBook = message.cast<bool>()[1];
+            bool isNotifyToGuardian = message.cast<bool>()[2];
+            if (isSelfBook == false) {
+              if (isNotifyToGuardian == false) {
+                final driver = Driver.fromMap(driverData);
+                ref.read(driverProvider.notifier).addDriverData(driver);
+                ref.read(stageProvider.notifier).setStage(
+                      Stage.stage2,
+                    );
+              }
+            } else {}
+          } catch (e) {
+            print(
+              e.toString(),
+            );
+          }
+        },
+      );
+
+      connection.on(
+        'NotifyPassengerDriverPickup',
+        (message) {
+          try {
+            final data = message as List<dynamic>;
+            final tripData = data.cast<Map<String, dynamic>>().first;
+            final trip = TripModel.fromMap(tripData);
+            bool isSelfBook = data.cast<bool>()[1];
+            bool isNotifyToGuardian = data.cast<bool>()[2];
+
+            if (isSelfBook == false) {
+              if (isNotifyToGuardian == false) {
+                showDialogInfoPickUp(
+                  trip,
+                  context,
+                );
+                // ref.watch(stageProvider.notifier).setStage(Stage.stage2);
+              }
+            }
+          } catch (e) {
+            print(
+              e.toString(),
+            );
+            rethrow;
+          }
+        },
+      );
+
+      connection.on(
+        'NotifyPassengerTripEnded',
+        (message) {
+          try {
+            if (mounted) {
+              print('ON TRIP ENDED DASHBOARD');
+              // print(" DAY ROI SIGNAL R DAY ROI ${message.toString()}");
+              final data = message as List<dynamic>;
+              final tripData = data.cast<Map<String, dynamic>>().first;
+              final trip = TripModel.fromMap(tripData);
+              bool isSelfBook = data.cast<bool>()[1];
+              bool isNotifyToGuardian = data.cast<bool>()[2];
+              ref
+                  .read(currentOnTripIdProvider.notifier)
+                  .setCurrentOnTripId(null);
+              if (isSelfBook == true) {
+                ref
+                    .read(currentOnTripIdProvider.notifier)
+                    .setCurrentOnTripId(null);
+                context.replaceNamed(RouteConstants.rating);
+              } else {
+                if (isNotifyToGuardian == false) {
+                  ref.read(stageProvider.notifier).setStage(Stage.stage0);
+                  context.replaceNamed(RouteConstants.rating);
+                } else {
+                  showNavigateDashBoardDialog(trip, context);
+                }
+              }
+            }
+          } catch (e) {
+            print(e.toString());
+            rethrow;
+          }
+          connection.onclose(
+            (exception) {
+              print(
+                exception.toString(),
+              );
+            },
+          );
+        },
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 
   void navigateToFindTrip(TripModel trip) {
-    context.replaceNamed(RouteConstants.findTrip, extra: {
-      'startLatitude': trip.startLocation?.latitude,
-      'startLongitude': trip.startLocation?.longitude,
-      'endLatitude': trip.endLocation?.latitude,
-      'endLongitude': trip.endLocation?.longitude,
+    context.goNamed(RouteConstants.findTrip, extra: {
+      'startLatitude': trip.startLocation.latitude,
+      'startLongitude': trip.startLocation.longitude,
+      'endLatitude': trip.endLocation.latitude,
+      'endLongitude': trip.endLocation.longitude,
       'paymentMethod': trip.paymentMethod.toString(),
       'bookerId': trip.bookerId,
       'carTypeId': trip.cartypeId,

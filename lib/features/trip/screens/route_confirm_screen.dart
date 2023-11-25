@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
+//import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 
 import 'package:vietmap_flutter_navigation/embedded/controller.dart';
 import 'package:vietmap_flutter_navigation/helpers.dart';
@@ -100,6 +101,8 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
     _navigationOption = _vietmapNavigationPlugin.getDefaultOptions();
     _navigationOption.simulateRoute = false;
     _navigationOption.alternatives = false;
+    _navigationOption.bearing = 0;
+    _navigationOption.tilt = 0;
     _navigationOption.apiKey =
         'c3d0f188ff669f89042771a20656579073cffec5a8a69747';
     _navigationOption.mapStyle =
@@ -112,11 +115,11 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
   //MapOptions? options;
 
   void navigateToSearchTripRoute() {
-    context.replaceNamed(RouteConstants.searchTripRoute);
+    context.goNamed(RouteConstants.searchTripRoute);
   }
 
   void navigateToFindTrip() {
-    context.replaceNamed(RouteConstants.findTrip, extra: {
+    context.goNamed(RouteConstants.findTrip, extra: {
       'startLatitude': widget.startLatitude,
       'startLongitude': widget.startLongitude,
       'endLatitude': widget.endLatitude,
@@ -232,6 +235,16 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
                     longitude: double.parse(widget.endLongitude),
                   ),
                 );
+                // _controller?.addImageMarkers([
+                //   Marker(
+                //     imagePath: 'assets/images/icon.png',
+                //     latLng: LatLng(
+                //       double.parse(widget.endLatitude),
+                //       double.parse(widget.endLongitude),
+                //     ),
+                //   ),
+                // ]);
+                // _controller?.addImageMarkers(Marker(child: child, latLng: latLng));
                 _controller?.buildRoute(wayPoints: wayPoints);
               },
               // onRouteProgressChange: (RouteProgressEvent routeProgressEvent) {

@@ -7,6 +7,7 @@
   <!-- Include only if your app benefits from precise location access. -->
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />  
+  <uses-permission android:name="android.permission.VIBRATE"/>
    <application
         android:label="goshare"
         android:name="${applicationName}"

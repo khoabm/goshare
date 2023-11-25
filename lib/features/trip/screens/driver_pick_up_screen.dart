@@ -1,13 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:goshare/core/utils/locations_util.dart';
+import 'package:goshare/models/trip_model.dart';
 import 'package:location/location.dart';
 import 'package:signalr_core/signalr_core.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 
 import 'package:goshare/common/loader.dart';
 import 'package:goshare/core/constants/route_constants.dart';
-import 'package:goshare/core/locations_util.dart';
 import 'package:goshare/providers/signalr_providers.dart';
 
 class DriverPickUpScreen extends ConsumerStatefulWidget {
@@ -43,6 +46,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   UserLocation? userLocation;
   LocationData? currentLocation;
   bool _isLoading = false;
+
   // List<LatLng> latLngList = [
   //   const LatLng(10.736657, 106.672240),
   //   const LatLng(10.766543, 106.742378),
@@ -55,8 +59,17 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
 
   @override
   void dispose() {
+    //revokeHub();
     _mapController?.dispose();
     super.dispose();
+  }
+
+  void revokeHub() async {
+    final hubConnection = await ref.read(
+      hubConnectionProvider.future,
+    );
+    hubConnection.off('UpdateDriverLocation');
+    hubConnection.off('NotifyPassengerDriverPickup');
   }
 
   @override
@@ -64,10 +77,24 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
     if (!mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await initSignalR(ref);
-      final location = ref.watch(locationProvider);
+      final location = ref.read(locationProvider);
       currentLocation = await location.getCurrentLocation();
       //updateMarker();
-
+      final hubConnection = await ref.read(
+        hubConnectionProvider.future,
+      );
+      hubConnection.on(
+        'UpdateDriverLocation',
+        (arguments) {
+          print("SIGNAL R DEP TRIP BOOK" + arguments.toString());
+          final stringData = arguments?.first as String;
+          final data = jsonDecode(stringData) as Map<String, dynamic>;
+          updateMarker(
+            data['latitude'],
+            data['longitude'],
+          );
+        },
+      );
       setState(() {});
     });
     super.initState();
@@ -75,47 +102,66 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
 
   Future<void> initSignalR(WidgetRef ref) async {
     try {
-      final hubConnection = await ref.watch(
+      final hubConnection = await ref.read(
         hubConnectionProvider.future,
       );
 
       hubConnection.on('NotifyPassengerDriverPickup', (message) {
-        print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
-        _handleNotifyPassengerDriverPickUp(message);
+        if (mounted) {
+          print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
+          _handleNotifyPassengerDriverPickUp(message);
+        }
       });
 
       hubConnection.onclose((exception) async {
-        print(exception.toString() + "LOI CUA SIGNALR ON CLOSE");
         await Future.delayed(
           const Duration(seconds: 3),
           () async {
-            if (hubConnection.state == HubConnectionState.disconnected) {
+            if (mounted &&
+                hubConnection.state == HubConnectionState.disconnected) {
               await hubConnection.start();
             }
           },
         );
       });
     } catch (e) {
-      print(e.toString());
+      rethrow;
+      //print(e.toString());
     }
   }
 
   void _handleNotifyPassengerDriverPickUp(dynamic message) {
-    _showDriverInfoDialog();
+    if (mounted) {
+      final data = message as List<dynamic>;
+      final tripData = data.cast<Map<String, dynamic>>().first;
+      final trip = TripModel.fromMap(tripData);
+      bool isSelfBook = data.cast<bool>()[1];
+      bool isNotifyToGuardian = data.cast<bool>()[2];
+      if (isSelfBook == true) {
+        print('TỰ ĐẶT TRONG PICKUP');
+        _showDriverInfoDialog(trip);
+      } else {
+        print('KHÔNG PHẢI TỰ ĐẶT TRONG PICKUP');
+        if (isNotifyToGuardian == true) {
+          print('NOTIFY CHO GUARDIAN TRONG PICKUP');
+          _showDependentDriverInfoDialog(trip);
+        }
+      }
+    }
   }
 
-  void _showDriverInfoDialog() {
+  void _showDriverInfoDialog(TripModel trip) {
     showDialog(
       barrierDismissible: true,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Center(
+          title: Center(
             child: Text(
-              'Tài xế đã đến',
+              'Tài xế ${trip.driver?.name} đã đến',
             ),
           ),
-          content: const Row(
+          content: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Expanded(
@@ -124,7 +170,11 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Vui lòng tìm tài xế của bạn gần đó'),
+                    Text(
+                        'Bạn đã đặt xe: ${trip.driver?.car.make} ${trip.driver?.car.model}'),
+                    Text('Biển số xe: ${trip.driver?.car.licensePlate}'),
+                    Text('Số điện thoại tài xế: ${trip.driver?.phone}'),
+                    const Text('Vui lòng tìm tài xế của bạn gần đó'),
                   ],
                 ),
               ),
@@ -133,16 +183,8 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                navigateToOnTripScreen(
-                  widget.driverName,
-                  widget.driverCarType,
-                  widget.driverPlate,
-                  widget.driverPhone,
-                  widget.driverAvatar,
-                  widget.driverId,
-                  widget.endLatitude,
-                  widget.endLongitude,
-                );
+                //context.pop();
+                navigateToOnTripScreen(trip);
               },
               child: const Text(
                 'Xác nhận',
@@ -154,25 +196,77 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
     );
   }
 
+  void _showDependentDriverInfoDialog(TripModel trip) {
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Center(
+            child: Text(
+              'Tài xế ${widget.driverName} đã đến',
+            ),
+          ),
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                        'Bạn đã đặt xe: ${trip.driver?.car.make} ${trip.driver?.car.model}'),
+                    Text('Biển số xe: ${trip.driver?.car.licensePlate}'),
+                    Text('Số điện thoại tài xế: ${trip.driver?.phone}'),
+                    const Text(
+                      'Vui lòng thông báo cho người thân của bạn.',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // setState(() {
+                //   _isLoading = true;
+                // });
+                // await Future.delayed(
+                //   const Duration(seconds: 2),
+                // );
+                // setState(() {
+                //   _isLoading = false;
+                // });
+                navigateToGuardianObserverScreen(trip);
+              },
+              child: const Text(
+                'Xác nhận',
+              ),
+            ),
+          ],
+        );
+      },
+    ).then((value) {
+      navigateToGuardianObserverScreen(trip);
+    });
+  }
+
   void navigateToOnTripScreen(
-    String driverName,
-    String driverCarType,
-    String driverPlate,
-    String driverPhone,
-    String driverAvatar,
-    String driverId,
-    String endLatitude,
-    String endLongitude,
+    TripModel trip,
   ) {
-    context.replaceNamed(RouteConstants.onTrip, extra: {
-      'driverName': driverName,
-      'driverCarType': driverCarType,
-      'driverPlate': driverPlate,
-      'driverPhone': driverPhone,
-      'driverAvatar': driverAvatar,
-      'driverId': driverId,
-      'endLatitude': endLatitude,
-      'endLongitude': endLongitude,
+    context.goNamed(RouteConstants.onTrip, extra: {
+      'trip': trip,
+    });
+  }
+
+  void navigateToGuardianObserverScreen(
+    TripModel trip,
+  ) {
+    context.goNamed(RouteConstants.guardianObserveDependentTrip, extra: {
+      'trip': trip,
     });
   }
 
@@ -182,32 +276,41 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
     super.didChangeDependencies();
   }
 
-  // void updateMarker() async {
-  //   if (mounted) {
-  //     List<Marker> tempMarkers = []; // Temporary list to hold the new markers
+  void updateMarker(double latitude, double longitude) async {
+    if (mounted) {
+      List<Marker> tempMarkers = []; // Temporary list to hold the new markers
 
-  //     for (var latLng in latLngList) {
-  //       // Wait for a while before updating the marker
-  //       await Future.delayed(const Duration(seconds: 8));
-  //       print('did update marker');
-  //       // Add the new marker to the temporary list
-  //       tempMarkers.clear();
-  //       temp.clear();
-  //       tempMarkers.add(
-  //         Marker(
-  //           child: _markerWidget(
-  //             const IconData(0xe1d7, fontFamily: 'MaterialIcons'),
-  //           ),
-  //           latLng: latLng,
-  //         ),
-  //       );
-  //       setState(() {
-  //         temp = tempMarkers;
-  //         _mapController?.animateCamera(CameraUpdate.newCameraPosition(
-  //             CameraPosition(target: temp.first.latLng, zoom: 10, tilt: 0)));
-  //       });
-  //     }
-  //   }
+      // Wait for a while before updating the marker
+      await Future.delayed(const Duration(seconds: 1));
+      print('did update marker');
+      // Add the new marker to the temporary list
+      tempMarkers.clear();
+      temp.clear();
+      tempMarkers.add(
+        Marker(
+          child: _markerWidget(
+            const IconData(0xe1d7, fontFamily: 'MaterialIcons'),
+          ),
+          latLng: LatLng(
+            latitude,
+            longitude,
+          ),
+        ),
+      );
+      setState(() {
+        temp = tempMarkers;
+        _mapController?.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: temp.first.latLng,
+              zoom: 15.5,
+              tilt: 0,
+            ),
+          ),
+        );
+      });
+    }
+  }
 
   //   // Update the markers list
   // }
@@ -516,12 +619,18 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   }
 
   _markerWidget(IconData icon) {
-    return Container(
+    return SizedBox(
       width: 20,
       height: 20,
-      decoration:
-          const BoxDecoration(shape: BoxShape.circle, color: Colors.green),
-      child: Icon(icon, color: Colors.red, size: 13),
+      child: Center(
+        child: CircleAvatar(
+          radius: 20.0,
+          backgroundImage: NetworkImage(
+            widget.driverAvatar,
+          ),
+          backgroundColor: Colors.transparent,
+        ),
+      ),
     );
   }
 }

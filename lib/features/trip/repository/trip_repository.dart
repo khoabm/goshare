@@ -82,7 +82,7 @@ class TripRepository {
       print(response.body);
       if (response.statusCode == 200) {
         Map<String, dynamic> tripData = json.decode(response.body);
-        TripModel trip = TripModel.fromJson(tripData);
+        TripModel trip = TripModel.fromMap(tripData);
         return right(trip);
       } else if (response.statusCode == 429) {
         return left(Failure('Too many request'));
@@ -142,7 +142,7 @@ class TripRepository {
       print(response.body);
       if (response.statusCode == 200) {
         Map<String, dynamic> tripData = json.decode(response.body);
-        TripModel trip = TripModel.fromJson(tripData);
+        TripModel trip = TripModel.fromMap(tripData);
         return right(trip);
       } else if (response.statusCode == 429) {
         return left(Failure('Too many request'));
@@ -173,7 +173,7 @@ class TripRepository {
       print(response.body);
       if (response.statusCode == 200) {
         Map<String, dynamic> tripData = json.decode(response.body);
-        TripModel trip = TripModel.fromJson(tripData);
+        TripModel trip = TripModel.fromMap(tripData);
         return right(trip);
       } else if (response.statusCode == 429) {
         return left(Failure('Too many request'));

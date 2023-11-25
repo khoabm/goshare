@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:goshare/core/constants/route_constants.dart';
-import 'package:goshare/providers/current_on_trip_provider.dart';
+import 'package:goshare/core/utils/locations_util.dart';
+import 'package:goshare/providers/dependent_booking_stage_provider.dart';
 import 'package:location/location.dart';
 import 'package:signalr_core/signalr_core.dart';
 import 'package:vietmap_flutter_navigation/embedded/controller.dart';
@@ -12,28 +12,16 @@ import 'package:vietmap_flutter_navigation/models/way_point.dart';
 import 'package:vietmap_flutter_navigation/navigation_plugin.dart';
 import 'package:vietmap_flutter_navigation/views/navigation_view.dart';
 
-import 'package:goshare/core/locations_util.dart';
+import 'package:goshare/core/constants/route_constants.dart';
+import 'package:goshare/models/trip_model.dart';
+import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:goshare/providers/signalr_providers.dart';
 
 class OnTripScreen extends ConsumerStatefulWidget {
-  final String driverName;
-  final String driverPhone;
-  final String driverAvatar;
-  final String driverPlate;
-  final String driverCarType;
-  final String driverId;
-  final String endLatitude;
-  final String endLongitude;
+  final TripModel trip;
   const OnTripScreen({
     super.key,
-    required this.driverName,
-    required this.driverPhone,
-    required this.driverAvatar,
-    required this.driverPlate,
-    required this.driverCarType,
-    required this.driverId,
-    required this.endLatitude,
-    required this.endLongitude,
+    required this.trip,
   });
 
   @override
@@ -47,6 +35,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
   LocationData? currentLocation;
   bool _isRouteBuilt = false;
   bool _isLoading = false;
+  double _containerHeight = 60.0;
   List<WayPoint> wayPoints = [
     WayPoint(name: "origin point", latitude: 10.759091, longitude: 106.675817),
     WayPoint(
@@ -57,41 +46,147 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
     // TODO: implement initState
     initialize().then((value) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
+        print('đang ở màn hình on trip nè');
         await initSignalR(ref);
       });
     });
     super.initState();
   }
 
+  @override
+  void dispose() {
+    //revokeHub();
+    super.dispose();
+  }
+
+  void revokeHub() async {
+    final hubConnection = await ref.read(
+      hubConnectionProvider.future,
+    );
+    hubConnection.off('NotifyPassengerTripEnded');
+  }
+
   Future<void> initSignalR(WidgetRef ref) async {
     try {
-      final hubConnection = await ref.watch(
+      final hubConnection = await ref.read(
         hubConnectionProvider.future,
       );
 
-      hubConnection.on('NotifyPassengerTripEnded', (message) {
-        print('hehehehehehe');
-        print(" DAY ROI SIGNAL R DAY ROI ${message.toString()}");
-        setState(() {
-          ref.watch(currentOnTripIdProvider.notifier).setCurrentOnTripId(null);
-        });
-        context.goNamed(RouteConstants.rating);
-      });
+      hubConnection.on(
+        'NotifyPassengerTripEnded',
+        (message) {
+          try {
+            print('ON TRIP ENDED ON_TRIP');
+            if (mounted) {
+              print('mounted');
+              final data = message as List<dynamic>;
+              final tripData = data.cast<Map<String, dynamic>>().first;
+              final trip = TripModel.fromMap(tripData);
+              bool isSelfBook = data.cast<bool>()[1];
+              bool isNotifyToGuardian = data.cast<bool>()[2];
+              ref
+                  .read(currentOnTripIdProvider.notifier)
+                  .setCurrentOnTripId(null);
 
-      hubConnection.onclose((exception) async {
-        print(exception.toString() + "LOI CUA SIGNALR ON CLOSE");
-        await Future.delayed(
-          const Duration(seconds: 3),
-          () async {
-            if (hubConnection.state == HubConnectionState.disconnected) {
-              await hubConnection.start();
+              if (isSelfBook == true) {
+                print('isSelfBook');
+                ref
+                    .read(currentOnTripIdProvider.notifier)
+                    .setCurrentOnTripId(null);
+                if (mounted) {
+                  context.replaceNamed(RouteConstants.rating);
+                }
+              } else {
+                print('KHONG PHAI TU DAT');
+                if (isNotifyToGuardian == false) {
+                  print('KHONG PHAI NOTI GUARDIAN');
+                  ref.read(stageProvider.notifier).setStage(Stage.stage0);
+                  if (mounted) {
+                    context.replaceNamed(RouteConstants.rating);
+                  }
+                } else {
+                  print('LA NOTI GUARDIAN');
+                  if (mounted) {
+                    context.goNamed(
+                      RouteConstants.dashBoard,
+                    );
+                  }
+                }
+              }
             }
-          },
-        );
-      });
+          } catch (e) {
+            print(e.toString());
+            rethrow;
+          }
+        },
+      );
+
+      hubConnection.onclose(
+        (exception) async {
+          print(exception.toString() + "LOI CUA SIGNALR ON CLOSE");
+          await Future.delayed(
+            const Duration(seconds: 3),
+            () async {
+              if (mounted) {
+                if (hubConnection.state == HubConnectionState.disconnected) {
+                  await hubConnection.start();
+                }
+              }
+            },
+          );
+        },
+      );
     } catch (e) {
       print(e.toString());
     }
+  }
+
+  // void _showNavigateDashBoardDialog(TripModel trip) {
+  //   showDialog(
+  //     barrierDismissible: true,
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Center(
+  //           child: Text(
+  //             'Tài xế ${trip.driver?.name} đã hoàn thành chuyến đi',
+  //           ),
+  //         ),
+  //         content: Row(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             Expanded(
+  //               child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   Text(
+  //                       'Người thân ${trip.passenger.name} đã hoàn thành chuyến đi'),
+  //                   Text('Tổng số tiền được thanh toán là: ${trip.price}đ'),
+  //                   const Text('Cảm ơn bạn đã sử dụng dịch vụ'),
+  //                 ],
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               navigateToDashBoard();
+  //             },
+  //             child: const Text(
+  //               'Xác nhận',
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+
+  void navigateToDashBoard() {
+    context.goNamed(RouteConstants.dashBoard);
   }
 
   Future<void> initialize() async {
@@ -149,8 +244,8 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                 wayPoints.add(
                   WayPoint(
                     name: 'destination point',
-                    latitude: double.parse(widget.endLatitude),
-                    longitude: double.parse(widget.endLongitude),
+                    latitude: widget.trip.endLocation.latitude,
+                    longitude: widget.trip.endLocation.longitude,
                   ),
                 );
                 _controller?.buildRoute(wayPoints: wayPoints);
@@ -199,6 +294,139 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                       ],
                     ),
                   ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: GestureDetector(
+                onVerticalDragUpdate: (details) {
+                  // Adjust height based on the swipe direction
+                  setState(() {
+                    _containerHeight += details.primaryDelta!;
+                    // Clamp the height between 60 and 300
+                    _containerHeight = _containerHeight.clamp(60.0, 250.0);
+                  });
+                },
+                onVerticalDragEnd: (details) {
+                  // Determine whether to fully reveal or hide the container based on the gesture velocity
+                  if (details.primaryVelocity! > 0) {
+                    // Swipe down
+                    setState(() {
+                      _containerHeight = 60.0;
+                    });
+                  } else {
+                    // Swipe up
+                    setState(() {
+                      _containerHeight = 250.0;
+                    });
+                  }
+                },
+                child: AnimatedContainer(
+                  padding: const EdgeInsets.all(12.0),
+                  duration: const Duration(milliseconds: 400),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(
+                        30,
+                      ),
+                    ),
+                  ),
+                  height: _containerHeight,
+                  //color: Pallete.primaryColor,
+                  child: _containerHeight == 250
+                      ? Column(
+                          children: [
+                            Text(
+                              widget.trip.driver?.name ?? 'Tên không rõ',
+                              style: const TextStyle(
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Row(
+                              //mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const SizedBox(
+                                        height: 8,
+                                      ),
+                                      Text(
+                                        widget.trip.driver?.car.make ??
+                                            'Xe không rõ',
+                                        style: const TextStyle(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 8,
+                                      ),
+                                      Text(
+                                        widget.trip.driver?.car.licensePlate ??
+                                            'Không rõ',
+                                        style: const TextStyle(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 8,
+                                      ),
+                                      Text(
+                                        widget.trip.driver?.phone ??
+                                            'SĐT không rõ',
+                                        style: const TextStyle(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 8,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                widget.trip.driver != null
+                                    ? widget.trip.driver?.avatarUrl != null
+                                        ? Center(
+                                            child: CircleAvatar(
+                                              radius: 50.0,
+                                              backgroundImage: NetworkImage(
+                                                widget.trip.driver!.avatarUrl!,
+                                              ),
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                            ),
+                                          )
+                                        : const SizedBox.shrink()
+                                    : const SizedBox.shrink(),
+                              ],
+                            ),
+                          ],
+                        )
+                      : Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: MediaQuery.of(context).size.width * .4,
+                          ),
+                          child: const Divider(
+                            //height: 1,
+                            color: Colors.grey,
+                            thickness: 5,
+                          ),
+                        ),
+                ),
+              ),
+            ),
             if (_isLoading)
               Container(
                 color: Colors.black.withOpacity(0.5),

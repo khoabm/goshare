@@ -4,6 +4,7 @@ import 'package:goshare/core/constants/constants.dart';
 import 'package:goshare/core/failure.dart';
 import 'package:goshare/core/type_def.dart';
 import 'package:goshare/models/vietmap_place_model.dart';
+import 'package:goshare/models/vietmap_route_model.dart';
 import 'package:location/location.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
@@ -70,6 +71,43 @@ class LocationUtils {
 
       if (res.statusCode == 200) {
         var data = VietmapPlaceModel.fromJson(res.body);
+        return right(data);
+      } else {
+        return left(
+          Failure('Có lỗi xảy ra'),
+        );
+      }
+    } on TimeoutException catch (_) {
+      return left(
+        Failure('Timeout'),
+      );
+    }
+  }
+
+  static FutureEither<VietMapRouteModel> getRoute(
+    double startLatitude,
+    double startLongitude,
+    double endLatitude,
+    double endLongitude,
+  ) async {
+    try {
+      final url = Uri.https(
+        'maps.vietmap.vn',
+        '/api/route',
+        {
+          'api-version': '1.1',
+          'apikey': Constants.vietMapApiKey,
+          'point': [
+            '$startLatitude,$startLongitude',
+            '$endLatitude,$endLongitude',
+          ],
+          'vehicle': 'car',
+        },
+      );
+      var res = await http.get(url);
+
+      if (res.statusCode == 200) {
+        var data = VietMapRouteModel.fromJson(res.body);
         return right(data);
       } else {
         return left(
