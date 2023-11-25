@@ -16,6 +16,7 @@ import 'package:goshare/features/home/screen/home_screen.dart';
 // import 'package:goshare/features/search_trip_route/screens/search_trip_route_screen.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/menu_user/edit-profile/edit-profile-screen.dart';
+import 'package:goshare/features/menu_user/money-topup/money-topup-screen.dart';
 
 import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
 import 'package:goshare/features/trip/screens/chat_screen.dart';
@@ -36,8 +37,7 @@ class AppRouter {
 
   GoRouter createRouter(String initialLocation) {
     return GoRouter(
-
-      initialLocation: initialLocation, //'/find-trip',
+      initialLocation: RouteConstants.loginUrl, //'/find-trip',
 
       routes: <RouteBase>[
         GoRoute(
@@ -80,7 +80,6 @@ class AppRouter {
             key: state.pageKey,
           ),
         ),
-// <<<<<<< khang-branch
         GoRoute(
           path: RouteConstants.loginUrl,
           pageBuilder: (context, state) => SlideBottomTransition(
@@ -95,7 +94,13 @@ class AppRouter {
             key: state.pageKey,
           ),
         ),
-
+        GoRoute(
+          path: RouteConstants.moneyTopupUrl,
+          pageBuilder: (context, state) => SlideLeftTransition(
+            child: const MoneyTopupPage(),
+            key: state.pageKey,
+          ),
+        ),
         GoRoute(
           name: 'connect-to-driver',
           path: RouteConstants.connectToDriverUrl,

@@ -9,6 +9,8 @@ import 'package:goshare/features/login/controller/log_in_controller.dart';
 import 'package:goshare/firebase_options.dart';
 import 'package:goshare/router.dart';
 import 'package:goshare/theme/pallet.dart';
+import 'package:uni_links/uni_links.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,11 +31,43 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
+  String _deepLink = 'abcd1234.com';
+
   @override
   void initState() {
     super.initState();
     requestPermission();
     initInfor();
+    initUniLinks();
+  }
+
+  Future<void> initUniLinks() async {
+    try {
+      final initialLink = await getInitialLink();
+      if (initialLink != null) {
+        handleDeepLink(initialLink);
+      }
+    } on PlatformException {
+      // Handle exceptions
+    }
+
+    getLinksStream().listen((String? link) {
+      if (link != null) {
+        handleDeepLink(link);
+      }
+    }, onError: (dynamic err) {
+      // Handle errors
+    });
+  }
+
+  void handleDeepLink(String link) {
+    setState(() {
+      _deepLink = link;
+    });
+
+    // Add your logic to handle the deep link
+    // For example, navigate to a specific screen based on the link
+    // or perform actions within your app.
   }
 
   // This widget is the root of your application.

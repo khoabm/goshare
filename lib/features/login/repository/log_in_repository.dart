@@ -37,8 +37,8 @@ class LoginRepository {
 
   Future<LoginResult> login(String phone, String passcode) async {
     if (phone.isEmpty || passcode.isEmpty) {
-      phone = '84327885391';
-      passcode = '270602';
+      phone = '+84363111098';
+      passcode = '123456';
     }
     print(phone);
     try {

@@ -17,6 +17,22 @@ class SlideRightTransition extends CustomTransitionPage<void> {
         );
 }
 
+class SlideLeftTransition extends CustomTransitionPage<void> {
+  SlideLeftTransition({super.key, required super.child})
+      : super(
+          transitionDuration: const Duration(milliseconds: 250),
+          transitionsBuilder: (_, animation, __, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(-1, 0),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            );
+          },
+        );
+}
+
 class CustomScaleTransition extends CustomTransitionPage<void> {
   CustomScaleTransition({super.key, required super.child})
       : super(

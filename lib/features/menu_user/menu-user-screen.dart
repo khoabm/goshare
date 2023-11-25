@@ -15,7 +15,7 @@ class _UserMenuPageState extends State<UserMenuPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('User Menu'),
+        title: const Text('Tài khoản'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
       ),
@@ -26,10 +26,9 @@ class _UserMenuPageState extends State<UserMenuPage> {
             color: Colors.white,
             child: ListTile(
               visualDensity: const VisualDensity(
-                  vertical: -4.0), // Reduced vertical padding
-              title: const Text('Edit Profile'),
+                  vertical: -4.0),
+              title: const Text('Thông tin cá nhân'),
               onTap: () {
-                // Navigator.goN(context, '/edit-profile');
                 context.go(RouteConstants.editProfileUrl);
               },
             ),
@@ -39,10 +38,10 @@ class _UserMenuPageState extends State<UserMenuPage> {
             color: Colors.white,
             child: ListTile(
               visualDensity: const VisualDensity(
-                  vertical: -4.0), // Reduced vertical padding
-              title: const Text('Money Topup'),
+                  vertical: -4.0),
+              title: const Text('Ví của bạn'),
               onTap: () {
-                Navigator.pushNamed(context, '/moneyTopup');
+                context.go(RouteConstants.moneyTopupUrl);
               },
             ),
           ),
