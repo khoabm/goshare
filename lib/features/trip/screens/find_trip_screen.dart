@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -142,8 +143,8 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
 
   @override
   void dispose() {
+    //revokeHub();
     _controller?.onDispose();
-    revokeHub();
     super.dispose();
   }
 
@@ -179,36 +180,37 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
         hubConnectionProvider.future,
       );
 
-      hubConnection.on('NotifyPassengerDriverOnTheWay', (message) {
+      hubConnection.on('NotifyPassengerDriverOnTheWay', (message) async {
         try {
           print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
-          // setState(() {
-          //   _isLoading = true;
-          // });
-          // await Future.delayed(
-          //   const Duration(seconds: 2),
-          // );
-          // setState(() {
-          //   _isLoading = false;
-          // });
+          setState(() {
+            _isLoading = true;
+          });
+          await Future.delayed(
+            const Duration(seconds: 1),
+          );
+          setState(() {
+            _isLoading = false;
+          });
+          HapticFeedback.vibrate();
           _handleNotifyPassengerDriverOnTheWay(message);
         } catch (e) {
           print(e.toString());
         }
       });
-      hubConnection.on('NotifyPassengerTripCanceled', (message) {
+      hubConnection.on('NotifyPassengerTripCanceled', (message) async {
         try {
           print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
 
-          // setState(() {
-          //   _isLoading = true;
-          // });
-          // await Future.delayed(
-          //   const Duration(seconds: 2),
-          // );
-          // setState(() {
-          //   _isLoading = false;
-          // });
+          setState(() {
+            _isLoading = true;
+          });
+          await Future.delayed(
+            const Duration(seconds: 2),
+          );
+          setState(() {
+            _isLoading = false;
+          });
           _handleNotifyPassengerTripCanceled(message);
         } catch (e) {
           print(e.toString());
@@ -241,7 +243,6 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
   }
 
   void _handleNotifyPassengerDriverOnTheWay(dynamic message) {
-    print('bên trong handle data');
     final driverData =
         (message as List<dynamic>).cast<Map<String, dynamic>>().first;
 
@@ -259,8 +260,6 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
   }
 
   void _handleNotifyPassengerTripTimedOut(dynamic message) {
-    print('bên trong handle data');
-
     _showFindTripTimeOutDialog();
   }
 
@@ -514,7 +513,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     String endLatitude,
     String endLongitude,
   ) {
-    context.replaceNamed(RouteConstants.driverPickUp, extra: {
+    context.goNamed(RouteConstants.driverPickUp, extra: {
       'driverName': driverName,
       'driverCarType': driverCarType,
       'driverPlate': driverPlate,

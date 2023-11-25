@@ -41,20 +41,26 @@ class DependentCard extends ConsumerWidget {
           InkWell(
             onTap: () async {
               DependentLocationModel? dependentLocationData;
+              bool isGetForMySelf = true;
               if (isGetLocation) {
                 if (dependentModel?.id !=
                     ref.watch(userProvider.notifier).state?.id) {
                   isLoading.value = true;
+                  isGetForMySelf = false;
                   dependentLocationData = await ref
                       .watch(dependentControllerProvider.notifier)
                       .getDependentsLocation(context, dependentModel?.id ?? '');
+
                   isLoading.value = true;
                 }
               }
 
               if (context.mounted) {
                 context.pop({
-                  'dependentModel': dependentModel,
+                  'dependentModel':
+                      (dependentLocationData == null && isGetForMySelf == false)
+                          ? null
+                          : dependentModel,
                   'dependentLocationData': dependentLocationData
                 });
               }

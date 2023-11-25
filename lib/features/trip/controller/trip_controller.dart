@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geocoding/geocoding.dart';
 
 import 'package:goshare/core/failure.dart';
-import 'package:goshare/core/utils/locations_util.dart';
 import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/home/controller/home_controller.dart';
 import 'package:goshare/features/trip/repository/trip_repository.dart';
@@ -33,18 +31,26 @@ class TripController extends StateNotifier<bool> {
       BuildContext context, FindTripModel tripModel) async {
     TripModel? trip;
 
-    final endAddress = await placemarkFromCoordinates(
-      tripModel.endLatitude,
-      tripModel.endLongitude,
-    );
-    final startAddress = await placemarkFromCoordinates(
-      tripModel.startLatitude,
-      tripModel.startLongitude,
-    );
-    tripModel.copyWith(
-      endAddress: endAddress.first.name,
-      startAddress: startAddress.first.name,
-    );
+    final res =
+        await _ref.watch(homeControllerProvider.notifier).searchLocationReverse(
+              context,
+              tripModel.startLongitude,
+              tripModel.startLatitude,
+            );
+    if (context.mounted) {
+      final res2 = await _ref
+          .watch(homeControllerProvider.notifier)
+          .searchLocationReverse(
+            context,
+            tripModel.startLongitude,
+            tripModel.startLatitude,
+          );
+      tripModel.copyWith(
+        endAddress: res.address,
+        startAddress: res2.address,
+      );
+    }
+
     final result = await _tripRepository.findDriver(tripModel);
     result.fold((l) {
       state = false;

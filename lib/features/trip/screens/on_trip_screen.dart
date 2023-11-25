@@ -47,7 +47,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
     initialize().then((value) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         print('đang ở màn hình on trip nè');
-        initSignalR(ref);
+        await initSignalR(ref);
       });
     });
     super.initState();
@@ -55,7 +55,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
 
   @override
   void dispose() {
-    revokeHub();
+    //revokeHub();
     super.dispose();
   }
 
@@ -66,7 +66,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
     hubConnection.off('NotifyPassengerTripEnded');
   }
 
-  void initSignalR(WidgetRef ref) async {
+  Future<void> initSignalR(WidgetRef ref) async {
     try {
       final hubConnection = await ref.read(
         hubConnectionProvider.future,
@@ -76,35 +76,47 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
         'NotifyPassengerTripEnded',
         (message) {
           try {
-            print('ON TRIP ENDED');
-            // print(" DAY ROI SIGNAL R DAY ROI ${message.toString()}");
-            final data = message as List<dynamic>;
-            final tripData = data.cast<Map<String, dynamic>>().first;
-            final trip = TripModel.fromMap(tripData);
-            bool isSelfBook = data.cast<bool>()[1];
-            bool isNotifyToGuardian = data.cast<bool>()[2];
-            ref.read(currentOnTripIdProvider.notifier).setCurrentOnTripId(null);
-            print(isSelfBook);
-            print(isNotifyToGuardian);
-            if (isSelfBook == true) {
-              print('self booking');
+            print('ON TRIP ENDED ON_TRIP');
+            if (mounted) {
+              print('mounted');
+              final data = message as List<dynamic>;
+              final tripData = data.cast<Map<String, dynamic>>().first;
+              final trip = TripModel.fromMap(tripData);
+              bool isSelfBook = data.cast<bool>()[1];
+              bool isNotifyToGuardian = data.cast<bool>()[2];
               ref
                   .read(currentOnTripIdProvider.notifier)
                   .setCurrentOnTripId(null);
-              context.replaceNamed(RouteConstants.rating);
-            } else {
-              print('self booking false');
-              if (isNotifyToGuardian == false) {
-                print('not notify for guardian booking');
-                ref.read(stageProvider.notifier).setStage(Stage.stage0);
-                context.replaceNamed(RouteConstants.rating);
+
+              if (isSelfBook == true) {
+                print('isSelfBook');
+                ref
+                    .read(currentOnTripIdProvider.notifier)
+                    .setCurrentOnTripId(null);
+                if (mounted) {
+                  context.replaceNamed(RouteConstants.rating);
+                }
               } else {
-                print('notify for guardian booking');
-                _showNavigateDashBoardDialog(trip);
+                print('KHONG PHAI TU DAT');
+                if (isNotifyToGuardian == false) {
+                  print('KHONG PHAI NOTI GUARDIAN');
+                  ref.read(stageProvider.notifier).setStage(Stage.stage0);
+                  if (mounted) {
+                    context.replaceNamed(RouteConstants.rating);
+                  }
+                } else {
+                  print('LA NOTI GUARDIAN');
+                  if (mounted) {
+                    context.goNamed(
+                      RouteConstants.dashBoard,
+                    );
+                  }
+                }
               }
             }
           } catch (e) {
             print(e.toString());
+            rethrow;
           }
         },
       );
@@ -115,8 +127,10 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
           await Future.delayed(
             const Duration(seconds: 3),
             () async {
-              if (hubConnection.state == HubConnectionState.disconnected) {
-                await hubConnection.start();
+              if (mounted) {
+                if (hubConnection.state == HubConnectionState.disconnected) {
+                  await hubConnection.start();
+                }
               }
             },
           );
@@ -127,52 +141,52 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
     }
   }
 
-  void _showNavigateDashBoardDialog(TripModel trip) {
-    showDialog(
-      barrierDismissible: true,
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(
-            child: Text(
-              'Tài xế ${trip.driver?.name} đã hoàn thành chuyến đi',
-            ),
-          ),
-          content: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                        'Người thân ${trip.passenger.name} đã hoàn thành chuyến đi'),
-                    Text('Tổng số tiền được thanh toán là: ${trip.price}đ'),
-                    const Text('Cảm ơn bạn đã sử dụng dịch vụ'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                navigateToDashBoard();
-              },
-              child: const Text(
-                'Xác nhận',
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // void _showNavigateDashBoardDialog(TripModel trip) {
+  //   showDialog(
+  //     barrierDismissible: true,
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Center(
+  //           child: Text(
+  //             'Tài xế ${trip.driver?.name} đã hoàn thành chuyến đi',
+  //           ),
+  //         ),
+  //         content: Row(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             Expanded(
+  //               child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   Text(
+  //                       'Người thân ${trip.passenger.name} đã hoàn thành chuyến đi'),
+  //                   Text('Tổng số tiền được thanh toán là: ${trip.price}đ'),
+  //                   const Text('Cảm ơn bạn đã sử dụng dịch vụ'),
+  //                 ],
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               navigateToDashBoard();
+  //             },
+  //             child: const Text(
+  //               'Xác nhận',
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   void navigateToDashBoard() {
-    context.replaceNamed(RouteConstants.dashBoard);
+    context.goNamed(RouteConstants.dashBoard);
   }
 
   Future<void> initialize() async {

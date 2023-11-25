@@ -146,12 +146,15 @@ void showDialogInfo(TripModel? trip, BuildContext context, WidgetRef ref) {
           ),
           ElevatedButton(
             onPressed: () async {
-              await ref.watch(tripControllerProvider.notifier).cancelTrip(
-                    context,
-                    trip?.id ?? '',
-                  );
+              bool check =
+                  await ref.watch(tripControllerProvider.notifier).cancelTrip(
+                        context,
+                        trip?.id ?? '',
+                      );
               if (context.mounted) {
-                ref.watch(stageProvider.notifier).setStage(Stage.stage0);
+                if (check == true) {
+                  ref.watch(stageProvider.notifier).setStage(Stage.stage0);
+                }
                 abcContext.pop();
               }
             },
