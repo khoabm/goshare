@@ -249,16 +249,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           ],
         );
       },
-    ).then((value) async {
-      setState(() {
-        _isLoading = true;
-      });
-      await Future.delayed(
-        const Duration(seconds: 2),
-      );
-      setState(() {
-        _isLoading = false;
-      });
+    ).then((value) {
       navigateToGuardianObserverScreen(trip);
     });
   }
