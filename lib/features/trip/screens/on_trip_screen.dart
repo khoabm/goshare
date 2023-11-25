@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:goshare/core/utils/locations_util.dart';
 import 'package:goshare/providers/dependent_booking_stage_provider.dart';
 import 'package:location/location.dart';
 import 'package:signalr_core/signalr_core.dart';
@@ -12,7 +13,6 @@ import 'package:vietmap_flutter_navigation/navigation_plugin.dart';
 import 'package:vietmap_flutter_navigation/views/navigation_view.dart';
 
 import 'package:goshare/core/constants/route_constants.dart';
-import 'package:goshare/core/locations_util.dart';
 import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:goshare/providers/signalr_providers.dart';

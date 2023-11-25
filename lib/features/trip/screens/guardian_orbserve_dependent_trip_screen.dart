@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:goshare/core/utils/locations_util.dart';
 import 'package:location/location.dart';
 import 'package:signalr_core/signalr_core.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 
 import 'package:goshare/common/loader.dart';
 import 'package:goshare/core/constants/route_constants.dart';
-import 'package:goshare/core/locations_util.dart';
 import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/providers/signalr_providers.dart';
 import 'package:goshare/theme/pallet.dart';

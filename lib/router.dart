@@ -335,6 +335,7 @@ class AppRouter {
             final String? bookerId = extras['bookerId'] as String?;
             final String? carTypeId = extras['carTypeId'] as String?;
             final String? driverNote = extras['driverNote'] as String?;
+            final int capacity = extras['capacity'] as int;
             return SlideRightTransition(
               child: RouteConfirmScreen(
                 driverNote: driverNote,

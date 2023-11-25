@@ -101,6 +101,8 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
     _navigationOption = _vietmapNavigationPlugin.getDefaultOptions();
     _navigationOption.simulateRoute = false;
     _navigationOption.alternatives = false;
+    _navigationOption.bearing = 0;
+    _navigationOption.tilt = 0;
     _navigationOption.apiKey =
         'c3d0f188ff669f89042771a20656579073cffec5a8a69747';
     _navigationOption.mapStyle =

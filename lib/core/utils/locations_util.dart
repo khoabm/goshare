@@ -82,4 +82,41 @@ class LocationUtils {
       );
     }
   }
+
+  static FutureEither<VietmapPlaceModel> getRoute(
+    double startLatitude,
+    double startLongitude,
+    double endLatitude,
+    double endLongitude,
+  ) async {
+    try {
+      final url = Uri.https(
+        'maps.vietmap.vn',
+        '/api/route',
+        {
+          'api-version': '1.1',
+          'apikey': Constants.vietMapApiKey,
+          'point': [
+            '$startLatitude,$startLongitude',
+            '$endLatitude,$endLongitude',
+          ],
+          'vehicle': 'car',
+        },
+      );
+      var res = await http.get(url);
+
+      if (res.statusCode == 200) {
+        var data = VietmapPlaceModel.fromJson(res.body);
+        return right(data);
+      } else {
+        return left(
+          Failure('Có lỗi xảy ra'),
+        );
+      }
+    } on TimeoutException catch (_) {
+      return left(
+        Failure('Timeout'),
+      );
+    }
+  }
 }
