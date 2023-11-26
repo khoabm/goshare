@@ -8,6 +8,7 @@ import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/find_trip_model.dart';
 import 'package:goshare/models/trip_model.dart';
+import 'package:goshare/models/user_data_model.dart';
 import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:signalr_core/signalr_core.dart';
 
@@ -91,10 +92,10 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                   FindTripModel(
                     startLatitude: double.parse(widget.startLatitude),
                     startLongitude: double.parse(widget.startLongitude),
-                    startAddress: 'Nha Nguyen',
+                    //startAddress: 'Nha Nguyen',
                     endLatitude: double.parse(widget.endLatitude),
                     endLongitude: double.parse(widget.endLongitude),
-                    endAddress: 'Nga 3',
+                    //endAddress: 'Nga 3',
                     cartypeId: widget.carTypeId,
                     paymentMethod: int.parse(widget.paymentMethod),
                   ),
@@ -116,10 +117,10 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                   FindTripModel(
                     startLatitude: double.parse(widget.startLatitude),
                     startLongitude: double.parse(widget.startLongitude),
-                    startAddress: 'Nha Nguyen',
+                    //startAddress: 'Nha Nguyen',
                     endLatitude: double.parse(widget.endLatitude),
                     endLongitude: double.parse(widget.endLongitude),
-                    endAddress: 'Nga 3',
+                    //endAddress: 'Nga 3',
                     cartypeId: widget.carTypeId,
                     paymentMethod: int.parse(widget.paymentMethod),
                   ),
@@ -128,7 +129,14 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           }
 
           if (result != null) {
-            //ref.watch(currentOnTripDependentProvider.notifier).state = [];
+            ref
+                .read(currentDependentOnTripProvider.notifier)
+                .addDependentCurrentOnTripId(
+                  DependentTrip(
+                      id: result!.id,
+                      name: result!.passenger.name,
+                      dependentId: result!.passenger.id),
+                );
           }
         }
         // Use setState to trigger a rebuild of the widget with the new data.
@@ -180,38 +188,37 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
         hubConnectionProvider.future,
       );
 
-      hubConnection.on('NotifyPassengerDriverOnTheWay', (message) async {
+      hubConnection.on('NotifyPassengerDriverOnTheWay', (message) {
         try {
-          print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
-          setState(() {
-            _isLoading = true;
-          });
-          await Future.delayed(
-            const Duration(seconds: 1),
-          );
-          setState(() {
-            _isLoading = false;
-          });
-          HapticFeedback.vibrate();
+          // setState(() {
+          //   _isLoading = true;
+          // });
+          // await Future.delayed(
+          //   const Duration(seconds: 1),
+          // );
+          // setState(() {
+          //   _isLoading = false;
+          // });
+          // HapticFeedback.vibrate();
           _handleNotifyPassengerDriverOnTheWay(message);
         } catch (e) {
           print(e.toString());
         }
       });
-      hubConnection.on('NotifyPassengerTripCanceled', (message) async {
+      hubConnection.on('NotifyPassengerTripCanceled', (message) {
         try {
-          print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
-
-          setState(() {
-            _isLoading = true;
-          });
-          await Future.delayed(
-            const Duration(seconds: 2),
-          );
-          setState(() {
-            _isLoading = false;
-          });
-          _handleNotifyPassengerTripCanceled(message);
+          // setState(() {
+          //   _isLoading = true;
+          // });
+          // await Future.delayed(
+          //   const Duration(seconds: 2),
+          // );
+          // setState(() {
+          //   _isLoading = false;
+          // });
+          if (mounted) {
+            _handleNotifyPassengerTripCanceled(message);
+          }
         } catch (e) {
           print(e.toString());
         }
@@ -513,7 +520,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     String endLatitude,
     String endLongitude,
   ) {
-    context.goNamed(RouteConstants.driverPickUp, extra: {
+    context.replaceNamed(RouteConstants.driverPickUp, extra: {
       'driverName': driverName,
       'driverCarType': driverCarType,
       'driverPlate': driverPlate,

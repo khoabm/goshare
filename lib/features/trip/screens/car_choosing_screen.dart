@@ -71,7 +71,7 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
     String? driverNote,
     int capacity,
   ) {
-    context.goNamed(RouteConstants.routeConfirm, extra: {
+    context.pushNamed(RouteConstants.routeConfirm, extra: {
       'startLatitude': startLatitude,
       'startLongitude': startLongitude,
       'endLatitude': endLatitude,

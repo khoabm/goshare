@@ -168,6 +168,45 @@ void showDialogInfo(TripModel? trip, BuildContext context, WidgetRef ref) {
   );
 }
 
+void showDialogTripCancel(
+    TripModel? trip, BuildContext context, WidgetRef ref) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext abcContext) {
+      return AlertDialog(
+        title: Center(
+          child: Text(
+            'Người thân ${trip?.booker.name} đã hủy tìm xe',
+          ),
+        ),
+        content: const SizedBox.shrink(),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              abcContext.pop();
+            },
+            child: const Text(
+              'Xác nhận',
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (context.mounted) {
+                ref.watch(stageProvider.notifier).setStage(Stage.stage0);
+                abcContext.pop();
+              }
+            },
+            child: const Text(
+              'Hủy',
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 void showDialogInfoPickUp(TripModel trip, BuildContext context) {
   showDialog(
     barrierDismissible: true,

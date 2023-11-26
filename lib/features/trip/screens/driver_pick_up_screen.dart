@@ -79,22 +79,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
       await initSignalR(ref);
       final location = ref.read(locationProvider);
       currentLocation = await location.getCurrentLocation();
-      //updateMarker();
-      final hubConnection = await ref.read(
-        hubConnectionProvider.future,
-      );
-      hubConnection.on(
-        'UpdateDriverLocation',
-        (arguments) {
-          print("SIGNAL R DEP TRIP BOOK" + arguments.toString());
-          final stringData = arguments?.first as String;
-          final data = jsonDecode(stringData) as Map<String, dynamic>;
-          updateMarker(
-            data['latitude'],
-            data['longitude'],
-          );
-        },
-      );
+
       setState(() {});
     });
     super.initState();
@@ -112,7 +97,18 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           _handleNotifyPassengerDriverPickUp(message);
         }
       });
-
+      hubConnection.on(
+        'UpdateDriverLocation',
+        (arguments) {
+          print("SIGNAL R DEP TRIP BOOK" + arguments.toString());
+          final stringData = arguments?.first as String;
+          final data = jsonDecode(stringData) as Map<String, dynamic>;
+          updateMarker(
+            data['latitude'],
+            data['longitude'],
+          );
+        },
+      );
       hubConnection.onclose((exception) async {
         await Future.delayed(
           const Duration(seconds: 3),
@@ -132,19 +128,21 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
 
   void _handleNotifyPassengerDriverPickUp(dynamic message) {
     if (mounted) {
-      final data = message as List<dynamic>;
-      final tripData = data.cast<Map<String, dynamic>>().first;
-      final trip = TripModel.fromMap(tripData);
-      bool isSelfBook = data.cast<bool>()[1];
-      bool isNotifyToGuardian = data.cast<bool>()[2];
-      if (isSelfBook == true) {
-        print('TỰ ĐẶT TRONG PICKUP');
-        _showDriverInfoDialog(trip);
-      } else {
-        print('KHÔNG PHẢI TỰ ĐẶT TRONG PICKUP');
-        if (isNotifyToGuardian == true) {
-          print('NOTIFY CHO GUARDIAN TRONG PICKUP');
-          _showDependentDriverInfoDialog(trip);
+      if (ModalRoute.of(context)?.isCurrent ?? false) {
+        final data = message as List<dynamic>;
+        final tripData = data.cast<Map<String, dynamic>>().first;
+        final trip = TripModel.fromMap(tripData);
+        bool isSelfBook = data.cast<bool>()[1];
+        bool isNotifyToGuardian = data.cast<bool>()[2];
+        if (isSelfBook == true) {
+          print('TỰ ĐẶT TRONG PICKUP');
+          _showDriverInfoDialog(trip);
+        } else {
+          print('KHÔNG PHẢI TỰ ĐẶT TRONG PICKUP');
+          if (isNotifyToGuardian == true) {
+            print('NOTIFY CHO GUARDIAN TRONG PICKUP');
+            _showDependentDriverInfoDialog(trip);
+          }
         }
       }
     }
@@ -257,7 +255,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   void navigateToOnTripScreen(
     TripModel trip,
   ) {
-    context.goNamed(RouteConstants.onTrip, extra: {
+    context.replaceNamed(RouteConstants.onTrip, extra: {
       'trip': trip,
     });
   }
@@ -281,7 +279,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
       List<Marker> tempMarkers = []; // Temporary list to hold the new markers
 
       // Wait for a while before updating the marker
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 3));
       print('did update marker');
       // Add the new marker to the temporary list
       tempMarkers.clear();
@@ -372,8 +370,8 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                         setState(() {
                           _isLoading = true;
                         });
-                        final location = ref.read(locationProvider);
-                        currentLocation = await location.getCurrentLocation();
+                        // final location = ref.read(locationProvider);
+                        // currentLocation = await location.getCurrentLocation();
                         _mapController?.animateCamera(
                           CameraUpdate.newCameraPosition(
                             CameraPosition(

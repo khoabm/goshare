@@ -148,7 +148,9 @@ class _GuardianObserveDependentTripScreenState
       final data = message as List<dynamic>;
       final tripData = data.cast<Map<String, dynamic>>().first;
       final trip = TripModel.fromMap(tripData);
-      _showDriverInfoDialog(trip);
+      if (trip.passengerId == widget.trip.passengerId) {
+        _showDriverInfoDialog(trip);
+      }
     }
   }
 

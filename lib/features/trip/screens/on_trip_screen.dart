@@ -78,38 +78,29 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
           try {
             print('ON TRIP ENDED ON_TRIP');
             if (mounted) {
-              print('mounted');
-              final data = message as List<dynamic>;
-              final tripData = data.cast<Map<String, dynamic>>().first;
-              final trip = TripModel.fromMap(tripData);
-              bool isSelfBook = data.cast<bool>()[1];
-              bool isNotifyToGuardian = data.cast<bool>()[2];
-              ref
-                  .read(currentOnTripIdProvider.notifier)
-                  .setCurrentOnTripId(null);
-
-              if (isSelfBook == true) {
-                print('isSelfBook');
+              if (ModalRoute.of(context)?.isCurrent ?? false) {
+                final data = message as List<dynamic>;
+                final tripData = data.cast<Map<String, dynamic>>().first;
+                final trip = TripModel.fromMap(tripData);
+                bool isSelfBook = data.cast<bool>()[1];
+                bool isNotifyToGuardian = data.cast<bool>()[2];
                 ref
                     .read(currentOnTripIdProvider.notifier)
                     .setCurrentOnTripId(null);
-                if (mounted) {
-                  context.replaceNamed(RouteConstants.rating);
-                }
-              } else {
-                print('KHONG PHAI TU DAT');
-                if (isNotifyToGuardian == false) {
-                  print('KHONG PHAI NOTI GUARDIAN');
-                  ref.read(stageProvider.notifier).setStage(Stage.stage0);
+
+                if (isSelfBook == true) {
+                  ref
+                      .read(currentOnTripIdProvider.notifier)
+                      .setCurrentOnTripId(null);
                   if (mounted) {
                     context.replaceNamed(RouteConstants.rating);
                   }
                 } else {
-                  print('LA NOTI GUARDIAN');
-                  if (mounted) {
-                    context.goNamed(
-                      RouteConstants.dashBoard,
-                    );
+                  if (isNotifyToGuardian == false) {
+                    ref.read(stageProvider.notifier).setStage(Stage.stage0);
+                    if (mounted) {
+                      context.replaceNamed(RouteConstants.rating);
+                    }
                   }
                 }
               }
