@@ -197,7 +197,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                         children: [
                           InkWell(
                             onTap: () {
-                              context.goNamed(RouteConstants.dashBoard);
+                              context.pop();
                             },
                             child: RichText(
                               text: const TextSpan(

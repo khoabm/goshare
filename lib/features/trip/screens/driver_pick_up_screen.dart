@@ -135,12 +135,9 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
         bool isSelfBook = data.cast<bool>()[1];
         bool isNotifyToGuardian = data.cast<bool>()[2];
         if (isSelfBook == true) {
-          print('TỰ ĐẶT TRONG PICKUP');
           _showDriverInfoDialog(trip);
         } else {
-          print('KHÔNG PHẢI TỰ ĐẶT TRONG PICKUP');
           if (isNotifyToGuardian == true) {
-            print('NOTIFY CHO GUARDIAN TRONG PICKUP');
             _showDependentDriverInfoDialog(trip);
           }
         }
@@ -181,7 +178,6 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                //context.pop();
                 navigateToOnTripScreen(trip);
               },
               child: const Text(
@@ -229,15 +225,6 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                // setState(() {
-                //   _isLoading = true;
-                // });
-                // await Future.delayed(
-                //   const Duration(seconds: 2),
-                // );
-                // setState(() {
-                //   _isLoading = false;
-                // });
                 navigateToGuardianObserverScreen(trip);
               },
               child: const Text(
@@ -349,23 +336,6 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                         });
                       },
 
-                      // onMapRenderedCallback: () async {
-                      //   // await _mapController?.addPolyline(
-                      //   //   const PolylineOptions(
-                      //   //       geometry: [
-                      //   //         LatLng(10.736657, 106.672240),
-                      //   //         LatLng(10.766543, 106.742378),
-                      //   //         LatLng(10.775818, 106.640497),
-                      //   //         LatLng(10.727416, 106.735597),
-                      //   //         LatLng(10.792765, 106.674143),
-                      //   //         LatLng(10.736657, 106.672240),
-                      //   //       ],
-                      //   //       polylineColor: Colors.red,
-                      //   //       polylineWidth: 14.0,
-                      //   //       polylineOpacity: 1,
-                      //   //       draggable: true),
-                      //   // );
-                      // },
                       onMapRenderedCallback: () async {
                         setState(() {
                           _isLoading = true;
@@ -400,9 +370,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                           child: InkWell(
                             onTap: () async {
                               if (context.mounted) {
-                                context.goNamed(
-                                  RouteConstants.dashBoard,
-                                );
+                                context.pop();
                               }
                             },
                             child: const Row(

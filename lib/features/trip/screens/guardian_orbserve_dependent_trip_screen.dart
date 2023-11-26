@@ -108,27 +108,31 @@ class _GuardianObserveDependentTripScreenState
       final hubConnection = await ref.watch(
         hubConnectionProvider.future,
       );
-      hubConnection.on(
-        'UpdateDriverLocation',
-        (arguments) {
-          final stringData = arguments?.first as String;
-          final data = jsonDecode(stringData) as Map<String, dynamic>;
-          updateMarker(
-            data['latitude'],
-            data['longitude'],
+      if (mounted) {
+        if (ModalRoute.of(context)?.isCurrent ?? false) {
+          hubConnection.on(
+            'UpdateDriverLocation',
+            (arguments) {
+              final stringData = arguments?.first as String;
+              final data = jsonDecode(stringData) as Map<String, dynamic>;
+              updateMarker(
+                data['latitude'],
+                data['longitude'],
+              );
+            },
           );
-        },
-      );
+        }
+      }
 
       hubConnection.on('NotifyPassengerTripEnded', (message) {
-        print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
         if (mounted) {
-          _handleNotifyPassengerDriverPickUp(message);
+          if (ModalRoute.of(context)?.isCurrent ?? false) {
+            _handleNotifyPassengerDriverPickUp(message);
+          }
         }
       });
 
       hubConnection.onclose((exception) async {
-        print(exception.toString() + "LOI CUA SIGNALR ON CLOSE");
         await Future.delayed(
           const Duration(seconds: 3),
           () async {

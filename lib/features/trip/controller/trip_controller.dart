@@ -110,7 +110,7 @@ class TripController extends StateNotifier<bool> {
         );
       } else if (l is AlreadyInTripFailure) {
       } else {
-        showSnackBar(
+        showFindTripErrorDialog(
           context: context,
           message: l.message,
         );

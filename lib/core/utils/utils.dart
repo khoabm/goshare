@@ -68,6 +68,31 @@ void showAlreadyInTripError({
   );
 }
 
+void showFindTripErrorDialog({
+  required BuildContext context,
+  required String message,
+}) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Có lỗi xảy ra'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('OK'),
+            onPressed: () {
+              context.pop();
+              context.go(RouteConstants.dashBoardUrl);
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 String convertPhoneNumber(String phoneNumber) {
   // Check if the phone number starts with '0'
   if (phoneNumber.startsWith('0')) {

@@ -80,8 +80,8 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
             if (mounted) {
               if (ModalRoute.of(context)?.isCurrent ?? false) {
                 final data = message as List<dynamic>;
-                final tripData = data.cast<Map<String, dynamic>>().first;
-                final trip = TripModel.fromMap(tripData);
+                //final tripData = data.cast<Map<String, dynamic>>().first;
+                //final trip = TripModel.fromMap(tripData);
                 bool isSelfBook = data.cast<bool>()[1];
                 bool isNotifyToGuardian = data.cast<bool>()[2];
                 ref
@@ -114,7 +114,6 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
 
       hubConnection.onclose(
         (exception) async {
-          print(exception.toString() + "LOI CUA SIGNALR ON CLOSE");
           await Future.delayed(
             const Duration(seconds: 3),
             () async {
@@ -131,50 +130,6 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
       print(e.toString());
     }
   }
-
-  // void _showNavigateDashBoardDialog(TripModel trip) {
-  //   showDialog(
-  //     barrierDismissible: true,
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Center(
-  //           child: Text(
-  //             'Tài xế ${trip.driver?.name} đã hoàn thành chuyến đi',
-  //           ),
-  //         ),
-  //         content: Row(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             Expanded(
-  //               child: Column(
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   Text(
-  //                       'Người thân ${trip.passenger.name} đã hoàn thành chuyến đi'),
-  //                   Text('Tổng số tiền được thanh toán là: ${trip.price}đ'),
-  //                   const Text('Cảm ơn bạn đã sử dụng dịch vụ'),
-  //                 ],
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () {
-  //               navigateToDashBoard();
-  //             },
-  //             child: const Text(
-  //               'Xác nhận',
-  //             ),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
 
   void navigateToDashBoard() {
     context.goNamed(RouteConstants.dashBoard);
@@ -204,9 +159,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
           children: [
             NavigationView(
               mapOptions: _navigationOption,
-              onNewRouteSelected: (p0) {
-                print(p0.toString());
-              },
+              onNewRouteSelected: (p0) {},
               onMapCreated: (p0) async {
                 _controller = p0;
               },
@@ -259,9 +212,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                           child: InkWell(
                             onTap: () async {
                               if (context.mounted) {
-                                context.goNamed(
-                                  RouteConstants.dashBoard,
-                                );
+                                context.pop();
                               }
                             },
                             child: const Row(

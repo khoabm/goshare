@@ -127,7 +127,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           .getUserData(context, ref), // Replace with your actual token
       builder: (BuildContext context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LoaderPrimary(); // Show a loading spinner while waiting
+          return const SplashScreen(); // Show a loading spinner while waiting
         } else {
           final initialLocation =
               snapshot.data != null && snapshot.data!.isNotEmpty

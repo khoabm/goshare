@@ -44,9 +44,10 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
   }
 
   void initialize() async {
-    print(widget.startLatitude + 'heheheheeheheheheh');
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      setState(() {
+        _isLoading = true;
+      });
       cars = await ref.watch(tripControllerProvider.notifier).getCarDetails(
             context,
             double.parse(widget.startLatitude),
@@ -54,8 +55,9 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
             double.parse(widget.endLatitude),
             double.parse(widget.endLongitude),
           );
-      // Use setState to trigger a rebuild of the widget with the new data.
-      setState(() {});
+      setState(() {
+        _isLoading = false;
+      });
     });
   }
 
@@ -71,7 +73,7 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
     String? driverNote,
     int capacity,
   ) {
-    context.pushNamed(RouteConstants.routeConfirm, extra: {
+    context.replaceNamed(RouteConstants.routeConfirm, extra: {
       'startLatitude': startLatitude,
       'startLongitude': startLongitude,
       'endLatitude': endLatitude,

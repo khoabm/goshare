@@ -116,7 +116,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (context.mounted) {
       try {
         if (mounted) {
-          print("INIT O HOME NE");
           locations = await ref
               .read(homeControllerProvider.notifier)
               .getUserListLocation(context);
@@ -166,8 +165,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     WidgetRef ref,
   ) async {
     try {
-      print('hehehe');
-
       final oCcy = NumberFormat("#,##0", "vi_VN");
       setState(() {
         _isLoading = true;
@@ -175,7 +172,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       final location = ref.watch(locationProvider);
       final currentLocation = await location.getCurrentLocation();
 
-      print('hehehehe');
       List<CarModel> cars = [];
       if (context.mounted) {
         cars = await ref.watch(tripControllerProvider.notifier).getCarDetails(
@@ -666,18 +662,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             AppButton(
                               buttonText: 'Đóng góp',
                               fontSize: 16,
-                              onPressed: () {
-                                navigateToDriverPickupScreen(
-                                  '',
-                                  '',
-                                  '',
-                                  '',
-                                  '',
-                                  '',
-                                  '0',
-                                  '0',
-                                );
-                              },
+                              onPressed: () {},
                             ),
                           ],
                         ),
