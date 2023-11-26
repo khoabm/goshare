@@ -38,36 +38,29 @@ class _MyAppState extends ConsumerState<MyApp> {
     super.initState();
     requestPermission();
     initInfor();
-    initUniLinks();
+    setupInteractedMessage();
   }
 
-  Future<void> initUniLinks() async {
-    try {
-      final initialLink = await getInitialLink();
-      if (initialLink != null) {
-        handleDeepLink(initialLink);
-      }
-    } on PlatformException {
-      // Handle exceptions
+  // It is assumed that all messages contain a data field with the key 'type'
+  Future<void> setupInteractedMessage() async {
+    // Get any messages which caused the application to open from
+    // a terminated state.
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+    // If the message also contains a data property with a "type" of "chat",
+    // navigate to a chat screen
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
     }
 
-    getLinksStream().listen((String? link) {
-      if (link != null) {
-        handleDeepLink(link);
-      }
-    }, onError: (dynamic err) {
-      // Handle errors
-    });
+    // Also handle any interaction when the app is in the background via a
+    // Stream listener
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
   }
 
-  void handleDeepLink(String link) {
-    setState(() {
-      _deepLink = link;
-    });
-
-    // Add your logic to handle the deep link
-    // For example, navigate to a specific screen based on the link
-    // or perform actions within your app.
+  void _handleMessage(RemoteMessage message) {
+    print(message);
   }
 
   // This widget is the root of your application.
@@ -138,7 +131,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           .getUserData(context, ref), // Replace with your actual token
       builder: (BuildContext context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LoaderPrimary(); // Show a loading spinner while waiting
+          return const SplashScreen(); // Show a loading spinner while waiting
         } else {
           final initialLocation =
               snapshot.data != null && snapshot.data!.isNotEmpty

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/find_trip_model.dart';
 import 'package:goshare/models/trip_model.dart';
+import 'package:goshare/models/user_data_model.dart';
 import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:signalr_core/signalr_core.dart';
 
@@ -85,16 +85,15 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
         await initSignalR(ref);
         if (widget.bookerId == ref.read(userProvider.notifier).state?.id) {
           if (context.mounted) {
-            print('ĐẶT XE CHO MÌNH NÈ');
             result = await ref.read(tripControllerProvider.notifier).findDriver(
                   context,
                   FindTripModel(
                     startLatitude: double.parse(widget.startLatitude),
                     startLongitude: double.parse(widget.startLongitude),
-                    startAddress: 'Nha Nguyen',
+                    //startAddress: 'Nha Nguyen',
                     endLatitude: double.parse(widget.endLatitude),
                     endLongitude: double.parse(widget.endLongitude),
-                    endAddress: 'Nga 3',
+                    //endAddress: 'Nga 3',
                     cartypeId: widget.carTypeId,
                     paymentMethod: int.parse(widget.paymentMethod),
                   ),
@@ -116,10 +115,10 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                   FindTripModel(
                     startLatitude: double.parse(widget.startLatitude),
                     startLongitude: double.parse(widget.startLongitude),
-                    startAddress: 'Nha Nguyen',
+                    //startAddress: 'Nha Nguyen',
                     endLatitude: double.parse(widget.endLatitude),
                     endLongitude: double.parse(widget.endLongitude),
-                    endAddress: 'Nga 3',
+                    //endAddress: 'Nga 3',
                     cartypeId: widget.carTypeId,
                     paymentMethod: int.parse(widget.paymentMethod),
                   ),
@@ -128,7 +127,14 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           }
 
           if (result != null) {
-            //ref.watch(currentOnTripDependentProvider.notifier).state = [];
+            ref
+                .read(currentDependentOnTripProvider.notifier)
+                .addDependentCurrentOnTripId(
+                  DependentTrip(
+                      id: result!.id,
+                      name: result!.passenger.name,
+                      dependentId: result!.passenger.id),
+                );
           }
         }
         // Use setState to trigger a rebuild of the widget with the new data.
@@ -180,46 +186,48 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
         hubConnectionProvider.future,
       );
 
-      hubConnection.on('NotifyPassengerDriverOnTheWay', (message) async {
+      hubConnection.on('NotifyPassengerDriverOnTheWay', (message) {
         try {
-          print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
-          setState(() {
-            _isLoading = true;
-          });
-          await Future.delayed(
-            const Duration(seconds: 1),
-          );
-          setState(() {
-            _isLoading = false;
-          });
-          HapticFeedback.vibrate();
-          _handleNotifyPassengerDriverOnTheWay(message);
+          // setState(() {
+          //   _isLoading = true;
+          // });
+          // await Future.delayed(
+          //   const Duration(seconds: 1),
+          // );
+          // setState(() {
+          //   _isLoading = false;
+          // });
+          if (mounted) {
+            HapticFeedback.mediumImpact();
+            _handleNotifyPassengerDriverOnTheWay(message);
+          }
         } catch (e) {
           print(e.toString());
         }
       });
-      hubConnection.on('NotifyPassengerTripCanceled', (message) async {
+      hubConnection.on('NotifyPassengerTripCanceled', (message) {
         try {
-          print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
-
-          setState(() {
-            _isLoading = true;
-          });
-          await Future.delayed(
-            const Duration(seconds: 2),
-          );
-          setState(() {
-            _isLoading = false;
-          });
-          _handleNotifyPassengerTripCanceled(message);
+          // setState(() {
+          //   _isLoading = true;
+          // });
+          // await Future.delayed(
+          //   const Duration(seconds: 2),
+          // );
+          // setState(() {
+          //   _isLoading = false;
+          // });
+          if (mounted) {
+            _handleNotifyPassengerTripCanceled(message);
+          }
         } catch (e) {
           print(e.toString());
         }
       });
       hubConnection.on('NotifyPassengerTripTimedOut', (message) {
         try {
-          print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
-          _handleNotifyPassengerTripTimedOut(message);
+          if (mounted) {
+            _handleNotifyPassengerTripTimedOut(message);
+          }
           //_handleNotifyPassengerDriverOnTheWay(message);
         } catch (e) {
           print(e.toString());
@@ -227,7 +235,6 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       });
 
       hubConnection.onclose((exception) async {
-        print(exception.toString() + "LOI CUA SIGNALR ON CLOSE");
         await Future.delayed(
           const Duration(seconds: 3),
           () async {
@@ -239,6 +246,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       });
     } catch (e) {
       print(e.toString());
+      rethrow;
     }
   }
 
@@ -320,7 +328,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           ),
           actions: [
             TextButton(
-              onPressed: () async {
+              onPressed: () {
                 // setState(() {
                 //   _isLoading = true;
                 // });
@@ -513,7 +521,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     String endLatitude,
     String endLongitude,
   ) {
-    context.goNamed(RouteConstants.driverPickUp, extra: {
+    context.replaceNamed(RouteConstants.driverPickUp, extra: {
       'driverName': driverName,
       'driverCarType': driverCarType,
       'driverPlate': driverPlate,
@@ -619,7 +627,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
               onMapCreated: (p0) async {
                 _controller = p0;
               },
-              onMapMove: () => _showRecenterButton(),
+              //onMapMove: () => _showRecenterButton(),
               onRouteBuilt: (p0) {
                 setState(() {
                   //EasyLoading.dismiss();
@@ -659,42 +667,14 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                 //   wayPoints: wayPoints,
                 // );
               },
-              onRouteProgressChange: (RouteProgressEvent routeProgressEvent) {
-                setState(() {
-                  this.routeProgressEvent = routeProgressEvent;
-                });
-                _setInstructionImage(routeProgressEvent.currentModifier,
-                    routeProgressEvent.currentModifierType);
-              },
-              // onArrival: () {
-              //   _isRunning = false;
-              //   ScaffoldMessenger.of(context).showSnackBar(
-              //     SnackBar(
-              //       content: Container(
-              //         height: 100,
-              //         color: Colors.red,
-              //         child: const Text('Bạn đã tới đích'),
-              //       ),
-              //     ),
-              //   );
+              // onRouteProgressChange: (RouteProgressEvent routeProgressEvent) {
+              //   setState(() {
+              //     this.routeProgressEvent = routeProgressEvent;
+              //   });
+              //   _setInstructionImage(routeProgressEvent.currentModifier,
+              //       routeProgressEvent.currentModifierType);
               // },
             ),
-            // Positioned(
-            //     top: MediaQuery.of(context).viewPadding.top,
-            //     left: 0,
-            //     child: BannerInstructionView(
-            //       routeProgressEvent: routeProgressEvent,
-            //       instructionIcon: instructionImage,
-            //     )),
-            // Positioned(
-            //     bottom: 0,
-            //     child: BottomActionView(
-            //       recenterButton: recenterButton,
-            //       controller: _controller,
-            //       onOverviewCallback: _showRecenterButton,
-            //       onStopNavigationCallback: _onStopNavigation,
-            //       routeProgressEvent: routeProgressEvent,
-            //     )),
             _isRunning && _isRouteBuilt
                 ? const SizedBox.shrink()
                 : Positioned(
@@ -758,112 +738,9 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                             ),
                           ),
                         ),
-                        // IconButton(
-                        //   onPressed: () {
-                        //     context.pop();
-                        //   },
-                        //   icon: SizedBox(
-                        //     width: MediaQuery.of(context).size.width * .95,
-                        //     child: const Row(
-                        //       children: [
-                        //         Icon(Icons.arrow_back_ios_new_outlined),
-                        //         SizedBox(
-                        //           width: 10,
-                        //         ),
-                        //         Text(
-                        //           'Quay lại',
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
-                        // FloatingSearchBar(
-                        //   focusNode: focusNode,
-                        //   onSearchItemClick: (p0) async {
-                        //     //EasyLoading.show();
-
-                        //     VietmapPlaceModel? data;
-                        //     var res = await LocationUtils.getPlaceDetail(
-                        //         p0.refId ?? '');
-
-                        //     // GetPlaceDetailUseCase(VietmapApiRepositories())
-                        //     //     .call(p0.refId ?? '');
-                        //     res.fold((l) {
-                        //       print(l.message);
-                        //       //EasyLoading.dismiss();
-                        //       return;
-                        //     }, (r) {
-                        //       print(r.address);
-                        //       data = r;
-                        //     });
-                        //     wayPoints.clear();
-                        //     // var location = await Geolocator.getCurrentPosition(
-                        //     //   desiredAccuracy: LocationAccuracy.bestForNavigation,
-                        //     // );
-                        //     // wayPoints.add(
-                        //     //   WayPoint(
-                        //     //     name: 'destination',
-                        //     //     latitude: location.latitude,
-                        //     //     longitude: location.longitude,
-                        //     //   ),
-                        //     // );
-                        //     if (data?.lat != null) {
-                        //       wayPoints.add(WayPoint(
-                        //           name: '',
-                        //           latitude: data?.lat,
-                        //           longitude: data?.lng));
-                        //     }
-                        //     _controller?.buildRoute(wayPoints: wayPoints);
-                        //   },
-                        // ),
                       ],
                     ),
                   ),
-            // _isRouteBuilt && !_isRunning
-            //     ? Positioned(
-            //         bottom: 20,
-            //         left: 0,
-            //         child: SizedBox(
-            //           width: MediaQuery.of(context).size.width,
-            //           child: Row(
-            //             mainAxisSize: MainAxisSize.max,
-            //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //             children: [
-            //               ElevatedButton(
-            //                   style: ButtonStyle(
-            //                       shape: MaterialStateProperty.all<
-            //                               RoundedRectangleBorder>(
-            //                           RoundedRectangleBorder(
-            //                               borderRadius:
-            //                                   BorderRadius.circular(18.0),
-            //                               side: const BorderSide(
-            //                                   color: Colors.blue)))),
-            //                   onPressed: () {
-            //                     // _isRunning = true;
-            //                     // _controller?.startNavigation();
-            //                   },
-            //                   child: const Text('Tiep tuc')),
-            //               ElevatedButton(
-            //                   style: ButtonStyle(
-            //                       shape: MaterialStateProperty.all<
-            //                               RoundedRectangleBorder>(
-            //                           RoundedRectangleBorder(
-            //                               borderRadius:
-            //                                   BorderRadius.circular(18.0),
-            //                               side: const BorderSide(
-            //                                   color: Colors.blue)))),
-            //                   onPressed: () {
-            //                     _controller?.clearRoute();
-            //                     setState(() {
-            //                       _isRouteBuilt = false;
-            //                     });
-            //                   },
-            //                   child: const Text('Xoá tuyến đường')),
-            //             ],
-            //           ),
-            //         ),
-            //       )
-            //     : const SizedBox.shrink()
             if (_isLoading)
               Container(
                 color: Colors.black.withOpacity(0.5),
@@ -875,63 +752,58 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
         ),
       ),
     );
-    // result == true
-    //     ? const SizedBox(
-    //         child: Text('true'),
-    //       )
-    //     : const SizedBox();
   }
 
-  _showRecenterButton() {
-    recenterButton = TextButton(
-        onPressed: () {
-          _controller?.recenter();
-          setState(() {
-            recenterButton = const SizedBox.shrink();
-          });
-        },
-        child: Container(
-            height: 50,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-                color: Colors.white,
-                border: Border.all(color: Colors.black45, width: 1)),
-            child: const Row(
-              children: [
-                Icon(
-                  Icons.keyboard_double_arrow_up_sharp,
-                  color: Colors.lightBlue,
-                  size: 35,
-                ),
-                Text(
-                  'Về giữa',
-                  style: TextStyle(fontSize: 18, color: Colors.lightBlue),
-                )
-              ],
-            )));
-    setState(() {});
-  }
+  // _showRecenterButton() {
+  //   recenterButton = TextButton(
+  //       onPressed: () {
+  //         _controller?.recenter();
+  //         setState(() {
+  //           recenterButton = const SizedBox.shrink();
+  //         });
+  //       },
+  //       child: Container(
+  //           height: 50,
+  //           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+  //           decoration: BoxDecoration(
+  //               borderRadius: BorderRadius.circular(50),
+  //               color: Colors.white,
+  //               border: Border.all(color: Colors.black45, width: 1)),
+  //           child: const Row(
+  //             children: [
+  //               Icon(
+  //                 Icons.keyboard_double_arrow_up_sharp,
+  //                 color: Colors.lightBlue,
+  //                 size: 35,
+  //               ),
+  //               Text(
+  //                 'Về giữa',
+  //                 style: TextStyle(fontSize: 18, color: Colors.lightBlue),
+  //               )
+  //             ],
+  //           )));
+  //   setState(() {});
+  // }
 
-  _setInstructionImage(String? modifier, String? type) {
-    if (modifier != null && type != null) {
-      List<String> data = [
-        type.replaceAll(' ', '_'),
-        modifier.replaceAll(' ', '_')
-      ];
-      String path = 'assets/navigation_symbol/${data.join('_')}.svg';
-      setState(() {
-        instructionImage = SvgPicture.asset(path, color: Colors.white);
-      });
-    }
-  }
+  // _setInstructionImage(String? modifier, String? type) {
+  //   if (modifier != null && type != null) {
+  //     List<String> data = [
+  //       type.replaceAll(' ', '_'),
+  //       modifier.replaceAll(' ', '_')
+  //     ];
+  //     String path = 'assets/navigation_symbol/${data.join('_')}.svg';
+  //     setState(() {
+  //       instructionImage = SvgPicture.asset(path, color: Colors.white);
+  //     });
+  //   }
+  // }
 
-  _onStopNavigation() {
-    setState(() {
-      routeProgressEvent = null;
-      _isRunning = false;
-    });
-  }
+  // _onStopNavigation() {
+  //   setState(() {
+  //     routeProgressEvent = null;
+  //     _isRunning = false;
+  //   });
+  // }
 
   // _showBottomSheetInfo(VietmapReverseModel data) {
   //   showModalBottomSheet(

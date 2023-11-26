@@ -61,7 +61,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
     double? endLatitude,
     double? endLongitude,
   ) {
-    context.goNamed(RouteConstants.carChoosing, pathParameters: {
+    context.pushNamed(RouteConstants.carChoosing, pathParameters: {
       'startLatitude': startLatitude?.toString() ?? '',
       'startLongitude': startLongitude?.toString() ?? '',
       'endLatitude': endLatitude?.toString() ?? '',
@@ -172,9 +172,9 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                           setState(() {
                             _isLoading = true;
                           });
-                          final location = ref.read(locationProvider);
-                          currentLocation = await location.getCurrentLocation();
-                          _mapController?.animateCamera(
+                          // final location = ref.read(locationProvider);
+                          // currentLocation = await location.getCurrentLocation();
+                          await _mapController?.animateCamera(
                             CameraUpdate.newCameraPosition(
                               CameraPosition(
                                   target: LatLng(currentLocation?.latitude ?? 0,
@@ -197,7 +197,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                         children: [
                           InkWell(
                             onTap: () {
-                              context.goNamed(RouteConstants.dashBoard);
+                              context.pop();
                             },
                             child: RichText(
                               text: const TextSpan(

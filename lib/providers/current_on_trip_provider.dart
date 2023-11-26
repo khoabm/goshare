@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:goshare/models/user_data_model.dart';
 
 final currentOnTripIdProvider =
     StateNotifierProvider<CurrentOnTripIdNotifier, String?>(
@@ -9,5 +10,22 @@ class CurrentOnTripIdNotifier extends StateNotifier<String?> {
   String? get currentTripId => state;
   void setCurrentOnTripId(String? id) {
     state = id;
+  }
+}
+
+final currentDependentOnTripProvider = StateNotifierProvider<
+    CurrentDependentOnTripIdNotifier,
+    List<DependentTrip>>((ref) => CurrentDependentOnTripIdNotifier());
+
+class CurrentDependentOnTripIdNotifier
+    extends StateNotifier<List<DependentTrip>> {
+  CurrentDependentOnTripIdNotifier() : super([]);
+  List<DependentTrip> get currentTripId => state;
+  void setDependentCurrentOnTripId(List<DependentTrip> trips) {
+    state = trips;
+  }
+
+  void addDependentCurrentOnTripId(DependentTrip trip) {
+    state = [...state, trip];
   }
 }

@@ -52,7 +52,8 @@ class LoginRepository {
           'passcode': passcode,
         }),
       );
-
+      print(response.statusCode);
+      print(response.body);
       if (response.statusCode == 200) {
         final resultMap = json.decode(response.body);
         return LoginResult(
@@ -114,6 +115,7 @@ class LoginRepository {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final accessToken = prefs.getString('accessToken');
       final refreshToken = prefs.getString('refreshToken');
+
       final response = await http
           .post(
             Uri.parse('${Constants.apiBaseUrl}/auth/refresh-token'),
@@ -136,6 +138,7 @@ class LoginRepository {
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         final userData = UserDataModel.fromMap(jsonData);
+        print('get user dâta');
         if (jsonData.containsKey('id') &&
             jsonData.containsKey('phone') &&
             jsonData.containsKey('name') &&
@@ -149,8 +152,11 @@ class LoginRepository {
           ref.read(userProvider.notifier).state = userTmp;
 
           ref
-              .watch(currentOnTripIdProvider.notifier)
+              .read(currentOnTripIdProvider.notifier)
               .setCurrentOnTripId(userData.currentTrip);
+          ref
+              .read(currentDependentOnTripProvider.notifier)
+              .setDependentCurrentOnTripId(userData.dependentCurrentTrip ?? []);
         }
         return right(jsonData['accessToken']);
       } else {

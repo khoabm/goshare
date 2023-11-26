@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 class UserDataModel {
   final String accessToken;
@@ -10,7 +11,7 @@ class UserDataModel {
   final String name;
   final String role;
   final String? currentTrip;
-  final List<DependentTrip>? dependentTrips;
+  final List<DependentTrip>? dependentCurrentTrip;
   UserDataModel({
     required this.accessToken,
     required this.refreshToken,
@@ -19,7 +20,7 @@ class UserDataModel {
     required this.name,
     required this.role,
     this.currentTrip,
-    required this.dependentTrips,
+    required this.dependentCurrentTrip,
   });
 
   UserDataModel copyWith({
@@ -30,7 +31,7 @@ class UserDataModel {
     String? name,
     String? role,
     ValueGetter<String?>? currentTrip,
-    ValueGetter<List<DependentTrip>?>? dependentTrips,
+    ValueGetter<List<DependentTrip>?>? dependentCurrentTrip,
   }) {
     return UserDataModel(
       accessToken: accessToken ?? this.accessToken,
@@ -40,7 +41,8 @@ class UserDataModel {
       name: name ?? this.name,
       role: role ?? this.role,
       currentTrip: currentTrip?.call() ?? this.currentTrip,
-      dependentTrips: dependentTrips?.call() ?? this.dependentTrips,
+      dependentCurrentTrip:
+          dependentCurrentTrip?.call() ?? this.dependentCurrentTrip,
     );
   }
 
@@ -53,7 +55,8 @@ class UserDataModel {
       'name': name,
       'role': role,
       'currentTrip': currentTrip,
-      'dependentTrips': dependentTrips?.map((x) => x.toMap()).toList(),
+      'dependentCurrentTrip':
+          dependentCurrentTrip?.map((x) => x?.toMap())?.toList(),
     };
   }
 
@@ -66,9 +69,9 @@ class UserDataModel {
       name: map['name'] ?? '',
       role: map['role'] ?? '',
       currentTrip: map['currentTrip'],
-      dependentTrips: map['dependentTrips'] != null
+      dependentCurrentTrip: map['dependentCurrentTrip'] != null
           ? List<DependentTrip>.from(
-              map['dependentTrips']?.map((x) => DependentTrip.fromMap(x)))
+              map['dependentCurrentTrip']?.map((x) => DependentTrip.fromMap(x)))
           : null,
     );
   }
@@ -85,7 +88,7 @@ class UserDataModel {
 
   @override
   String toString() {
-    return 'UserDataModel(accessToken: $accessToken, refreshToken: $refreshToken, id: $id, phone: $phone, name: $name, role: $role, currentTrip: $currentTrip, dependentTrips: $dependentTrips)';
+    return 'UserDataModel(accessToken: $accessToken, refreshToken: $refreshToken, id: $id, phone: $phone, name: $name, role: $role, currentTrip: $currentTrip, dependentCurrentTrip: $dependentCurrentTrip)';
   }
 
   @override
@@ -100,7 +103,7 @@ class UserDataModel {
         other.name == name &&
         other.role == role &&
         other.currentTrip == currentTrip &&
-        listEquals(other.dependentTrips, dependentTrips);
+        listEquals(other.dependentCurrentTrip, dependentCurrentTrip);
   }
 
   @override
@@ -112,7 +115,7 @@ class UserDataModel {
         name.hashCode ^
         role.hashCode ^
         currentTrip.hashCode ^
-        dependentTrips.hashCode;
+        dependentCurrentTrip.hashCode;
   }
 }
 

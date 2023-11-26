@@ -90,7 +90,7 @@ class TripRepository {
         return left(
           UnauthorizedFailure('Unauthorized'),
         );
-      } else if (response.statusCode == 401) {
+      } else if (response.statusCode == 400) {
         Map<String, dynamic> error = json.decode(response.body);
         if (error['message'] ==
             "Passenger is already in a trip that hasn't completed. Please complete the current trip before creating a new one.") {
@@ -101,7 +101,10 @@ class TripRepository {
           return left(AlreadyInTripFailure(
               'Bạn không thể tạo chuyến vào lúc này. Nếu đây là lỗi vui lòng liên hệ cho hệ thống'));
         } else {
-          left(Failure('Có lỗi xảy ra'));
+          left(
+            AlreadyInTripFailure(
+                'Bạn không thể tạo chuyến vào lúc này. Nếu đây là lỗi vui lòng liên hệ cho hệ thống'),
+          );
         }
         return left(
           Failure('Có lỗi xảy ra'),

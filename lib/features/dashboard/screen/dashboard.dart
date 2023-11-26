@@ -112,6 +112,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
               },
             );
       }
+
       final location = ref.read(locationProvider);
       final user = ref.read(userProvider.notifier).state;
       if (user?.role.toLowerCase() == 'dependent') {
@@ -141,15 +142,43 @@ class _DashBoardState extends ConsumerState<DashBoard> {
           'NotifyDependentNewTripBooked',
           (arguments) {
             try {
-              final tripData = (arguments as List<dynamic>)
-                  .cast<Map<String, dynamic>>()
-                  .first;
-              final trip = TripModel.fromMap(tripData);
-              ref.read(stageProvider.notifier).setStage(
-                    Stage.stage1,
-                  );
-
-              showDialogInfo(trip, context, ref);
+              if (mounted) {
+                if (ModalRoute.of(context)?.isCurrent ?? false) {
+                  final tripData = (arguments as List<dynamic>)
+                      .cast<Map<String, dynamic>>()
+                      .first;
+                  final trip = TripModel.fromMap(tripData);
+                  ref.read(stageProvider.notifier).setStage(
+                        Stage.stage1,
+                      );
+                  if (mounted) {
+                    showDialogInfo(trip, context, ref);
+                  }
+                }
+              }
+            } catch (e) {
+              print("Error in SignalR callback: $e");
+            }
+          },
+        );
+        connection.on(
+          'NotifyPassengerTripCanceled',
+          (arguments) {
+            try {
+              if (mounted) {
+                if (ModalRoute.of(context)?.isCurrent ?? false) {
+                  final data = arguments as List<dynamic>;
+                  final tripData = data.cast<Map<String, dynamic>>().first;
+                  final trip = TripModel.fromMap(tripData);
+                  bool isSelfBook = data.cast<bool>()[1];
+                  bool isNotifyToGuardian = data.cast<bool>()[2];
+                  if (isSelfBook == false) {
+                    if (isNotifyToGuardian == false) {
+                      showDialogInfo(trip, context, ref);
+                    }
+                  }
+                }
+              }
             } catch (e) {
               print("Error in SignalR callback: $e");
             }
@@ -161,19 +190,24 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         'NotifyPassengerDriverOnTheWay',
         (message) {
           try {
-            final driverData =
-                (message as List<dynamic>).cast<Map<String, dynamic>>().first;
-            bool isSelfBook = message.cast<bool>()[1];
-            bool isNotifyToGuardian = message.cast<bool>()[2];
-            if (isSelfBook == false) {
-              if (isNotifyToGuardian == false) {
-                final driver = Driver.fromMap(driverData);
-                ref.read(driverProvider.notifier).addDriverData(driver);
-                ref.read(stageProvider.notifier).setStage(
-                      Stage.stage2,
-                    );
+            if (mounted) {
+              if (ModalRoute.of(context)?.isCurrent ?? false) {
+                final driverData = (message as List<dynamic>)
+                    .cast<Map<String, dynamic>>()
+                    .first;
+                bool isSelfBook = message.cast<bool>()[1];
+                bool isNotifyToGuardian = message.cast<bool>()[2];
+                if (isSelfBook == false) {
+                  if (isNotifyToGuardian == false) {
+                    final driver = Driver.fromMap(driverData);
+                    ref.read(driverProvider.notifier).addDriverData(driver);
+                    ref.read(stageProvider.notifier).setStage(
+                          Stage.stage2,
+                        );
+                  }
+                } else {}
               }
-            } else {}
+            }
           } catch (e) {
             print(
               e.toString(),
@@ -186,19 +220,23 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         'NotifyPassengerDriverPickup',
         (message) {
           try {
-            final data = message as List<dynamic>;
-            final tripData = data.cast<Map<String, dynamic>>().first;
-            final trip = TripModel.fromMap(tripData);
-            bool isSelfBook = data.cast<bool>()[1];
-            bool isNotifyToGuardian = data.cast<bool>()[2];
+            if (mounted) {
+              if (ModalRoute.of(context)?.isCurrent ?? false) {
+                final data = message as List<dynamic>;
+                final tripData = data.cast<Map<String, dynamic>>().first;
+                final trip = TripModel.fromMap(tripData);
+                bool isSelfBook = data.cast<bool>()[1];
+                bool isNotifyToGuardian = data.cast<bool>()[2];
 
-            if (isSelfBook == false) {
-              if (isNotifyToGuardian == false) {
-                showDialogInfoPickUp(
-                  trip,
-                  context,
-                );
-                // ref.watch(stageProvider.notifier).setStage(Stage.stage2);
+                if (isSelfBook == false) {
+                  if (isNotifyToGuardian == false) {
+                    showDialogInfoPickUp(
+                      trip,
+                      context,
+                    );
+                    // ref.watch(stageProvider.notifier).setStage(Stage.stage2);
+                  }
+                }
               }
             }
           } catch (e) {
@@ -215,27 +253,29 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         (message) {
           try {
             if (mounted) {
-              print('ON TRIP ENDED DASHBOARD');
-              // print(" DAY ROI SIGNAL R DAY ROI ${message.toString()}");
-              final data = message as List<dynamic>;
-              final tripData = data.cast<Map<String, dynamic>>().first;
-              final trip = TripModel.fromMap(tripData);
-              bool isSelfBook = data.cast<bool>()[1];
-              bool isNotifyToGuardian = data.cast<bool>()[2];
-              ref
-                  .read(currentOnTripIdProvider.notifier)
-                  .setCurrentOnTripId(null);
-              if (isSelfBook == true) {
+              if (ModalRoute.of(context)?.isCurrent ?? false) {
+                print('ON TRIP ENDED DASHBOARD');
+                // print(" DAY ROI SIGNAL R DAY ROI ${message.toString()}");
+                final data = message as List<dynamic>;
+                final tripData = data.cast<Map<String, dynamic>>().first;
+                final trip = TripModel.fromMap(tripData);
+                bool isSelfBook = data.cast<bool>()[1];
+                bool isNotifyToGuardian = data.cast<bool>()[2];
                 ref
                     .read(currentOnTripIdProvider.notifier)
                     .setCurrentOnTripId(null);
-                context.replaceNamed(RouteConstants.rating);
-              } else {
-                if (isNotifyToGuardian == false) {
-                  ref.read(stageProvider.notifier).setStage(Stage.stage0);
+                if (isSelfBook == true) {
+                  ref
+                      .read(currentOnTripIdProvider.notifier)
+                      .setCurrentOnTripId(null);
                   context.replaceNamed(RouteConstants.rating);
                 } else {
-                  showNavigateDashBoardDialog(trip, context);
+                  if (isNotifyToGuardian == false) {
+                    ref.read(stageProvider.notifier).setStage(Stage.stage0);
+                    context.replaceNamed(RouteConstants.rating);
+                  } else {
+                    showNavigateDashBoardDialog(trip, context);
+                  }
                 }
               }
             }
@@ -243,12 +283,13 @@ class _DashBoardState extends ConsumerState<DashBoard> {
             print(e.toString());
             rethrow;
           }
-          connection.onclose(
-            (exception) {
-              print(
-                exception.toString(),
-              );
-            },
+        },
+      );
+
+      connection.onclose(
+        (exception) {
+          print(
+            exception.toString(),
           );
         },
       );
@@ -278,6 +319,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
   @override
   Widget build(BuildContext context) {
     //ref.watch(locationProvider);
+    print('TestWidget: ${ModalRoute.of(context)?.isCurrent}');
     return Scaffold(
       body: Center(
         child: _isLoading ? const Loader() : _children[_currentIndex],

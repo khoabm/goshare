@@ -45,6 +45,8 @@ class TripController extends StateNotifier<bool> {
             tripModel.startLongitude,
             tripModel.startLatitude,
           );
+      print(res.address);
+      print(res2.address);
       tripModel.copyWith(
         endAddress: res.address,
         startAddress: res2.address,
@@ -108,7 +110,7 @@ class TripController extends StateNotifier<bool> {
         );
       } else if (l is AlreadyInTripFailure) {
       } else {
-        showSnackBar(
+        showFindTripErrorDialog(
           context: context,
           message: l.message,
         );

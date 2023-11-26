@@ -8,7 +8,6 @@ import 'package:goshare/core/constants/route_constants.dart';
 import 'package:vietmap_flutter_navigation/embedded/controller.dart';
 import 'package:vietmap_flutter_navigation/helpers.dart';
 import 'package:vietmap_flutter_navigation/models/options.dart';
-import 'package:vietmap_flutter_navigation/models/route_progress_event.dart';
 import 'package:vietmap_flutter_navigation/models/way_point.dart';
 import 'package:vietmap_flutter_navigation/navigation_plugin.dart';
 import 'package:vietmap_flutter_navigation/views/navigation_view.dart';
@@ -48,13 +47,13 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
     WayPoint(
         name: "destination point", latitude: 10.762528, longitude: 106.653099)
   ];
-  Widget instructionImage = const SizedBox.shrink();
-  String guideDirection = "";
-  Widget recenterButton = const SizedBox.shrink();
-  RouteProgressEvent? routeProgressEvent;
+  // Widget instructionImage = const SizedBox.shrink();
+  // String guideDirection = "";
+  // Widget recenterButton = const SizedBox.shrink();
+  // RouteProgressEvent? routeProgressEvent;
   bool _isRouteBuilt = false;
   bool _isRunning = false;
-  FocusNode focusNode = FocusNode();
+
   bool _isLoading = false;
   String driverName = '';
   String driverPhone = '';
@@ -67,29 +66,29 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
     initialize().then((value) {
       // _showDriverInfoDialog();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        setState(() {
-          _isLoading = true;
-        });
-        print('DAY LA CHO INITTTTTTTTTTTTT');
-        print(widget.bookerId);
-        print(widget.paymentMethod);
-        print(widget.startLatitude);
-        print(widget.startLongitude);
-        print(widget.carTypeId);
-        print(widget.endLatitude);
-        print(widget.endLongitude);
-        print(
-            '===================================================================');
-        // Use setState to trigger a rebuild of the widget with the new data.
-        setState(() {
-          _isLoading = false;
-        });
+        // setState(() {
+        //   _isLoading = true;
+        // });
+        // print('DAY LA CHO INITTTTTTTTTTTTT');
+        // print(widget.bookerId);
+        // print(widget.paymentMethod);
+        // print(widget.startLatitude);
+        // print(widget.startLongitude);
+        // print(widget.carTypeId);
+        // print(widget.endLatitude);
+        // print(widget.endLongitude);
+        // print(
+        //     '===================================================================');
+        // // Use setState to trigger a rebuild of the widget with the new data.
+        // setState(() {
+        //   _isLoading = false;
+        // });
       });
 
       // Use setState to trigger a rebuild of the widget with the new data.
-      setState(() {
-        _isLoading = false;
-      });
+      // setState(() {
+      //   _isLoading = false;
+      // });
     });
 
     super.initState();
@@ -119,7 +118,7 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
   }
 
   void navigateToFindTrip() {
-    context.goNamed(RouteConstants.findTrip, extra: {
+    context.replaceNamed(RouteConstants.findTrip, extra: {
       'startLatitude': widget.startLatitude,
       'startLongitude': widget.startLongitude,
       'endLatitude': widget.endLatitude,
@@ -177,6 +176,9 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
                 //CircularProgressIndicator(),
               ],
             ),
+            const SizedBox(
+              height: 10,
+            ),
             SizedBox(
               width: MediaQuery.of(context).size.width * .5,
               child: ElevatedButton(
@@ -185,6 +187,9 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
                 },
                 child: const Text('Hủy'),
               ),
+            ),
+            const SizedBox(
+              height: 10,
             ),
             SizedBox(
               width: MediaQuery.of(context).size.width * .5,

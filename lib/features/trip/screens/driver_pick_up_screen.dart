@@ -79,22 +79,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
       await initSignalR(ref);
       final location = ref.read(locationProvider);
       currentLocation = await location.getCurrentLocation();
-      //updateMarker();
-      final hubConnection = await ref.read(
-        hubConnectionProvider.future,
-      );
-      hubConnection.on(
-        'UpdateDriverLocation',
-        (arguments) {
-          print("SIGNAL R DEP TRIP BOOK" + arguments.toString());
-          final stringData = arguments?.first as String;
-          final data = jsonDecode(stringData) as Map<String, dynamic>;
-          updateMarker(
-            data['latitude'],
-            data['longitude'],
-          );
-        },
-      );
+
       setState(() {});
     });
     super.initState();
@@ -112,7 +97,18 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           _handleNotifyPassengerDriverPickUp(message);
         }
       });
-
+      hubConnection.on(
+        'UpdateDriverLocation',
+        (arguments) {
+          print("SIGNAL R DEP TRIP BOOK" + arguments.toString());
+          final stringData = arguments?.first as String;
+          final data = jsonDecode(stringData) as Map<String, dynamic>;
+          updateMarker(
+            data['latitude'],
+            data['longitude'],
+          );
+        },
+      );
       hubConnection.onclose((exception) async {
         await Future.delayed(
           const Duration(seconds: 3),
@@ -132,19 +128,18 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
 
   void _handleNotifyPassengerDriverPickUp(dynamic message) {
     if (mounted) {
-      final data = message as List<dynamic>;
-      final tripData = data.cast<Map<String, dynamic>>().first;
-      final trip = TripModel.fromMap(tripData);
-      bool isSelfBook = data.cast<bool>()[1];
-      bool isNotifyToGuardian = data.cast<bool>()[2];
-      if (isSelfBook == true) {
-        print('TỰ ĐẶT TRONG PICKUP');
-        _showDriverInfoDialog(trip);
-      } else {
-        print('KHÔNG PHẢI TỰ ĐẶT TRONG PICKUP');
-        if (isNotifyToGuardian == true) {
-          print('NOTIFY CHO GUARDIAN TRONG PICKUP');
-          _showDependentDriverInfoDialog(trip);
+      if (ModalRoute.of(context)?.isCurrent ?? false) {
+        final data = message as List<dynamic>;
+        final tripData = data.cast<Map<String, dynamic>>().first;
+        final trip = TripModel.fromMap(tripData);
+        bool isSelfBook = data.cast<bool>()[1];
+        bool isNotifyToGuardian = data.cast<bool>()[2];
+        if (isSelfBook == true) {
+          _showDriverInfoDialog(trip);
+        } else {
+          if (isNotifyToGuardian == true) {
+            _showDependentDriverInfoDialog(trip);
+          }
         }
       }
     }
@@ -183,7 +178,6 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                //context.pop();
                 navigateToOnTripScreen(trip);
               },
               child: const Text(
@@ -231,15 +225,6 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                // setState(() {
-                //   _isLoading = true;
-                // });
-                // await Future.delayed(
-                //   const Duration(seconds: 2),
-                // );
-                // setState(() {
-                //   _isLoading = false;
-                // });
                 navigateToGuardianObserverScreen(trip);
               },
               child: const Text(
@@ -257,7 +242,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   void navigateToOnTripScreen(
     TripModel trip,
   ) {
-    context.goNamed(RouteConstants.onTrip, extra: {
+    context.replaceNamed(RouteConstants.onTrip, extra: {
       'trip': trip,
     });
   }
@@ -281,7 +266,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
       List<Marker> tempMarkers = []; // Temporary list to hold the new markers
 
       // Wait for a while before updating the marker
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 3));
       print('did update marker');
       // Add the new marker to the temporary list
       tempMarkers.clear();
@@ -351,29 +336,12 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                         });
                       },
 
-                      // onMapRenderedCallback: () async {
-                      //   // await _mapController?.addPolyline(
-                      //   //   const PolylineOptions(
-                      //   //       geometry: [
-                      //   //         LatLng(10.736657, 106.672240),
-                      //   //         LatLng(10.766543, 106.742378),
-                      //   //         LatLng(10.775818, 106.640497),
-                      //   //         LatLng(10.727416, 106.735597),
-                      //   //         LatLng(10.792765, 106.674143),
-                      //   //         LatLng(10.736657, 106.672240),
-                      //   //       ],
-                      //   //       polylineColor: Colors.red,
-                      //   //       polylineWidth: 14.0,
-                      //   //       polylineOpacity: 1,
-                      //   //       draggable: true),
-                      //   // );
-                      // },
                       onMapRenderedCallback: () async {
                         setState(() {
                           _isLoading = true;
                         });
-                        final location = ref.read(locationProvider);
-                        currentLocation = await location.getCurrentLocation();
+                        // final location = ref.read(locationProvider);
+                        // currentLocation = await location.getCurrentLocation();
                         _mapController?.animateCamera(
                           CameraUpdate.newCameraPosition(
                             CameraPosition(
@@ -402,9 +370,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                           child: InkWell(
                             onTap: () async {
                               if (context.mounted) {
-                                context.goNamed(
-                                  RouteConstants.dashBoard,
-                                );
+                                context.pop();
                               }
                             },
                             child: const Row(
