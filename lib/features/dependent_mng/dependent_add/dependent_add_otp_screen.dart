@@ -11,20 +11,18 @@ import 'package:goshare/features/signup/controller/sign_up_controller.dart';
 import 'package:goshare/features/signup/widgets/otp_form.dart';
 import 'package:goshare/theme/pallet.dart';
 
-class OtpScreen extends ConsumerStatefulWidget {
+class DependentAddOtpScreen extends ConsumerStatefulWidget {
   final String phone;
-  final String isFor;
-  const OtpScreen({
+  const DependentAddOtpScreen({
     super.key,
     required this.phone,
-    required this.isFor,
   });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState extends ConsumerState<OtpScreen> {
+class _OtpScreenState extends ConsumerState<DependentAddOtpScreen> {
   late Timer _countdownTimer;
   int _countdown = Constants.otpResendTimeout;
   bool _isResendButtonDisabled = true;
@@ -108,7 +106,6 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     context.goNamed(RouteConstants.passcode, pathParameters: {
       'phone': phone,
       'setToken': setToken,
-      'navigationTo': widget.isFor,
     });
   }
 

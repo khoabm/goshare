@@ -9,12 +9,10 @@ import 'package:goshare/features/signup/widgets/passcode_input.dart';
 class SetPassCodeScreen extends ConsumerStatefulWidget {
   final String setToken;
   final String phone;
-  final String isFor;
   const SetPassCodeScreen({
     super.key,
     required this.setToken,
     required this.phone,
-    required this.isFor,
   });
 
   @override

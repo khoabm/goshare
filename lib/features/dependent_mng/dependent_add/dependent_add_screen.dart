@@ -15,6 +15,7 @@ import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/date_time_formatters.dart';
 import 'package:goshare/core/input_formatters.dart';
 import 'package:goshare/core/input_validator.dart';
+import 'package:goshare/features/dependent_mng/dependent_add/dependent_add_controller.dart';
 import 'package:goshare/features/login/controller/log_in_controller.dart';
 import 'package:goshare/features/login/repository/log_in_repository.dart';
 
@@ -77,49 +78,43 @@ class DependentAddScreen extends ConsumerStatefulWidget {
   const DependentAddScreen({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _DependentAddScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _DependentAddScreenState();
 }
 
 class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
   // final _loginFormKey = GlobalKey<FormState>();
   final TextEditingController _phoneNumberTextController =
       TextEditingController();
-  final TextEditingController _passcodeTextController = TextEditingController();
+  final TextEditingController _nameTextController = TextEditingController();
+  final TextEditingController _birthDateTextController =
+      TextEditingController();
+  String? _gender;
 
   bool _isLoading = false;
   @override
   void dispose() {
     super.dispose();
     _phoneNumberTextController.dispose();
-    _passcodeTextController.dispose();
+    _nameTextController.dispose();
   }
 
   void _onSubmit(WidgetRef ref) async {
-    // if (_loginFormKey.currentState!.validate()) {
-    //   setState(() {
-    //     _isLoading = true;
-    //   });
-    //   String phone = _phoneNumberTextController.text;
-    //   String passcode = _passcodeTextController.text;
+    String phone = _phoneNumberTextController.text;
+    String name = _nameTextController.text;
+    DateTime birth =
+        DateTimeFormatters.convertStringToDate(_birthDateTextController.text);
 
-    //   final result = await ref
-    //       .read(LoginControllerProvider.notifier)
-    //       .login(phone, passcode, context);
-
-    //   setState(() {
-    //     _isLoading = false;
-    //   });
-
-    //   if (result.error != null) {
-    //     print('Error: ${result.error}');
-    //   } else {
-    //     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    //     prefs.setString('accessToken', result.accessToken!);
-    //     prefs.setString('refreshToken', result.refreshToken!);
-    //     ref.read(userProvider.notifier).state = result.user;
-    //     navigateToDashBoardScreen();
-    //   }
-    // }
+    final result = await ref
+        .read(DependentAddControllerProvider.notifier)
+        .dependentAdd(phone, name, _gender!, birth, context);
+    // print("resultAdd" + result.toString());
+    if (result) {
+      context.goNamed(RouteConstants.otp, pathParameters: {
+        'phone': phone,
+        'isFor': RouteConstants.dependentAdd,
+      });
+    }
   }
 
   void navigateToDashBoardScreen() {
@@ -131,6 +126,9 @@ class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Thêm người phụ thuộc'),
+        ),
         //resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
@@ -138,15 +136,13 @@ class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
               child: Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(
-                      8.0,
-                    ),
                     width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * .3,
-                    child: SvgPicture.asset(
-                      Constants.carBanner,
-                      fit: BoxFit.fill,
-                    ),
+                    // color: Pallete.red,
+                    height: MediaQuery.of(context).size.height * .15,
+                    // child: SvgPicture.asset(
+                    //   Constants.carBanner,
+                    //   fit: BoxFit.contain,
+                    // ),
                   ),
                   HomeCenterContainer(
                     width: MediaQuery.of(context).size.width * .9,
@@ -154,13 +150,6 @@ class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
                       // key: _loginFormKey,
                       child: Column(
                         children: [
-                          const Text(
-                            'Đăng nhập',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 22,
-                            ),
-                          ),
                           const SizedBox(
                             height: 20,
                           ),
@@ -186,47 +175,87 @@ class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
                             height: 20,
                           ),
                           const LeftSideText(
-                            title: 'Mật khẩu 6 số',
+                            title: 'Tên',
                           ),
                           const SizedBox(
                             height: 10,
                           ),
                           AppTextField(
-                            controller: _passcodeTextController,
-                            hintText: '123456',
+                            controller: _nameTextController,
+                            hintText: 'Nguyễn Văn A',
                             prefixIcons: const Icon(
-                              Icons.password,
+                              Icons.abc,
                             ),
-                            isObscure: true,
                             inputType: TextInputType.phone,
                             formatters: [
                               LengthLimitingTextInputFormatter(6),
                             ],
                           ),
                           const SizedBox(
-                            height: 0,
+                            height: 20,
+                          ),
+                          const LeftSideText(
+                            title: 'Giới tính',
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: ListTile(
+                                  title: const Text('Nam'),
+                                  selectedColor: Pallete.primaryColor,
+                                  leading: Radio<String>(
+                                    value: 'Nam',
+                                    groupValue: _gender,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        _gender = value;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: ListTile(
+                                  title: const Text('Nữ'),
+                                  selectedColor: Pallete.primaryColor,
+                                  leading: Radio<String>(
+                                    value: 'Nữ',
+                                    groupValue: _gender,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        _gender = value;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          // const SizedBox(
+                          //   height: 20,
+                          // ),
+                          const LeftSideText(
+                            title: 'Ngày tháng năm sinh',
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          AppTextField(
+                            hintText: 'dd/MM/yyyy',
+                            inputType: TextInputType.phone,
+                            prefixIcons: const Icon(
+                              Icons.calendar_today,
+                            ),
+                            controller: _birthDateTextController,
+                            formatters: [
+                              DateTextFormatter(),
+                              LengthLimitingTextInputFormatter(10),
+                              FilteringTextInputFormatter.singleLineFormatter,
+                            ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    TextButton(
-                                      onPressed: () {
-                                        context.pushNamed(
-                                          RouteConstants.signupUrl,
-                                        );
-                                      },
-                                      child: const Text('Chưa có tài khoản?'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {},
-                                      child: const Text('Quên mật khẩu?'),
-                                    ),
-                                  ],
-                                ),
-                              ),
                               Container(
                                 padding: const EdgeInsets.all(
                                   8.0,

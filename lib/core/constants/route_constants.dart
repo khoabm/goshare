@@ -3,6 +3,7 @@ class RouteConstants {
   ///Route name constants
   /// */
   static const home = 'home';
+  static const signup = 'sign-up';
   static const dashBoard = 'dashboard';
   static const otp = 'otp';
   static const passcode = 'passcode';
@@ -11,6 +12,7 @@ class RouteConstants {
   static const findTrip = 'find-trip';
   static const dependentList = 'dependent-list';
   static const dependentAdd = 'dependent-add';
+  static const dependentAddOtp = 'dependent-add-otp';
   static const driverPickUp = 'driver-pickup';
   static const chat = 'chat';
   static const routeConfirm = 'route-confirm';
@@ -37,6 +39,7 @@ class RouteConstants {
   static const findTripUrl = '/find-trip';
   static const dependentListUrl = '/dependent-list';
   static const dependentAddUrl = '/dependent-add';
+  static const dependentAddOtpUrl = '/dependent-add-otp';
   static const feedback = '/feedback';
   static const driverPickUpUrl = '/driver-pickup';
 

@@ -7,6 +7,7 @@ import 'package:goshare/features/connect_to_driver/screen/connect_to_driver_scre
 import 'package:goshare/features/create_destination/screens/create_destination_screen.dart';
 import 'package:goshare/features/dashboard/screen/dashboard.dart';
 import 'package:goshare/features/dependent_list/screens/dependent_list_screen.dart';
+import 'package:goshare/features/dependent_mng/dependent_add/dependent_add_otp_screen.dart';
 import 'package:goshare/features/dependent_mng/dependent_add/dependent_add_screen.dart';
 import 'package:goshare/features/feedback/feedback.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
@@ -119,10 +120,12 @@ class AppRouter {
             // Extract the parameters from the route
             final Map<String, dynamic> params = state.pathParameters;
             final String? phone = params['phone'] as String?;
+            final String? isFor = params['navigateTo'] as String?;
 
             return SlideBottomTransition(
               child: OtpScreen(
                 phone: phone ?? '',
+                isFor: isFor ?? RouteConstants.signup,
               ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
@@ -136,11 +139,13 @@ class AppRouter {
             final Map<String, dynamic> params = state.pathParameters;
             final String? phone = params['phone'] as String?;
             final String? setToken = params['setToken'] as String?;
+            final String? isFor = params['isFor'] as String?;
 
             return SlideBottomTransition(
               child: SetPassCodeScreen(
                 phone: phone ?? '',
                 setToken: setToken ?? '',
+                isFor: isFor ?? RouteConstants.signup,
               ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
@@ -257,6 +262,16 @@ class AppRouter {
           pageBuilder: (context, state) {
             return SlideRightTransition(
               child: DependentAddScreen(),
+              key: state.pageKey,
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteConstants.dependentAddOtp,
+          path: RouteConstants.dependentAddOtpUrl,
+          pageBuilder: (context, state) {
+            return SlideRightTransition(
+              child: DependentAddOtpScreen(),
               key: state.pageKey,
             );
           },
