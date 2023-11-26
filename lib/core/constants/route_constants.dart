@@ -10,6 +10,7 @@ class RouteConstants {
   static const searchTripRoute = 'search-trip-route';
   static const findTrip = 'find-trip';
   static const dependentList = 'dependent-list';
+  static const dependentAdd = 'dependent-add';
   static const driverPickUp = 'driver-pickup';
   static const chat = 'chat';
   static const routeConfirm = 'route-confirm';
@@ -35,6 +36,7 @@ class RouteConstants {
 
   static const findTripUrl = '/find-trip';
   static const dependentListUrl = '/dependent-list';
+  static const dependentAddUrl = '/dependent-add';
   static const feedback = '/feedback';
   static const driverPickUpUrl = '/driver-pickup';
 
@@ -43,7 +45,6 @@ class RouteConstants {
   static const onTripUrl = '/on-trip';
   static const createDestinationUrl = '/create-destination/:destinationAddress';
 
-
   static const editProfileUrl = '/edit-profile';
   static const moneyTopupUrl = '/money-topup';
   static const moneyHistoryUrl = '/money-history';
@@ -51,5 +52,4 @@ class RouteConstants {
   static const ratingUrl = '/rating';
 
   static const guardianObserveDependentTripUrl = '/guardian-observe';
-
 }

@@ -7,6 +7,7 @@ import 'package:goshare/features/connect_to_driver/screen/connect_to_driver_scre
 import 'package:goshare/features/create_destination/screens/create_destination_screen.dart';
 import 'package:goshare/features/dashboard/screen/dashboard.dart';
 import 'package:goshare/features/dependent_list/screens/dependent_list_screen.dart';
+import 'package:goshare/features/dependent_mng/dependent_add/dependent_add_screen.dart';
 import 'package:goshare/features/feedback/feedback.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
 
@@ -251,8 +252,18 @@ class AppRouter {
           },
         ),
         GoRoute(
+          name: RouteConstants.dependentAddUrl,
+          path: RouteConstants.dependentAddUrl,
+          pageBuilder: (context, state) {
+            return SlideRightTransition(
+              child: DependentAddScreen(),
+              key: state.pageKey,
+            );
+          },
+        ),
+        GoRoute(
           path: RouteConstants.feedback,
-          pageBuilder: (context, state) => SlideBottomTransition(
+          pageBuilder: (context, state) => SlideLeftTransition(
             child: const FeedbackScreen(),
             key: state.pageKey,
           ),

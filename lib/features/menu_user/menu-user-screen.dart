@@ -25,11 +25,10 @@ class _UserMenuPageState extends State<UserMenuPage> {
           Container(
             color: Colors.white,
             child: ListTile(
-              visualDensity: const VisualDensity(
-                  vertical: -4.0),
+              visualDensity: const VisualDensity(vertical: -4.0),
               title: const Text('Thông tin cá nhân'),
               onTap: () {
-                context.go(RouteConstants.editProfileUrl);
+                context.push(RouteConstants.editProfileUrl);
               },
             ),
           ),
@@ -37,11 +36,10 @@ class _UserMenuPageState extends State<UserMenuPage> {
           Container(
             color: Colors.white,
             child: ListTile(
-              visualDensity: const VisualDensity(
-                  vertical: -4.0),
+              visualDensity: const VisualDensity(vertical: -4.0),
               title: const Text('Ví của bạn'),
               onTap: () {
-                context.go(RouteConstants.moneyTopupUrl);
+                context.push(RouteConstants.moneyTopupUrl);
               },
             ),
           ),
@@ -54,6 +52,18 @@ class _UserMenuPageState extends State<UserMenuPage> {
               title: const Text('Money History'),
               onTap: () {
                 Navigator.pushNamed(context, '/moneyHistory');
+              },
+            ),
+          ),
+          const Divider(),
+          Container(
+            color: Colors.white,
+            child: ListTile(
+              visualDensity: const VisualDensity(
+                  vertical: -4.0), // Reduced vertical padding
+              title: const Text('Feedback'),
+              onTap: () {
+                context.push(RouteConstants.feedback);
               },
             ),
           ),

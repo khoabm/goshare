@@ -9,6 +9,7 @@ import 'package:goshare/common/loader.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/utils/locations_util.dart';
 import 'package:goshare/core/utils/utils.dart';
+import 'package:goshare/features/dependent_mng/dependent_screen.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
 import 'package:goshare/features/login/controller/log_in_controller.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
@@ -56,6 +57,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
     //     style: TextStyle(color: Colors.white),
     //   ),
     // ),
+    const DependentScreen(),
     const UserMenuPage(),
   ];
   void onTabTapped(int index) {
@@ -281,6 +283,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         child: _isLoading ? const Loader() : _children[_currentIndex],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         selectedItemColor: Pallete.primaryColor,
         onTap: onTabTapped,
         currentIndex: _currentIndex,
@@ -292,6 +295,10 @@ class _DashBoardState extends ConsumerState<DashBoard> {
           BottomNavigationBarItem(
             icon: Icon(Icons.history_outlined),
             label: 'Activity',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history_outlined),
+            label: 'Người phụ thuộc',
           ),
           BottomNavigationBarItem(
             icon: Icon(
