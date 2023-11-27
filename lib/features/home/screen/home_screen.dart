@@ -439,8 +439,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ref.watch(currentDependentOnTripProvider).isNotEmpty
                       ? GestureDetector(
                           onTap: () {
-                            context.goNamed(
-                              RouteConstants.dependentList,
+                            context.pushNamed(
+                              RouteConstants.dependentTripList,
                             );
                           },
                           child: const DependentOnTripGoing(),

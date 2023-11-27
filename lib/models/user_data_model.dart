@@ -11,7 +11,7 @@ class UserDataModel {
   final String name;
   final String role;
   final String? currentTrip;
-  final List<DependentTrip>? dependentCurrentTrip;
+  final List<DependentTrip>? dependentCurrentTrips;
   UserDataModel({
     required this.accessToken,
     required this.refreshToken,
@@ -20,7 +20,7 @@ class UserDataModel {
     required this.name,
     required this.role,
     this.currentTrip,
-    required this.dependentCurrentTrip,
+    this.dependentCurrentTrips,
   });
 
   UserDataModel copyWith({
@@ -30,8 +30,8 @@ class UserDataModel {
     String? phone,
     String? name,
     String? role,
-    ValueGetter<String?>? currentTrip,
-    ValueGetter<List<DependentTrip>?>? dependentCurrentTrip,
+    String? currentTrip,
+    List<DependentTrip>? dependentCurrentTrips,
   }) {
     return UserDataModel(
       accessToken: accessToken ?? this.accessToken,
@@ -40,24 +40,32 @@ class UserDataModel {
       phone: phone ?? this.phone,
       name: name ?? this.name,
       role: role ?? this.role,
-      currentTrip: currentTrip?.call() ?? this.currentTrip,
-      dependentCurrentTrip:
-          dependentCurrentTrip?.call() ?? this.dependentCurrentTrip,
+      currentTrip: currentTrip ?? this.currentTrip,
+      dependentCurrentTrips:
+          dependentCurrentTrips ?? this.dependentCurrentTrips,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'accessToken': accessToken,
-      'refreshToken': refreshToken,
-      'id': id,
-      'phone': phone,
-      'name': name,
-      'role': role,
-      'currentTrip': currentTrip,
-      'dependentCurrentTrip':
-          dependentCurrentTrip?.map((x) => x?.toMap())?.toList(),
-    };
+    final result = <String, dynamic>{};
+
+    result.addAll({'accessToken': accessToken});
+    result.addAll({'refreshToken': refreshToken});
+    result.addAll({'id': id});
+    result.addAll({'phone': phone});
+    result.addAll({'name': name});
+    result.addAll({'role': role});
+    if (currentTrip != null) {
+      result.addAll({'currentTrip': currentTrip});
+    }
+    if (dependentCurrentTrips != null) {
+      result.addAll({
+        'dependentCurrentTrips':
+            dependentCurrentTrips!.map((x) => x?.toMap()).toList()
+      });
+    }
+
+    return result;
   }
 
   factory UserDataModel.fromMap(Map<String, dynamic> map) {
@@ -69,9 +77,9 @@ class UserDataModel {
       name: map['name'] ?? '',
       role: map['role'] ?? '',
       currentTrip: map['currentTrip'],
-      dependentCurrentTrip: map['dependentCurrentTrip'] != null
-          ? List<DependentTrip>.from(
-              map['dependentCurrentTrip']?.map((x) => DependentTrip.fromMap(x)))
+      dependentCurrentTrips: map['dependentCurrentTrips'] != null
+          ? List<DependentTrip>.from(map['dependentCurrentTrips']
+              ?.map((x) => DependentTrip.fromMap(x)))
           : null,
     );
   }
@@ -88,7 +96,7 @@ class UserDataModel {
 
   @override
   String toString() {
-    return 'UserDataModel(accessToken: $accessToken, refreshToken: $refreshToken, id: $id, phone: $phone, name: $name, role: $role, currentTrip: $currentTrip, dependentCurrentTrip: $dependentCurrentTrip)';
+    return 'UserDataModel(accessToken: $accessToken, refreshToken: $refreshToken, id: $id, phone: $phone, name: $name, role: $role, currentTrip: $currentTrip, dependentCurrentTrips: $dependentCurrentTrips)';
   }
 
   @override
@@ -103,7 +111,7 @@ class UserDataModel {
         other.name == name &&
         other.role == role &&
         other.currentTrip == currentTrip &&
-        listEquals(other.dependentCurrentTrip, dependentCurrentTrip);
+        listEquals(other.dependentCurrentTrips, dependentCurrentTrips);
   }
 
   @override
@@ -115,7 +123,7 @@ class UserDataModel {
         name.hashCode ^
         role.hashCode ^
         currentTrip.hashCode ^
-        dependentCurrentTrip.hashCode;
+        dependentCurrentTrips.hashCode;
   }
 }
 

@@ -150,13 +150,14 @@ class LoginRepository {
             role: jsonData['role'],
           );
           ref.read(userProvider.notifier).state = userTmp;
-
+          print(userData.dependentCurrentTrips?.length);
           ref
-              .read(currentOnTripIdProvider.notifier)
+              .watch(currentOnTripIdProvider.notifier)
               .setCurrentOnTripId(userData.currentTrip);
           ref
-              .read(currentDependentOnTripProvider.notifier)
-              .setDependentCurrentOnTripId(userData.dependentCurrentTrip ?? []);
+              .watch(currentDependentOnTripProvider.notifier)
+              .setDependentCurrentOnTripId(
+                  userData.dependentCurrentTrips ?? []);
         }
         return right(jsonData['accessToken']);
       } else {

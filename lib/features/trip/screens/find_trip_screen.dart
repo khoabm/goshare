@@ -548,7 +548,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           ),
         ),
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * .2,
+        height: MediaQuery.of(context).size.height * .35,
         child: Column(
           children: [
             const Row(
@@ -600,9 +600,16 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                       if (check) {
                         if (context.mounted) {
                           setState(() {
-                            ref
-                                .watch(currentOnTripIdProvider.notifier)
-                                .setCurrentOnTripId(null);
+                            if (ref.watch(userProvider)?.id == result!.id) {
+                              ref
+                                  .watch(currentOnTripIdProvider.notifier)
+                                  .setCurrentOnTripId(null);
+                            } else {
+                              ref
+                                  .watch(
+                                      currentDependentOnTripProvider.notifier)
+                                  .removeDependentCurrentOnTripId(result!.id);
+                            }
                           });
                           context.goNamed(RouteConstants.dashBoard);
                         }

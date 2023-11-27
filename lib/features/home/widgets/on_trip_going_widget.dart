@@ -53,7 +53,7 @@ class DependentOnTripGoing extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                'Bạn đang có ${ref.watch(currentDependentOnTripProvider)}  chuyến xe đang chạy',
+                'Bạn đang có ${ref.watch(currentDependentOnTripProvider).length}  chuyến xe người thân đang chạy',
                 style: const TextStyle(fontSize: 16),
               ),
             ),

@@ -36,10 +36,10 @@ class _DependentListTripState extends ConsumerState<DependentListTrip> {
     });
   }
 
-  void navigateToOnTripScreen(
+  void navigateToGuardianObserverScreen(
     TripModel trip,
   ) {
-    context.pushNamed(RouteConstants.onTrip, extra: {
+    context.pushNamed(RouteConstants.guardianObserveDependentTrip, extra: {
       'trip': trip,
     });
   }
@@ -79,7 +79,7 @@ class _DependentListTripState extends ConsumerState<DependentListTrip> {
                   );
                 }
                 if (result.status == 2) {
-                  navigateToOnTripScreen(result);
+                  navigateToGuardianObserverScreen(result);
                 }
               }
             },
