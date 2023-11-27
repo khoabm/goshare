@@ -244,7 +244,7 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
                 );
                 _controller?.addImageMarkers([
                   Marker(
-                    imagePath: 'assets/images/pngegg.png',
+                    imagePath: 'assets/images/marker.png',
                     latLng: LatLng(
                       double.parse(widget.endLatitude),
                       double.parse(widget.endLongitude),

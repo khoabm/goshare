@@ -145,7 +145,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
     _navigationOption.apiKey =
         'c3d0f188ff669f89042771a20656579073cffec5a8a69747';
     _navigationOption.mapStyle =
-        "https://maps.vietmap.vn/api/maps/light/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747";
+        "https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm";
     _navigationOption.customLocationCenterIcon =
         await VietMapHelper.getBytesFromAsset('assets/download.jpeg');
     _vietmapNavigationPlugin.setDefaultOptions(_navigationOption);
@@ -195,7 +195,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                 );
                 _controller?.addImageMarkers([
                   Marker(
-                    imagePath: 'assets/images/pngegg.png',
+                    imagePath: 'assets/images/marker.png',
                     latLng: LatLng(
                       widget.trip.endLocation.latitude,
                       widget.trip.endLocation.longitude,
@@ -256,7 +256,8 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                   setState(() {
                     _containerHeight += details.primaryDelta!;
                     // Clamp the height between 60 and 300
-                    _containerHeight = _containerHeight.clamp(60.0, 250.0);
+                    _containerHeight = _containerHeight.clamp(
+                        60.0, MediaQuery.of(context).size.height * .3);
                   });
                 },
                 onVerticalDragEnd: (details) {
@@ -269,13 +270,14 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                   } else {
                     // Swipe up
                     setState(() {
-                      _containerHeight = 250.0;
+                      _containerHeight =
+                          MediaQuery.of(context).size.height * .3;
                     });
                   }
                 },
                 child: AnimatedContainer(
                   padding: const EdgeInsets.all(12.0),
-                  duration: const Duration(milliseconds: 400),
+                  duration: const Duration(milliseconds: 300),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.vertical(
@@ -286,7 +288,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                   ),
                   height: _containerHeight,
                   //color: Pallete.primaryColor,
-                  child: _containerHeight == 250
+                  child: _containerHeight > 0
                       ? Column(
                           children: [
                             Text(

@@ -318,8 +318,8 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                           setState(() {
                             _containerHeight += details.primaryDelta!;
                             // Clamp the height between 60 and 300
-                            _containerHeight =
-                                _containerHeight.clamp(60.0, 230.0);
+                            _containerHeight = _containerHeight.clamp(
+                                60.0, MediaQuery.of(context).size.height * .3);
                           });
                         },
                         onVerticalDragEnd: (details) {
@@ -332,13 +332,14 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                           } else {
                             // Swipe up
                             setState(() {
-                              _containerHeight = 230.0;
+                              _containerHeight =
+                                  MediaQuery.of(context).size.height * .3;
                             });
                           }
                         },
                         child: AnimatedContainer(
                             padding: const EdgeInsets.all(12.0),
-                            duration: const Duration(milliseconds: 400),
+                            duration: const Duration(milliseconds: 300),
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.vertical(
@@ -349,7 +350,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                             ),
                             height: _containerHeight,
                             //color: Pallete.primaryColor,
-                            child: _containerHeight == 230
+                            child: _containerHeight > 60
                                 ? _isPlaceMarker
                                     ? Column(
                                         children: [
