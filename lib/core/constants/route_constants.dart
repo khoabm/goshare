@@ -16,6 +16,7 @@ class RouteConstants {
   static const onTrip = 'on-trip';
   static const createDestination = 'create-destination';
   static const rating = 'rating';
+  static const dependentTripList = 'dependent-trip-list';
 
   ///**
   ///Route url constants
@@ -43,7 +44,6 @@ class RouteConstants {
   static const onTripUrl = '/on-trip';
   static const createDestinationUrl = '/create-destination/:destinationAddress';
 
-
   static const editProfileUrl = '/edit-profile';
   static const moneyTopupUrl = '/money-topup';
   static const moneyHistoryUrl = '/money-history';
@@ -51,5 +51,5 @@ class RouteConstants {
   static const ratingUrl = '/rating';
 
   static const guardianObserveDependentTripUrl = '/guardian-observe';
-
+  static const dependentTripListUrl = '/dependent-trip-list';
 }

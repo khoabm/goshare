@@ -7,6 +7,7 @@ import 'package:goshare/core/constants/route_constants.dart';
 
 import 'package:vietmap_flutter_navigation/embedded/controller.dart';
 import 'package:vietmap_flutter_navigation/helpers.dart';
+import 'package:vietmap_flutter_navigation/models/marker.dart';
 import 'package:vietmap_flutter_navigation/models/options.dart';
 import 'package:vietmap_flutter_navigation/models/way_point.dart';
 import 'package:vietmap_flutter_navigation/navigation_plugin.dart';
@@ -105,7 +106,7 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
     _navigationOption.apiKey =
         'c3d0f188ff669f89042771a20656579073cffec5a8a69747';
     _navigationOption.mapStyle =
-        "https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm";
+        "https://maps.vietmap.vn/api/maps/light/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747";
     _navigationOption.customLocationCenterIcon =
         await VietMapHelper.getBytesFromAsset('assets/download.jpeg');
     _vietmapNavigationPlugin.setDefaultOptions(_navigationOption);
@@ -113,9 +114,9 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
 
   //MapOptions? options;
 
-  void navigateToSearchTripRoute() {
-    context.goNamed(RouteConstants.searchTripRoute);
-  }
+  // void navigateToSearchTripRoute() {
+  //   context.replaceNamed(RouteConstants.searchTripRoute);
+  // }
 
   void navigateToFindTrip() {
     context.replaceNamed(RouteConstants.findTrip, extra: {
@@ -183,7 +184,8 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
               width: MediaQuery.of(context).size.width * .5,
               child: ElevatedButton(
                 onPressed: () {
-                  navigateToSearchTripRoute();
+                  //navigateToSearchTripRoute();
+                  context.pop();
                 },
                 child: const Text('Hủy'),
               ),
@@ -240,15 +242,15 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
                     longitude: double.parse(widget.endLongitude),
                   ),
                 );
-                // _controller?.addImageMarkers([
-                //   Marker(
-                //     imagePath: 'assets/images/icon.png',
-                //     latLng: LatLng(
-                //       double.parse(widget.endLatitude),
-                //       double.parse(widget.endLongitude),
-                //     ),
-                //   ),
-                // ]);
+                _controller?.addImageMarkers([
+                  Marker(
+                    imagePath: 'assets/images/pngegg.png',
+                    latLng: LatLng(
+                      double.parse(widget.endLatitude),
+                      double.parse(widget.endLongitude),
+                    ),
+                  ),
+                ]);
                 // _controller?.addImageMarkers(Marker(child: child, latLng: latLng));
                 _controller?.buildRoute(wayPoints: wayPoints);
               },

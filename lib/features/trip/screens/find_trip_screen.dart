@@ -655,7 +655,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                 );
                 _controller?.addImageMarkers([
                   Marker(
-                    imagePath: 'assets/download.png',
+                    imagePath: 'assets/images/pngegg.png',
                     latLng: LatLng(
                       double.parse(widget.endLatitude),
                       double.parse(widget.endLongitude),

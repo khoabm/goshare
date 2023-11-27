@@ -322,7 +322,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                       compassEnabled: false,
                       myLocationEnabled: true,
                       styleString:
-                          'https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm',
+                          'https://maps.vietmap.vn/api/maps/light/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747',
                       initialCameraPosition: const CameraPosition(
                         zoom: 17.5, target: LatLng(10.736657, 106.672240),
                         // LatLng(

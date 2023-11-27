@@ -154,7 +154,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void navigateToOnTripScreen(
     TripModel trip,
   ) {
-    context.replaceNamed(RouteConstants.onTrip, extra: {
+    context.pushNamed(RouteConstants.onTrip, extra: {
       'trip': trip,
     });
   }
@@ -355,7 +355,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     String endLatitude,
     String endLongitude,
   ) {
-    context.replaceNamed(RouteConstants.driverPickUp, extra: {
+    context.pushNamed(RouteConstants.driverPickUp, extra: {
       'driverName': driverName,
       'driverCarType': driverCarType,
       'driverPlate': driverPlate,
@@ -438,8 +438,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   ref.watch(currentDependentOnTripProvider).isNotEmpty
                       ? GestureDetector(
-                          onTap: () async {},
-                          child: const OnTripGoing(),
+                          onTap: () {
+                            context.goNamed(
+                              RouteConstants.dependentList,
+                            );
+                          },
+                          child: const DependentOnTripGoing(),
                         )
                       : const SizedBox.shrink(),
                   ref.watch(currentOnTripIdProvider) != null

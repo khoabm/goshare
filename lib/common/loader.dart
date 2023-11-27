@@ -40,7 +40,7 @@ class SplashScreen extends StatelessWidget {
           children: [
             // SVG image
             SvgPicture.asset(
-              'assets/car_banner.svg', // Replace with your SVG file path
+              'assets/images/car_banner.svg', // Replace with your SVG file path
               height: 150, // Adjust the height
               width: 150, // Adjust the width
             ),

@@ -7,6 +7,7 @@ import 'package:goshare/features/connect_to_driver/screen/connect_to_driver_scre
 import 'package:goshare/features/create_destination/screens/create_destination_screen.dart';
 import 'package:goshare/features/dashboard/screen/dashboard.dart';
 import 'package:goshare/features/dependent_list/screens/dependent_list_screen.dart';
+import 'package:goshare/features/dependent_list/screens/dependent_on_trip_list.dart';
 import 'package:goshare/features/feedback/feedback.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
 
@@ -30,7 +31,6 @@ import 'package:goshare/features/trip/screens/search_trip_route_screen.dart';
 import 'package:goshare/features/signup/screen/otp_screen.dart';
 import 'package:goshare/features/signup/screen/set_passcode_screen.dart';
 import 'package:goshare/features/signup/screen/sign_up_screen.dart';
-import 'package:goshare/location_display_demo.dart';
 import 'package:goshare/models/trip_model.dart';
 
 class AppRouter {
@@ -393,6 +393,17 @@ class AppRouter {
               child: GuardianObserveDependentTripScreen(
                 trip: trip,
               ),
+              key: state.pageKey,
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteConstants.dependentTripList,
+          path: RouteConstants.dependentTripListUrl,
+          pageBuilder: (context, state) {
+            //final Map<String, dynamic> params = state.pathParameters;
+            return SlideRightTransition(
+              child: const DependentListTrip(),
               key: state.pageKey,
             );
           },

@@ -373,13 +373,6 @@ class _GuardianObserveDependentTripScreenState
                       ],
                     ),
                   ),
-                  // _mapController == null
-                  //     ? const SizedBox.shrink()
-                  //     : MarkerLayer(
-                  //         ignorePointer: true,
-                  //         mapController: _mapController!,
-                  //         markers: temp,
-                  //       ),
                   _mapController == null
                       ? const SizedBox.shrink()
                       : MarkerLayer(
