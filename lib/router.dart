@@ -85,6 +85,7 @@ class AppRouter {
           ),
         ),
         GoRoute(
+          name: RouteConstants.login,
           path: RouteConstants.loginUrl,
           pageBuilder: (context, state) => SlideBottomTransition(
             child: const LogInScreen(),
@@ -120,7 +121,7 @@ class AppRouter {
             // Extract the parameters from the route
             final Map<String, dynamic> params = state.pathParameters;
             final String? phone = params['phone'] as String?;
-            final String? isFor = params['navigateTo'] as String?;
+            final String? isFor = params['isFor'] as String?;
 
             return SlideBottomTransition(
               child: OtpScreen(
@@ -266,16 +267,16 @@ class AppRouter {
             );
           },
         ),
-        GoRoute(
-          name: RouteConstants.dependentAddOtp,
-          path: RouteConstants.dependentAddOtpUrl,
-          pageBuilder: (context, state) {
-            return SlideRightTransition(
-              child: DependentAddOtpScreen(),
-              key: state.pageKey,
-            );
-          },
-        ),
+        // GoRoute(
+        //   name: RouteConstants.dependentAddOtp,
+        //   path: RouteConstants.dependentAddOtpUrl,
+        //   pageBuilder: (context, state) {
+        //     return SlideRightTransition(
+        //       child: DependentAddOtpScreen(),
+        //       key: state.pageKey,
+        //     );
+        //   },
+        // ),
         GoRoute(
           path: RouteConstants.feedback,
           pageBuilder: (context, state) => SlideLeftTransition(

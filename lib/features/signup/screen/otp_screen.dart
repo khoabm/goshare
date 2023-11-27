@@ -97,6 +97,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     setState(() {
       _isLoading = false;
     });
+
     if (result != null && result.trim().isNotEmpty) {
       navigateToSetPassCodeScreen(phone, result);
     } else {
@@ -106,9 +107,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
   void navigateToSetPassCodeScreen(String phone, String setToken) {
     context.goNamed(RouteConstants.passcode, pathParameters: {
-      'phone': phone,
       'setToken': setToken,
-      'navigationTo': widget.isFor,
+      'phone': phone,
+      'isFor': widget.isFor,
     });
   }
 

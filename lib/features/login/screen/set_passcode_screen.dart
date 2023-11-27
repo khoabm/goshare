@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:goshare/common/home_center_container.dart';
 import 'package:goshare/common/loader.dart';
-import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/features/signup/controller/sign_up_controller.dart';
 import 'package:goshare/features/signup/widgets/passcode_input.dart';
 
 class SetPassCodeScreen extends ConsumerStatefulWidget {
   final String setToken;
   final String phone;
-  final String isFor;
   const SetPassCodeScreen({
     super.key,
     required this.setToken,
     required this.phone,
-    required this.isFor,
   });
 
   @override
@@ -58,11 +54,6 @@ class _SetPassCodeScreenState extends ConsumerState<SetPassCodeScreen> {
         _isLoading = false;
       });
       if (result) {
-        if (widget.isFor == RouteConstants.signup) {
-          context.goNamed(RouteConstants.login);
-        } else {
-          context.goNamed(RouteConstants.dashBoard);
-        }
         print('Set thanh cong');
       } else {
         print('Set that bai');

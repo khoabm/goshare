@@ -4,6 +4,7 @@ class RouteConstants {
   /// */
   static const home = 'home';
   static const signup = 'sign-up';
+  static const login = 'log-in';
   static const dashBoard = 'dashboard';
   static const otp = 'otp';
   static const passcode = 'passcode';
@@ -26,11 +27,11 @@ class RouteConstants {
   static const homeUrl = '/home';
   static const dashBoardUrl = '/';
   static const signupUrl = '/sign-up';
-  static const loginUrl = '/login-up';
+  static const loginUrl = '/log-in';
   static const homeTripUrl = '/home-trip';
   static const connectToDriverUrl = '/connect-to-driver';
-  static const otpUrl = '/otp/:phone';
-  static const passcodeUrl = '/passcode/:setToken/:phone';
+  static const otpUrl = '/otp/:phone/:isFor';
+  static const passcodeUrl = '/passcode/:setToken/:phone/:isFor';
   static const carChoosingUrl =
       '/car-choosing/:startLongitude/:startLatitude/:endLongitude/:endLatitude';
   static const searchTripRouteUrl = '/search-trip-route';

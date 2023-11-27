@@ -15,6 +15,20 @@ class MoneyTopupController extends StateNotifier<bool> {
     required MoneyTopupRepository moneyTopupRepository,
   })  : _moneyTopupRepository = moneyTopupRepository,
         super(false);
+  Future<BalanceResult> getBalance(
+    BuildContext context,
+  ) async {
+    final result = await _moneyTopupRepository.getBalance();
+    return result;
+  }
+
+  Future<List<TransactionResult>> getTransaction(
+    BuildContext context,
+  ) async {
+    final result = await _moneyTopupRepository.getTransaction();
+    return result;
+  }
+
   Future moneyTopup(
     int amount,
     BuildContext context,

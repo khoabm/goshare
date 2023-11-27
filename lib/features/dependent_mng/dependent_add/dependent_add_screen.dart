@@ -83,7 +83,7 @@ class DependentAddScreen extends ConsumerStatefulWidget {
 }
 
 class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
-  // final _loginFormKey = GlobalKey<FormState>();
+  final _dependentAddFormKey = GlobalKey<FormState>();
   final TextEditingController _phoneNumberTextController =
       TextEditingController();
   final TextEditingController _nameTextController = TextEditingController();
@@ -100,20 +100,22 @@ class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
   }
 
   void _onSubmit(WidgetRef ref) async {
-    String phone = _phoneNumberTextController.text;
-    String name = _nameTextController.text;
-    DateTime birth =
-        DateTimeFormatters.convertStringToDate(_birthDateTextController.text);
+    if (_dependentAddFormKey.currentState!.validate()) {
+      String phone = _phoneNumberTextController.text;
+      String name = _nameTextController.text;
+      DateTime birth =
+          DateTimeFormatters.convertStringToDate(_birthDateTextController.text);
 
-    final result = await ref
-        .read(DependentAddControllerProvider.notifier)
-        .dependentAdd(phone, name, _gender!, birth, context);
-    // print("resultAdd" + result.toString());
-    if (result) {
-      context.goNamed(RouteConstants.otp, pathParameters: {
-        'phone': phone,
-        'isFor': RouteConstants.dependentAdd,
-      });
+      final result = await ref
+          .read(DependentAddControllerProvider.notifier)
+          .dependentAdd(phone, name, _gender!, birth, context);
+
+      if (result) {
+        context.goNamed(RouteConstants.otp, pathParameters: {
+          'phone': phone,
+          'isFor': RouteConstants.dependentAdd,
+        });
+      }
     }
   }
 
@@ -129,25 +131,33 @@ class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
         appBar: AppBar(
           title: const Text('Thêm người phụ thuộc'),
         ),
-        //resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
             SingleChildScrollView(
               child: Column(
                 children: [
                   Container(
-                    width: MediaQuery.of(context).size.width,
-                    // color: Pallete.red,
-                    height: MediaQuery.of(context).size.height * .15,
-                    // child: SvgPicture.asset(
-                    //   Constants.carBanner,
-                    //   fit: BoxFit.contain,
-                    // ),
-                  ),
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * .15,
+                      child: Row(children: [
+                        Image.asset(
+                          Constants.dep1,
+                          fit: BoxFit.cover,
+                        ),
+                        Image.asset(
+                          Constants.dep2,
+                          fit: BoxFit.cover,
+                        ),
+                        Image.asset(
+                          Constants.dep3,
+                          fit: BoxFit.cover,
+                        ),
+                      ])),
                   HomeCenterContainer(
                     width: MediaQuery.of(context).size.width * .9,
                     child: Form(
-                      // key: _loginFormKey,
+                      key: _dependentAddFormKey,
                       child: Column(
                         children: [
                           const SizedBox(
@@ -170,6 +180,15 @@ class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
                             formatters: [
                               LengthLimitingTextInputFormatter(10),
                             ],
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Số điện thoại không được trống';
+                              } else if (value.length != 10 ||
+                                  value[0] != '0') {
+                                return 'Sai định dạng';
+                              }
+                              return null;
+                            },
                           ),
                           const SizedBox(
                             height: 20,
@@ -188,8 +207,14 @@ class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
                             ),
                             inputType: TextInputType.phone,
                             formatters: [
-                              LengthLimitingTextInputFormatter(6),
+                              LengthLimitingTextInputFormatter(100),
                             ],
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Tên không được trống';
+                              }
+                              return null;
+                            },
                           ),
                           const SizedBox(
                             height: 20,
@@ -252,6 +277,26 @@ class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
                               LengthLimitingTextInputFormatter(10),
                               FilteringTextInputFormatter.singleLineFormatter,
                             ],
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Ngày tháng năm sinh không được trống';
+                              } else if (int.parse(
+                                      value.toString().substring(0, 2)) >
+                                  31) {
+                                return 'Ngày không hợp lệ';
+                              } else if (int.parse(
+                                      value.toString().substring(3, 5)) >
+                                  12) {
+                                return 'Ngày không hợp lệ';
+                              } else if (int.parse(
+                                          value.toString().substring(6)) <=
+                                      1920 ||
+                                  int.parse(value.toString().substring(6)) >=
+                                      2023) {
+                                return 'Năm không hợp lệ';
+                              }
+                              return null;
+                            },
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,

@@ -36,11 +36,12 @@ class LoginRepository {
   LoginRepository({required this.baseUrl});
 
   Future<LoginResult> login(String phone, String passcode) async {
-    if (phone.isEmpty || passcode.isEmpty) {
-      phone = '+84363111098';
-      passcode = '123456';
-    }
+    // if (phone.isEmpty || passcode.isEmpty) {
+    //   phone = '+84363111098';
+    //   passcode = '123456';
+    // }
     print(phone);
+    print(passcode);
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
