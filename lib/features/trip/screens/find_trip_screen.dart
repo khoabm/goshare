@@ -198,7 +198,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           //   _isLoading = false;
           // });
           if (mounted) {
-            HapticFeedback.mediumImpact();
+            //HapticFeedback.mediumImpact();
             _handleNotifyPassengerDriverOnTheWay(message);
           }
         } catch (e) {

@@ -250,7 +250,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   void navigateToGuardianObserverScreen(
     TripModel trip,
   ) {
-    context.goNamed(RouteConstants.guardianObserveDependentTrip, extra: {
+    context.replaceNamed(RouteConstants.guardianObserveDependentTrip, extra: {
       'trip': trip,
     });
   }
