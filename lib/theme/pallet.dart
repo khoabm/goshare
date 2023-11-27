@@ -4,6 +4,7 @@ class Pallete {
   // Colors
   static const primaryColor = Color.fromRGBO(5, 32, 74, 1);
   static const red = Color.fromRGBO(255, 0, 0, 1);
+  static const green = Color.fromRGBO(39, 174, 96, 1.0);
 
   // Themes
   // static var darkModeAppTheme = ThemeData.dark().copyWith(

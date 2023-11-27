@@ -59,9 +59,7 @@ class TransactionCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
-                        color: type == 'TOPUP'
-                            ? Pallete.primaryColor
-                            : Pallete.red,
+                        color: type == 'TOPUP' ? Pallete.green : Pallete.red,
                       ),
                     ),
                     const SizedBox(height: 8.0),
@@ -147,6 +145,21 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
     );
   }
 
+  String _formatBalance(double balance) {
+    // Round to the nearest integer
+    int roundedBalance = balance.round();
+
+    // Convert to a string
+    String balanceString = roundedBalance.toString();
+
+    // Insert periods every three characters from the end
+    for (int i = balanceString.length - 3; i > 0; i -= 3) {
+      balanceString = balanceString.replaceRange(i, i, '.');
+    }
+
+    return balanceString;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -163,7 +176,7 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16.0),
-                color: Pallete.primaryColor,
+                color: Pallete.green,
               ),
               child: Column(
                 children: [
@@ -177,11 +190,12 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
                   ),
                   SizedBox(height: 16.0),
                   Text(
-                    '${currentBalance}đ',
+                    '${_formatBalance(currentBalance)}đ',
                     style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   SizedBox(height: 16.0),
                 ],

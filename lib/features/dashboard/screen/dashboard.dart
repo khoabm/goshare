@@ -17,6 +17,7 @@ import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/menu_user/menu-user-screen.dart';
 
 import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
+import 'package:goshare/features/trip_history/trip_history_screen.dart';
 import 'package:goshare/models/trip_model.dart';
 
 import 'package:goshare/providers/current_on_trip_provider.dart';
@@ -40,16 +41,18 @@ class _DashBoardState extends ConsumerState<DashBoard> {
   bool _isLoading = false;
   final List<Widget> _children = [
     const HomeScreen(),
+    const TripHistoryScreen(),
 
     // const GuardianObserveDependentTripScreen(
 
     // ),
-    CarChoosingScreen(
-      startLongitude: "106.8006742",
-      startLatitude: "10.8756434",
-      endLongitude: "106.748967",
-      endLatitude: "10.682559",
-    ), //Text('Second screen'),
+    // CarChoosingScreen(
+    //   startLongitude: "106.8006742",
+    //   startLatitude: "10.8756434",
+    //   endLongitude: "106.748967",
+    //   endLatitude: "10.682559",
+    // ),
+    //Text('Second screen'),
     //Text('Second screen'),
     // const Center(
     //   child: Text(
@@ -331,11 +334,11 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_filled),
-            label: 'Home',
+            label: 'Trang chủ',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history_outlined),
-            label: 'Activity',
+            label: 'Lịch sử',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history_outlined),
@@ -349,7 +352,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                 fontPackage: CupertinoIcons.iconFontPackage,
               ),
             ),
-            label: 'Account',
+            label: 'Tài khoản',
           )
         ],
       ),
