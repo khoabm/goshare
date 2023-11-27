@@ -7,6 +7,7 @@ import 'package:location/location.dart';
 import 'package:signalr_core/signalr_core.dart';
 import 'package:vietmap_flutter_navigation/embedded/controller.dart';
 import 'package:vietmap_flutter_navigation/helpers.dart';
+import 'package:vietmap_flutter_navigation/models/marker.dart';
 import 'package:vietmap_flutter_navigation/models/options.dart';
 import 'package:vietmap_flutter_navigation/models/way_point.dart';
 import 'package:vietmap_flutter_navigation/navigation_plugin.dart';
@@ -192,6 +193,15 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                     longitude: widget.trip.endLocation.longitude,
                   ),
                 );
+                _controller?.addImageMarkers([
+                  Marker(
+                    imagePath: 'assets/images/marker.png',
+                    latLng: LatLng(
+                      widget.trip.endLocation.latitude,
+                      widget.trip.endLocation.longitude,
+                    ),
+                  ),
+                ]);
                 _controller?.buildRoute(wayPoints: wayPoints);
                 setState(() {
                   _isLoading = false;
@@ -246,7 +256,8 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                   setState(() {
                     _containerHeight += details.primaryDelta!;
                     // Clamp the height between 60 and 300
-                    _containerHeight = _containerHeight.clamp(60.0, 250.0);
+                    _containerHeight = _containerHeight.clamp(
+                        60.0, MediaQuery.of(context).size.height * .3);
                   });
                 },
                 onVerticalDragEnd: (details) {
@@ -259,13 +270,14 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                   } else {
                     // Swipe up
                     setState(() {
-                      _containerHeight = 250.0;
+                      _containerHeight =
+                          MediaQuery.of(context).size.height * .3;
                     });
                   }
                 },
                 child: AnimatedContainer(
                   padding: const EdgeInsets.all(12.0),
-                  duration: const Duration(milliseconds: 400),
+                  duration: const Duration(milliseconds: 300),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.vertical(
@@ -276,7 +288,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                   ),
                   height: _containerHeight,
                   //color: Pallete.primaryColor,
-                  child: _containerHeight == 250
+                  child: _containerHeight > 0
                       ? Column(
                           children: [
                             Text(

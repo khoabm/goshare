@@ -60,7 +60,6 @@ class TripRepository {
         return left(Failure('Co loi xay ra'));
       }
     } catch (e) {
-      print(e.toString());
       return left(Failure('Loi roi'));
     }
   }
@@ -113,7 +112,6 @@ class TripRepository {
         return left(Failure('Co loi xay ra'));
       }
     } catch (e) {
-      print(e.toString());
       return left(Failure(e.toString()));
     }
   }
@@ -142,7 +140,6 @@ class TripRepository {
           "note": tripModel.note,
         }),
       );
-      print(response.body);
       if (response.statusCode == 200) {
         Map<String, dynamic> tripData = json.decode(response.body);
         TripModel trip = TripModel.fromMap(tripData);
@@ -155,7 +152,6 @@ class TripRepository {
         return left(Failure('Co loi xay ra'));
       }
     } catch (e) {
-      print(e.toString());
       return left(Failure(e.toString()));
     }
   }
@@ -173,7 +169,6 @@ class TripRepository {
           'Content-Type': 'application/json',
         },
       );
-      print(response.body);
       if (response.statusCode == 200) {
         Map<String, dynamic> tripData = json.decode(response.body);
         TripModel trip = TripModel.fromMap(tripData);
@@ -186,7 +181,6 @@ class TripRepository {
         return left(Failure('Co loi xay ra'));
       }
     } catch (e) {
-      print(e.toString());
       return left(Failure(e.toString()));
     }
   }
@@ -205,7 +199,6 @@ class TripRepository {
           'tripId': tripId,
         }),
       );
-      print(res.body);
       if (res.statusCode == 200) {
         if (res.body.isNotEmpty) {
           return right(true);
@@ -224,7 +217,6 @@ class TripRepository {
         );
       }
     } catch (e) {
-      print(e.toString());
       return left(
         Failure('Loi roi'),
       );

@@ -162,7 +162,7 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 0.75,
+                          childAspectRatio: 0.68,
                           mainAxisSpacing: 30,
                         ),
                         itemBuilder: (BuildContext context, int index) {

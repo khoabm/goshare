@@ -131,7 +131,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           .getUserData(context, ref), // Replace with your actual token
       builder: (BuildContext context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SplashScreen(); // Show a loading spinner while waiting
+          return const Loader(); // Show a loading spinner while waiting
         } else {
           final initialLocation =
               snapshot.data != null && snapshot.data!.isNotEmpty
@@ -141,6 +141,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
+            title: "Go Share",
             routerConfig: AppRouter().createRouter(initialLocation),
             theme: ThemeData(
               colorScheme: ThemeData().colorScheme.copyWith(
@@ -158,23 +159,5 @@ class _MyAppState extends ConsumerState<MyApp> {
         }
       },
     );
-    // MaterialApp.router(
-    //   debugShowCheckedModeBanner: false,
-    //   // routerDelegate: AppRouter().router.routerDelegate,
-    //   //routeInformationParser: AppRouter().router.routeInformationParser,
-    //   routerConfig: AppRouter().router,
-    //   theme: ThemeData(
-    //     colorScheme: ThemeData().colorScheme.copyWith(
-    //           primary: Pallete.primaryColor,
-    //         ),
-    //     primaryColor: Pallete.primaryColor,
-    //     scaffoldBackgroundColor: Pallete.primaryColor,
-    //     fontFamily: 'Raleway',
-    //     textTheme: Theme.of(context).textTheme.apply(
-    //           displayColor: Pallete.primaryColor,
-    //           bodyColor: Pallete.primaryColor,
-    //         ),
-    //   ),
-    // );
   }
 }

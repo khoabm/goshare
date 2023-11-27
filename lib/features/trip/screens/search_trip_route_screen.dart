@@ -117,7 +117,6 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                         //dragEnabled: false,
                         compassEnabled: false,
                         myLocationEnabled: true,
-
                         styleString:
                             'https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm',
                         initialCameraPosition: const CameraPosition(
@@ -150,7 +149,12 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                             lat = coordinates.latitude;
                             lon = coordinates.longitude;
                             _marker = Marker(
-                              child: _markerWidget(Icons.location_on),
+                              child: MyMarker(
+                                icon: Icons.location_on,
+                                address: currentAddress,
+                              ),
+                              // _markerWidget(
+                              //     Icons.location_on, currentAddress),
                               latLng: LatLng(
                                 coordinates.latitude,
                                 coordinates.longitude,
@@ -160,7 +164,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                               CameraUpdate.newCameraPosition(
                                 CameraPosition(
                                     target: _marker.latLng,
-                                    zoom: 17.5,
+                                    zoom: 15.5,
                                     tilt: 0),
                               ),
                             );
@@ -179,7 +183,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                               CameraPosition(
                                   target: LatLng(currentLocation?.latitude ?? 0,
                                       currentLocation?.longitude ?? 0),
-                                  zoom: 17.5,
+                                  zoom: 15.5,
                                   tilt: 0),
                             ),
                           );
@@ -255,7 +259,12 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                                   lat = data?.lat ?? 0.0;
                                   lon = data?.lng ?? 0.0;
                                   _marker = Marker(
-                                    child: _markerWidget(Icons.location_on),
+                                    child: MyMarker(
+                                      icon: Icons.location_on,
+                                      address: currentAddress,
+                                    ),
+                                    // _markerWidget(
+                                    //     Icons.location_on, currentAddress),
                                     latLng: LatLng(
                                       data?.lat ?? 0,
                                       data?.lng ?? 0,
@@ -265,7 +274,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                                     CameraUpdate.newCameraPosition(
                                       CameraPosition(
                                           target: _marker.latLng,
-                                          zoom: 17.5,
+                                          zoom: 15.5,
                                           tilt: 0),
                                     ),
                                   );
@@ -308,8 +317,8 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                           setState(() {
                             _containerHeight += details.primaryDelta!;
                             // Clamp the height between 60 and 300
-                            _containerHeight =
-                                _containerHeight.clamp(60.0, 230.0);
+                            _containerHeight = _containerHeight.clamp(
+                                60.0, MediaQuery.of(context).size.height * .4);
                           });
                         },
                         onVerticalDragEnd: (details) {
@@ -322,13 +331,14 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                           } else {
                             // Swipe up
                             setState(() {
-                              _containerHeight = 230.0;
+                              _containerHeight =
+                                  MediaQuery.of(context).size.height * .4;
                             });
                           }
                         },
                         child: AnimatedContainer(
                             padding: const EdgeInsets.all(12.0),
-                            duration: const Duration(milliseconds: 400),
+                            duration: const Duration(milliseconds: 300),
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.vertical(
@@ -339,7 +349,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                             ),
                             height: _containerHeight,
                             //color: Pallete.primaryColor,
-                            child: _containerHeight == 230
+                            child: _containerHeight > 60
                                 ? _isPlaceMarker
                                     ? Column(
                                         children: [
@@ -358,7 +368,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                                             ),
                                           ),
                                           const SizedBox(
-                                            height: 15,
+                                            height: 25,
                                           ),
                                           SizedBox(
                                             width: MediaQuery.of(context)
@@ -386,7 +396,6 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                                                 .5,
                                             child: ElevatedButton(
                                               onPressed: () {
-                                                print(currentAddress);
                                                 navigateToCreateDestination();
                                               },
                                               child: const Text(
@@ -435,13 +444,80 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
     super.dispose();
   }
 
-  _markerWidget(IconData icon) {
-    return Container(
-      width: 40,
-      height: 40,
-      // decoration:
-      //     const BoxDecoration(shape: BoxShape.circle, color: Colors.green),
-      child: Icon(icon, color: Pallete.primaryColor, size: 40),
+  // _markerWidget(IconData icon, String address) {
+  //   bool showAddress = false;
+
+  //   return GestureDetector(
+  //     onTap: () {
+  //       // Toggle between showing "Điểm đến" and the address
+  //       showAddress = !showAddress;
+  //     },
+  //     child: Column(
+  //       children: [
+  //         Container(
+  //           decoration: const BoxDecoration(
+  //             shape: BoxShape.rectangle,
+  //             color: Colors.white,
+  //           ),
+  //           child: Text(
+  //             showAddress ? address ?? 'Điểm đến' : 'Điểm đến',
+  //           ),
+  //         ),
+  //         SizedBox(
+  //           width: 40,
+  //           height: 40,
+  //           child: Icon(icon, color: Pallete.primaryColor, size: 40),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+}
+
+class MyMarker extends StatefulWidget {
+  final IconData icon;
+  final String address;
+
+  const MyMarker({
+    Key? key,
+    required this.icon,
+    required this.address,
+  }) : super(key: key);
+
+  @override
+  State createState() => _MyMarkerState();
+}
+
+class _MyMarkerState extends State<MyMarker> {
+  bool showAddress = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          print('hehe');
+          showAddress = !showAddress;
+        });
+      },
+      child: Column(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Colors.white,
+            ),
+            child: Text(
+              showAddress ? widget.address : 'Điểm đến',
+            ),
+          ),
+          SizedBox(
+            width: 40,
+            height: 40,
+            child: Icon(widget.icon, color: Pallete.primaryColor, size: 40),
+          ),
+        ],
+      ),
     );
   }
 }

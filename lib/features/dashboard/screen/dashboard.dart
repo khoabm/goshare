@@ -234,7 +234,6 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                       trip,
                       context,
                     );
-                    // ref.watch(stageProvider.notifier).setStage(Stage.stage2);
                   }
                 }
               }
@@ -255,7 +254,6 @@ class _DashBoardState extends ConsumerState<DashBoard> {
             if (mounted) {
               if (ModalRoute.of(context)?.isCurrent ?? false) {
                 print('ON TRIP ENDED DASHBOARD');
-                // print(" DAY ROI SIGNAL R DAY ROI ${message.toString()}");
                 final data = message as List<dynamic>;
                 final tripData = data.cast<Map<String, dynamic>>().first;
                 final trip = TripModel.fromMap(tripData);
@@ -274,6 +272,8 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                     ref.read(stageProvider.notifier).setStage(Stage.stage0);
                     context.replaceNamed(RouteConstants.rating);
                   } else {
+                    ref.watch(currentDependentOnTripProvider).removeWhere(
+                        (dep) => dep.dependentId == trip.passengerId);
                     showNavigateDashBoardDialog(trip, context);
                   }
                 }
@@ -298,7 +298,6 @@ class _DashBoardState extends ConsumerState<DashBoard> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 

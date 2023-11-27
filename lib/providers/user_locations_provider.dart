@@ -13,6 +13,5 @@ class UserLocationNotifier extends StateNotifier<List<LocationModel>> {
   }
 }
 
-final userLocationProvider =
-    StateNotifierProvider<UserLocationNotifier, List<LocationModel>>(
-        (ref) => UserLocationNotifier());
+final userLocationProvider = StateNotifierProvider.autoDispose<
+    UserLocationNotifier, List<LocationModel>>((ref) => UserLocationNotifier());

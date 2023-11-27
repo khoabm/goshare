@@ -58,14 +58,94 @@ class _SetPassCodeScreenState extends ConsumerState<SetPassCodeScreen> {
         _isLoading = false;
       });
       if (result) {
-        if (widget.isFor == RouteConstants.signup) {
-          context.goNamed(RouteConstants.login);
-        } else {
-          context.goNamed(RouteConstants.dashBoard);
+        if (context.mounted) {
+          showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (BuildContext abcContext) {
+              return AlertDialog(
+                title: const Center(
+                  child: Text(
+                    'Thành công',
+                  ),
+                ),
+                content: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Cảm ơn bạn đã sử dụng dịch vụ. Bây giờ bạn có thể đăng nhập vào hệ thống',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  ElevatedButton(
+                    onPressed: () {
+                      abcContext.pop();
+                      context.go(RouteConstants.loginUrl);
+                    },
+                    child: const Text(
+                      'Xác nhận',
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
         }
-        print('Set thanh cong');
       } else {
         print('Set that bai');
+        if (context.mounted) {
+          showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (BuildContext abcContext) {
+              return AlertDialog(
+                title: const Center(
+                  child: Text(
+                    'Thất bại',
+                  ),
+                ),
+                content: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Có lỗi xảy ra. Vui lòng kiểm tra lại mật khẩu hoặc thử lại trong giây lát',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  ElevatedButton(
+                    onPressed: () {
+                      abcContext.pop();
+                      //context.go(RouteConstants.loginUrl);
+                    },
+                    child: const Text(
+                      'Xác nhận',
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        }
       }
     }
   }

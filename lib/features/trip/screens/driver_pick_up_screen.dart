@@ -418,8 +418,8 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                         setState(() {
                           _containerHeight += details.primaryDelta!;
                           // Clamp the height between 60 and 300
-                          _containerHeight =
-                              _containerHeight.clamp(60.0, 250.0);
+                          _containerHeight = _containerHeight.clamp(
+                              60.0, MediaQuery.of(context).size.height * .3);
                         });
                       },
                       onVerticalDragEnd: (details) {
@@ -432,13 +432,14 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                         } else {
                           // Swipe up
                           setState(() {
-                            _containerHeight = 250.0;
+                            _containerHeight =
+                                MediaQuery.of(context).size.height * .3;
                           });
                         }
                       },
                       child: AnimatedContainer(
                         padding: const EdgeInsets.all(12.0),
-                        duration: const Duration(milliseconds: 400),
+                        duration: const Duration(milliseconds: 300),
                         decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.vertical(
@@ -449,7 +450,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                         ),
                         height: _containerHeight,
                         //color: Pallete.primaryColor,
-                        child: _containerHeight == 250
+                        child: _containerHeight > 60
                             ? Column(
                                 children: [
                                   Text(

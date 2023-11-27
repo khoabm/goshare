@@ -392,10 +392,10 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           ),
           content: ConstrainedBox(
             constraints: const BoxConstraints(maxHeight: 200.0),
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -406,30 +406,21 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                     ],
                   ),
                 ),
-                Center(
-                  child: CircleAvatar(
-                    radius: 50.0,
-                    backgroundImage: NetworkImage(
-                      driverAvatar,
-                    ),
-                    backgroundColor: Colors.transparent,
-                  ),
-                ),
               ],
             ),
           ),
           actions: [
             TextButton(
-              onPressed: () async {
-                setState(() {
-                  _isLoading = true;
-                });
-                await Future.delayed(
-                  const Duration(seconds: 2),
-                );
-                setState(() {
-                  _isLoading = false;
-                });
+              onPressed: () {
+                // setState(() {
+                //   _isLoading = true;
+                // });
+                // await Future.delayed(
+                //   const Duration(seconds: 2),
+                // );
+                // setState(() {
+                //   _isLoading = false;
+                // });
                 navigateToDashBoardScreen();
               },
               child: const Text(
@@ -465,7 +456,8 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                          'Đã quá hạn tìm xe mà chúng tôi không tìm được tài xế cho bạn. Vui lòng thử lại')
+                        'Đã quá hạn tìm xe mà chúng tôi không tìm được tài xế cho bạn. Vui lòng thử lại',
+                      )
                     ],
                   ),
                 ),
@@ -548,7 +540,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           ),
         ),
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * .2,
+        height: MediaQuery.of(context).size.height * .35,
         child: Column(
           children: [
             const Row(
@@ -599,11 +591,16 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                       });
                       if (check) {
                         if (context.mounted) {
-                          setState(() {
+                          if (ref.watch(userProvider)?.id == result!.id) {
                             ref
                                 .watch(currentOnTripIdProvider.notifier)
                                 .setCurrentOnTripId(null);
-                          });
+                          } else {
+                            ref
+                                .watch(currentDependentOnTripProvider.notifier)
+                                .removeDependentCurrentOnTripId(result!.id);
+                          }
+
                           context.goNamed(RouteConstants.dashBoard);
                         }
                       }
@@ -655,7 +652,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                 );
                 _controller?.addImageMarkers([
                   Marker(
-                    imagePath: 'assets/download.png',
+                    imagePath: 'assets/images/pngegg.png',
                     latLng: LatLng(
                       double.parse(widget.endLatitude),
                       double.parse(widget.endLongitude),
