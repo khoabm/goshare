@@ -2,41 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/dependent_mng/dependent_mng_repository.dart';
+import 'package:goshare/features/trip_history/trip_history_repository.dart';
+import 'package:goshare/models/trip_model.dart';
 
-final DependentAddControllerProvider =
-    StateNotifierProvider<DependentAddController, bool>(
-  (ref) => DependentAddController(
-    dependentMngRepository: ref.watch(dependentMngRepositoryProvider),
+final TripHistoryControllerProvider =
+    StateNotifierProvider<TripHistoryController, bool>(
+  (ref) => TripHistoryController(
+    tripHistoryRepository: ref.watch(tripHistoryRepositoryProvider),
   ),
 );
 
-class DependentAddController extends StateNotifier<bool> {
-  final DependentMngRepository _dependentMngRepository;
-  DependentAddController({
-    required DependentMngRepository dependentMngRepository,
-  })  : _dependentMngRepository = dependentMngRepository,
+class TripHistoryController extends StateNotifier<bool> {
+  final TripHistoryRepository _tripHistoryRepository;
+  TripHistoryController({
+    required TripHistoryRepository tripHistoryRepository,
+  })  : _tripHistoryRepository = tripHistoryRepository,
         super(false);
-  Future dependentAdd(
-    String phone,
-    String name,
-    String gender,
-    DateTime birth,
+
+  Future<List<TripModel>> tripHistory(
     BuildContext context,
   ) async {
-    final result =
-        await _dependentMngRepository.addDependent(phone, name, gender, birth);
+    final result = await _tripHistoryRepository.getTripHistory();
+    List<TripModel> res = [];
     result.fold(
       (l) {
-        state = false;
         showSnackBar(
           context: context,
           message: l.message,
         );
       },
       (success) {
-        state = success;
+        res = success;
       },
     );
-    return state;
+    return res;
   }
 }

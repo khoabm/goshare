@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:goshare/features/trip/controller/trip_controller.dart';
+import 'package:goshare/features/trip_history/trip_history_controller.dart';
+import 'package:goshare/models/trip_model.dart';
+import 'package:goshare/theme/pallet.dart';
 
-class TripHistoryScreen extends StatefulWidget {
-  const TripHistoryScreen({Key? key}) : super(key: key);
+class TripHistoryScreen extends ConsumerStatefulWidget {
+  const TripHistoryScreen({super.key});
 
   @override
-  _TripHistoryScreenState createState() => _TripHistoryScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _TripHistoryScreenState();
 }
 
-class _TripHistoryScreenState extends State<TripHistoryScreen> {
-  List<Map<String, dynamic>> trips = [];
+class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
+  List<TripModel> trips = [];
 
   @override
   void initState() {
@@ -18,47 +24,41 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
   }
 
   void fetchData() async {
-    // Replace this with your API call to get trip data
-    // For example, you can use Dio, http package, or any other networking library
-    // Here, we use a simple delay to simulate the API call
-    await Future.delayed(Duration(seconds: 2));
+    print('eiwrwereri');
+    final result = await ref
+        .read(TripHistoryControllerProvider.notifier)
+        .tripHistory(context);
 
-    // Replace this with the actual API response
-    List<Map<String, dynamic>> apiResponse = [
-      {
-        "id": "1",
-        "startTime": "2023-11-15T08:00:00",
-        "driver": {
-          "name": "tiếng việt",
-          "car": {"licensePlate": "ABC123"}
-        },
-        "passenger": {"name": "tiếng việt Doe"},
-        "booker": {"name": "tiếng việt Doe"},
-        "startLocation": {"address": "tiếng việt Address"},
-        "endLocation": {"address": "tiếng việt Address"},
-        "distance": 10.0,
-        "price": 50.0,
-        "cartype": {"capacity": 4},
-      },
-      {
-        "id": "1",
-        "startTime": "2023-11-15T08:00:00",
-        "driver": {
-          "name": "John Doe",
-          "car": {"licensePlate": "ABC123"}
-        },
-        "passenger": {"name": "Jane Doe"},
-        "booker": {"name": "Bob Doe"},
-        "startLocation": {"address": "Start Address"},
-        "endLocation": {"address": "End Address"},
-        "distance": 10.0,
-        "price": 50.0,
-        "cartype": {"capacity": 4},
-      },
-    ];
+    // print(result);
+
+    // List<Map<String, dynamic>> apiResponse = [
+    //   {
+    //     "id": "1",
+    //     "startTime": "2023-11-15T08:00:00",
+    //     "driver": {
+    //       "name": "tiếng việt",
+    //       "avatarUrl": 'https://imgflip.com/s/meme/Cute-Cat.jpg',
+    //       "car": {"licensePlate": "ABC123"},
+    //       "phone": "123456789",
+    //     },
+    //     "passenger": {
+    //       "name": "tiếng việt Doe",
+    //       "avatarUrl": 'https://imgflip.com/s/meme/Cute-Cat.jpg',
+    //     },
+    //     "booker": {
+    //       "name": "tiếng việt Doe",
+    //       "avatarUrl": 'https://imgflip.com/s/meme/Cute-Cat.jpg',
+    //     },
+    //     "startLocation": {"address": "tiếng việt Address"},
+    //     "endLocation": {"address": "tiếng việt Address"},
+    //     "distance": 10.0,
+    //     "price": 50.0,
+    //     "cartype": {"capacity": 4},
+    //   },
+    // ];
 
     setState(() {
-      trips = apiResponse;
+      trips = result;
     });
   }
 
@@ -86,8 +86,14 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                         _showTripDetails(context, trip);
                       },
                       child: ListTile(
-                        title: Text('Trip ${index + 1}'),
-                        subtitle: Text('Start: ${trip['startTime']}'),
+                        title: Text(
+                          '${trip.passenger.name} đã đặt chuyến đi',
+                          style: const TextStyle(
+                              fontSize: 18.0, fontWeight: FontWeight.bold),
+                        ),
+                        // ${trip['startTime'].toString().substring(11, 16)
+                        subtitle: Text(
+                            'Đặt vào ${trip.startTime.toString().substring(0, 10)} ${trip.startTime.toString().substring(11, 16)}'),
                       ),
                     ),
                     const Divider()
@@ -98,48 +104,123 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
     );
   }
 
-  void _showTripDetails(BuildContext context, Map<String, dynamic> trip) {
+  void _showTripDetails(BuildContext context, TripModel trip) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Trip Details'),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildUserDetails('Driver', trip['driver']),
-              _buildUserDetails('Passenger', trip['passenger']),
-              _buildUserDetails('Booker', trip['booker']),
-              Text('Start Location: ${trip['startLocation']['address']}'),
-              Text('End Location: ${trip['endLocation']['address']}'),
-              Text('Distance: ${trip['distance']}'),
-              Text('Price: ${trip['price']}'),
-              Text('Car Type Capacity: ${trip['cartype']['capacity']}'),
-            ],
+          title: const Text('Chi tiết chuyến đi'),
+          content: IntrinsicHeight(
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.8,
+              child: Column(
+                mainAxisSize: MainAxisSize.min, // Set to MainAxisSize.min
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('${trip.price}đ',
+                          style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                              color: Pallete.green)),
+                      SizedBox(height: 20),
+                      Text(
+                        'Chuyến đi đã bắt đầu từ ${trip.startLocation.address} đến ${trip.endLocation.address}',
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text('Thông tin tài xế',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage:
+                                NetworkImage(trip.driver?.avatarUrl ?? ''),
+                            radius: 30,
+                          ),
+                          const SizedBox(width: 20),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${trip.driver?.name}',
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                '${trip.driver?.phone}',
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Xe ${trip.cartype.capacity} chỗ',
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w400),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Biển số xe ${trip.driver?.car.licensePlate}',
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w400),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text('Thông tin người đặt',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage:
+                                NetworkImage(trip.driver?.avatarUrl ?? ''),
+                            radius: 30,
+                          ),
+                          const SizedBox(width: 20),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${trip.driver?.name}',
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                '${trip.driver?.phone}',
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('Close'),
+              child: const Text('Đóng'),
             ),
           ],
         );
       },
-    );
-  }
-
-  Widget _buildUserDetails(String title, Map<String, dynamic> user) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('$title Details:'),
-        Text('Name: ${user['name']}'),
-        Text('Phone: ${user['phone']}'),
-        // Add more details as needed
-        const SizedBox(height: 10),
-      ],
     );
   }
 }
