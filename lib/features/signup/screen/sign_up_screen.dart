@@ -103,6 +103,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   void navigateToOtpScreen(String phone) {
     context.goNamed(RouteConstants.otp, pathParameters: {
       'phone': phone,
+      'isFor': RouteConstants.signup,
     });
   }
 

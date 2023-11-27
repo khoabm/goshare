@@ -7,6 +7,9 @@ import 'package:goshare/features/connect_to_driver/screen/connect_to_driver_scre
 import 'package:goshare/features/create_destination/screens/create_destination_screen.dart';
 import 'package:goshare/features/dashboard/screen/dashboard.dart';
 import 'package:goshare/features/dependent_list/screens/dependent_list_screen.dart';
+import 'package:goshare/features/dependent_list/screens/dependent_on_trip_list.dart';
+import 'package:goshare/features/dependent_mng/dependent_add/dependent_add_otp_screen.dart';
+import 'package:goshare/features/dependent_mng/dependent_add/dependent_add_screen.dart';
 import 'package:goshare/features/feedback/feedback.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
 
@@ -16,6 +19,7 @@ import 'package:goshare/features/home/screen/home_screen.dart';
 // import 'package:goshare/features/search_trip_route/screens/search_trip_route_screen.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/menu_user/edit-profile/edit-profile-screen.dart';
+import 'package:goshare/features/menu_user/money-topup/money-topup-screen.dart';
 
 import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
 import 'package:goshare/features/trip/screens/chat_screen.dart';
@@ -30,7 +34,6 @@ import 'package:goshare/features/trip/screens/search_trip_route_screen.dart';
 import 'package:goshare/features/signup/screen/otp_screen.dart';
 import 'package:goshare/features/signup/screen/set_passcode_screen.dart';
 import 'package:goshare/features/signup/screen/sign_up_screen.dart';
-import 'package:goshare/location_display_demo.dart';
 import 'package:goshare/models/trip_model.dart';
 
 class AppRouter {
@@ -81,8 +84,8 @@ class AppRouter {
             key: state.pageKey,
           ),
         ),
-// <<<<<<< khang-branch
         GoRoute(
+          name: RouteConstants.login,
           path: RouteConstants.loginUrl,
           pageBuilder: (context, state) => SlideBottomTransition(
             child: const LogInScreen(),
@@ -96,7 +99,13 @@ class AppRouter {
             key: state.pageKey,
           ),
         ),
-
+        GoRoute(
+          path: RouteConstants.moneyTopupUrl,
+          pageBuilder: (context, state) => SlideLeftTransition(
+            child: const MoneyTopupPage(),
+            key: state.pageKey,
+          ),
+        ),
         GoRoute(
           name: 'connect-to-driver',
           path: RouteConstants.connectToDriverUrl,
@@ -112,10 +121,12 @@ class AppRouter {
             // Extract the parameters from the route
             final Map<String, dynamic> params = state.pathParameters;
             final String? phone = params['phone'] as String?;
+            final String? isFor = params['isFor'] as String?;
 
             return SlideBottomTransition(
               child: OtpScreen(
                 phone: phone ?? '',
+                isFor: isFor ?? RouteConstants.signup,
               ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
@@ -129,11 +140,13 @@ class AppRouter {
             final Map<String, dynamic> params = state.pathParameters;
             final String? phone = params['phone'] as String?;
             final String? setToken = params['setToken'] as String?;
+            final String? isFor = params['isFor'] as String?;
 
             return SlideBottomTransition(
               child: SetPassCodeScreen(
                 phone: phone ?? '',
                 setToken: setToken ?? '',
+                isFor: isFor ?? RouteConstants.signup,
               ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
@@ -245,8 +258,28 @@ class AppRouter {
           },
         ),
         GoRoute(
+          name: RouteConstants.dependentAddUrl,
+          path: RouteConstants.dependentAddUrl,
+          pageBuilder: (context, state) {
+            return SlideRightTransition(
+              child: DependentAddScreen(),
+              key: state.pageKey,
+            );
+          },
+        ),
+        // GoRoute(
+        //   name: RouteConstants.dependentAddOtp,
+        //   path: RouteConstants.dependentAddOtpUrl,
+        //   pageBuilder: (context, state) {
+        //     return SlideRightTransition(
+        //       child: DependentAddOtpScreen(),
+        //       key: state.pageKey,
+        //     );
+        //   },
+        // ),
+        GoRoute(
           path: RouteConstants.feedback,
-          pageBuilder: (context, state) => SlideBottomTransition(
+          pageBuilder: (context, state) => SlideLeftTransition(
             child: const FeedbackScreen(),
             key: state.pageKey,
           ),
@@ -393,6 +426,17 @@ class AppRouter {
               child: GuardianObserveDependentTripScreen(
                 trip: trip,
               ),
+              key: state.pageKey,
+            );
+          },
+        ),
+        GoRoute(
+          name: RouteConstants.dependentTripList,
+          path: RouteConstants.dependentTripListUrl,
+          pageBuilder: (context, state) {
+            //final Map<String, dynamic> params = state.pathParameters;
+            return SlideRightTransition(
+              child: const DependentListTrip(),
               key: state.pageKey,
             );
           },

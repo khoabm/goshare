@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +8,6 @@ import 'package:goshare/common/app_button.dart';
 import 'package:goshare/core/constants/constants.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/utils/locations_util.dart';
-import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/home/controller/home_controller.dart';
 import 'package:goshare/features/home/repositories/home_repository.dart';
 import 'package:goshare/features/home/widgets/dependent_widgets/driver_pick_up_card.dart';
@@ -119,7 +116,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (context.mounted) {
       try {
         if (mounted) {
-          print("INIT O HOME NE");
           locations = await ref
               .read(homeControllerProvider.notifier)
               .getUserListLocation(context);
@@ -133,7 +129,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void navigateToSearchTripRoute(BuildContext context) {
-    context.goNamed(RouteConstants.searchTripRoute);
+    context.pushNamed(RouteConstants.searchTripRoute);
   }
 
   Future<DependentModel?> navigateToDependentList(BuildContext context) async {
@@ -158,7 +154,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void navigateToOnTripScreen(
     TripModel trip,
   ) {
-    context.replaceNamed(RouteConstants.onTrip, extra: {
+    context.pushNamed(RouteConstants.onTrip, extra: {
       'trip': trip,
     });
   }
@@ -169,8 +165,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     WidgetRef ref,
   ) async {
     try {
-      print('hehehe');
-
       final oCcy = NumberFormat("#,##0", "vi_VN");
       setState(() {
         _isLoading = true;
@@ -178,7 +172,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       final location = ref.watch(locationProvider);
       final currentLocation = await location.getCurrentLocation();
 
-      print('hehehehe');
       List<CarModel> cars = [];
       if (context.mounted) {
         cars = await ref.watch(tripControllerProvider.notifier).getCarDetails(
@@ -362,7 +355,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     String endLatitude,
     String endLongitude,
   ) {
-    context.replaceNamed(RouteConstants.driverPickUp, extra: {
+    context.pushNamed(RouteConstants.driverPickUp, extra: {
       'driverName': driverName,
       'driverCarType': driverCarType,
       'driverPlate': driverPlate,
@@ -443,6 +436,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ],
                   ),
+                  ref.watch(currentDependentOnTripProvider).isNotEmpty
+                      ? GestureDetector(
+                          onTap: () {
+                            context.pushNamed(
+                              RouteConstants.dependentTripList,
+                            );
+                          },
+                          child: const DependentOnTripGoing(),
+                        )
+                      : const SizedBox.shrink(),
                   ref.watch(currentOnTripIdProvider) != null
                       ? GestureDetector(
                           onTap: () async {
@@ -663,18 +666,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             AppButton(
                               buttonText: 'Đóng góp',
                               fontSize: 16,
-                              onPressed: () {
-                                navigateToDriverPickupScreen(
-                                  '',
-                                  '',
-                                  '',
-                                  '',
-                                  '',
-                                  '',
-                                  '0',
-                                  '0',
-                                );
-                              },
+                              onPressed: () {},
                             ),
                           ],
                         ),

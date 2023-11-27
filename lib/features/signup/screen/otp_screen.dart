@@ -13,9 +13,11 @@ import 'package:goshare/theme/pallet.dart';
 
 class OtpScreen extends ConsumerStatefulWidget {
   final String phone;
+  final String isFor;
   const OtpScreen({
     super.key,
     required this.phone,
+    required this.isFor,
   });
 
   @override
@@ -95,6 +97,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     setState(() {
       _isLoading = false;
     });
+
     if (result != null && result.trim().isNotEmpty) {
       navigateToSetPassCodeScreen(phone, result);
     } else {
@@ -104,8 +107,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
   void navigateToSetPassCodeScreen(String phone, String setToken) {
     context.goNamed(RouteConstants.passcode, pathParameters: {
-      'phone': phone,
       'setToken': setToken,
+      'phone': phone,
+      'isFor': widget.isFor,
     });
   }
 

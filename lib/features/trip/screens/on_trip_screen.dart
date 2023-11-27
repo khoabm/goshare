@@ -7,6 +7,7 @@ import 'package:location/location.dart';
 import 'package:signalr_core/signalr_core.dart';
 import 'package:vietmap_flutter_navigation/embedded/controller.dart';
 import 'package:vietmap_flutter_navigation/helpers.dart';
+import 'package:vietmap_flutter_navigation/models/marker.dart';
 import 'package:vietmap_flutter_navigation/models/options.dart';
 import 'package:vietmap_flutter_navigation/models/way_point.dart';
 import 'package:vietmap_flutter_navigation/navigation_plugin.dart';
@@ -78,38 +79,29 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
           try {
             print('ON TRIP ENDED ON_TRIP');
             if (mounted) {
-              print('mounted');
-              final data = message as List<dynamic>;
-              final tripData = data.cast<Map<String, dynamic>>().first;
-              final trip = TripModel.fromMap(tripData);
-              bool isSelfBook = data.cast<bool>()[1];
-              bool isNotifyToGuardian = data.cast<bool>()[2];
-              ref
-                  .read(currentOnTripIdProvider.notifier)
-                  .setCurrentOnTripId(null);
-
-              if (isSelfBook == true) {
-                print('isSelfBook');
+              if (ModalRoute.of(context)?.isCurrent ?? false) {
+                final data = message as List<dynamic>;
+                //final tripData = data.cast<Map<String, dynamic>>().first;
+                //final trip = TripModel.fromMap(tripData);
+                bool isSelfBook = data.cast<bool>()[1];
+                bool isNotifyToGuardian = data.cast<bool>()[2];
                 ref
                     .read(currentOnTripIdProvider.notifier)
                     .setCurrentOnTripId(null);
-                if (mounted) {
-                  context.replaceNamed(RouteConstants.rating);
-                }
-              } else {
-                print('KHONG PHAI TU DAT');
-                if (isNotifyToGuardian == false) {
-                  print('KHONG PHAI NOTI GUARDIAN');
-                  ref.read(stageProvider.notifier).setStage(Stage.stage0);
+
+                if (isSelfBook == true) {
+                  ref
+                      .read(currentOnTripIdProvider.notifier)
+                      .setCurrentOnTripId(null);
                   if (mounted) {
                     context.replaceNamed(RouteConstants.rating);
                   }
                 } else {
-                  print('LA NOTI GUARDIAN');
-                  if (mounted) {
-                    context.goNamed(
-                      RouteConstants.dashBoard,
-                    );
+                  if (isNotifyToGuardian == false) {
+                    ref.read(stageProvider.notifier).setStage(Stage.stage0);
+                    if (mounted) {
+                      context.replaceNamed(RouteConstants.rating);
+                    }
                   }
                 }
               }
@@ -123,7 +115,6 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
 
       hubConnection.onclose(
         (exception) async {
-          print(exception.toString() + "LOI CUA SIGNALR ON CLOSE");
           await Future.delayed(
             const Duration(seconds: 3),
             () async {
@@ -140,50 +131,6 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
       print(e.toString());
     }
   }
-
-  // void _showNavigateDashBoardDialog(TripModel trip) {
-  //   showDialog(
-  //     barrierDismissible: true,
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Center(
-  //           child: Text(
-  //             'Tài xế ${trip.driver?.name} đã hoàn thành chuyến đi',
-  //           ),
-  //         ),
-  //         content: Row(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             Expanded(
-  //               child: Column(
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   Text(
-  //                       'Người thân ${trip.passenger.name} đã hoàn thành chuyến đi'),
-  //                   Text('Tổng số tiền được thanh toán là: ${trip.price}đ'),
-  //                   const Text('Cảm ơn bạn đã sử dụng dịch vụ'),
-  //                 ],
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () {
-  //               navigateToDashBoard();
-  //             },
-  //             child: const Text(
-  //               'Xác nhận',
-  //             ),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
 
   void navigateToDashBoard() {
     context.goNamed(RouteConstants.dashBoard);
@@ -213,9 +160,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
           children: [
             NavigationView(
               mapOptions: _navigationOption,
-              onNewRouteSelected: (p0) {
-                print(p0.toString());
-              },
+              onNewRouteSelected: (p0) {},
               onMapCreated: (p0) async {
                 _controller = p0;
               },
@@ -248,6 +193,15 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                     longitude: widget.trip.endLocation.longitude,
                   ),
                 );
+                _controller?.addImageMarkers([
+                  Marker(
+                    imagePath: 'assets/images/marker.png',
+                    latLng: LatLng(
+                      widget.trip.endLocation.latitude,
+                      widget.trip.endLocation.longitude,
+                    ),
+                  ),
+                ]);
                 _controller?.buildRoute(wayPoints: wayPoints);
                 setState(() {
                   _isLoading = false;
@@ -268,9 +222,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                           child: InkWell(
                             onTap: () async {
                               if (context.mounted) {
-                                context.goNamed(
-                                  RouteConstants.dashBoard,
-                                );
+                                context.pop();
                               }
                             },
                             child: const Row(
@@ -304,7 +256,8 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                   setState(() {
                     _containerHeight += details.primaryDelta!;
                     // Clamp the height between 60 and 300
-                    _containerHeight = _containerHeight.clamp(60.0, 250.0);
+                    _containerHeight = _containerHeight.clamp(
+                        60.0, MediaQuery.of(context).size.height * .3);
                   });
                 },
                 onVerticalDragEnd: (details) {
@@ -317,13 +270,14 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                   } else {
                     // Swipe up
                     setState(() {
-                      _containerHeight = 250.0;
+                      _containerHeight =
+                          MediaQuery.of(context).size.height * .3;
                     });
                   }
                 },
                 child: AnimatedContainer(
                   padding: const EdgeInsets.all(12.0),
-                  duration: const Duration(milliseconds: 400),
+                  duration: const Duration(milliseconds: 300),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.vertical(
@@ -334,7 +288,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                   ),
                   height: _containerHeight,
                   //color: Pallete.primaryColor,
-                  child: _containerHeight == 250
+                  child: _containerHeight > 0
                       ? Column(
                           children: [
                             Text(

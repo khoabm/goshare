@@ -2,32 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goshare/common/app_button.dart';
+import 'package:goshare/common/app_text_field.dart';
 import 'package:goshare/common/home_center_container.dart';
 import 'package:goshare/common/loader.dart';
 import 'package:goshare/core/constants/constants.dart';
 import 'package:goshare/core/constants/route_constants.dart';
-import 'package:goshare/features/feedback/controller/feedback_controller.dart';
-
-final ratingProvider = StateProvider<int?>((ref) => null);
-final feedbackTextProvider = StateProvider<String?>((ref) => null);
+import 'package:goshare/features/feedback/feedback_controller.dart';
 
 class FeedbackScreen extends ConsumerStatefulWidget {
-  const FeedbackScreen({Key? key}) : super(key: key);
+  const FeedbackScreen({super.key});
 
   @override
-  _FeedbackScreenState createState() => _FeedbackScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _FeedbackScreenState();
 }
 
 class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
+  int? _rating = null;
+  // String? _feedbackText = null;
   bool _isLoading = false;
+  final TextEditingController _feedbackText = TextEditingController();
 
-  void _submitFeedback(WidgetRef ref) {
-    final int? rating = ref.read(ratingProvider.notifier).state;
-    final String? feedbackText = ref.read(feedbackTextProvider.notifier).state;
-
-    if (rating != null && feedbackText != null) {
-      print('Rating: $rating');
+  void _submitFeedback(WidgetRef ref) async {
+    String feedbackText = _feedbackText.text;
+    if (_rating != null && feedbackText != null) {
+      print('Rating: $_rating');
       print('Feedback Text: $feedbackText');
+      final result = await ref
+          .read(FeedbackControllerProvider.notifier)
+          .feedback(5, feedbackText, context);
     } else {
       print('Please provide both rating and feedback text.');
     }
@@ -59,9 +61,20 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        RatingStars(),
+                        RatingStars(
+                          rating: _rating,
+                          onRatingSelected: (rating) {
+                            setState(() {
+                              _rating = rating;
+                            });
+                          },
+                        ),
                         const SizedBox(height: 20),
-                        FeedbackTextInput(),
+                        AppTextField(
+                          controller: _feedbackText,
+                          hintText: 'Nhập đánh giá của bạn',
+                          maxLines: 10,
+                        ),
                         const SizedBox(height: 20),
                         Container(
                           padding: const EdgeInsets.all(8.0),
@@ -103,21 +116,28 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
   }
 }
 
-class RatingStars extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final rating = ref.watch(ratingProvider);
+class RatingStars extends StatelessWidget {
+  final int? rating;
+  final Function(int) onRatingSelected;
 
+  const RatingStars({
+    Key? key,
+    required this.rating,
+    required this.onRatingSelected,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         for (int i = 1; i <= 5; i++)
           GestureDetector(
-            onTap: () => ref.read(ratingProvider.notifier).state = i,
+            onTap: () => onRatingSelected(i),
             child: Icon(
               Icons.star,
               size: 30,
-              color: (rating != null && rating >= i)
+              color: (rating != null && rating! >= i)
                   ? const Color(0xffffc107)
                   : Colors.grey,
             ),
@@ -127,18 +147,42 @@ class RatingStars extends ConsumerWidget {
   }
 }
 
-class FeedbackTextInput extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final feedbackText = ref.watch(feedbackTextProvider);
+// class FeedbackTextInput extends StatefulWidget {
+//   final String? feedbackText;
+//   final Function(String) onFeedbackTextChange;
 
-    return TextField(
-      decoration: InputDecoration(
-        hintText: 'Nhập phản hồi của bạn',
-        border: OutlineInputBorder(),
-      ),
-      maxLines: 5, // Set the maximum number of lines for the text field
-      onChanged: (text) => ref.read(feedbackTextProvider.notifier).state = text,
-    );
-  }
-}
+//   const FeedbackTextInput({
+//     Key? key,
+//     required this.feedbackText,
+//     required this.onFeedbackTextChange,
+//   }) : super(key: key);
+
+//   @override
+//   State<FeedbackTextInput> createState() => _FeedbackTextInputState();
+// }
+
+// class _FeedbackTextInputState extends State<FeedbackTextInput> {
+//   String _feedbackText = '';
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _feedbackText = widget.feedbackText ?? '';
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return TextField(
+//       decoration: InputDecoration(
+//         hintText: 'Nhập phản hồi của bạn',
+//         border: OutlineInputBorder(),
+//       ),
+//       maxLines: 5, // Set the maximum number of lines for the text field
+//       controller: TextEditingController(text: _feedbackText),
+//       onChanged: (text) {
+//         _feedbackText = text;
+//         widget.onFeedbackTextChange(_feedbackText);
+//       },
+//     );
+//   }
+// }

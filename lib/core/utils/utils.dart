@@ -68,6 +68,31 @@ void showAlreadyInTripError({
   );
 }
 
+void showFindTripErrorDialog({
+  required BuildContext context,
+  required String message,
+}) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Có lỗi xảy ra'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('OK'),
+            onPressed: () {
+              context.pop();
+              context.go(RouteConstants.dashBoardUrl);
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 String convertPhoneNumber(String phoneNumber) {
   // Check if the phone number starts with '0'
   if (phoneNumber.startsWith('0')) {
@@ -155,6 +180,84 @@ void showDialogInfo(TripModel? trip, BuildContext context, WidgetRef ref) {
                 if (check == true) {
                   ref.watch(stageProvider.notifier).setStage(Stage.stage0);
                 }
+                abcContext.pop();
+              }
+            },
+            child: const Text(
+              'Hủy',
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void showCancelDialogInfo(
+    TripModel? trip, BuildContext context, WidgetRef ref) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext abcContext) {
+      return AlertDialog(
+        title: Center(
+          child: Text(
+            '${trip?.booker.name} đã hủy tìm xe cho bạn',
+          ),
+        ),
+        content: const SizedBox.shrink(),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              ref.watch(stageProvider.notifier).setStage(Stage.stage0);
+              abcContext.pop();
+            },
+            child: const Text(
+              'Xác nhận',
+            ),
+          ),
+          // ElevatedButton(
+          //   onPressed: () {
+          //     ref.watch(stageProvider.notifier).setStage(Stage.stage0);
+
+          //     abcContext.pop();
+          //   },
+          //   child: const Text(
+          //     'Hủy',
+          //   ),
+          // ),
+        ],
+      );
+    },
+  );
+}
+
+void showDialogTripCancel(
+    TripModel? trip, BuildContext context, WidgetRef ref) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext abcContext) {
+      return AlertDialog(
+        title: Center(
+          child: Text(
+            'Người thân ${trip?.booker.name} đã hủy tìm xe',
+          ),
+        ),
+        content: const SizedBox.shrink(),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              abcContext.pop();
+            },
+            child: const Text(
+              'Xác nhận',
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (context.mounted) {
+                ref.watch(stageProvider.notifier).setStage(Stage.stage0);
                 abcContext.pop();
               }
             },

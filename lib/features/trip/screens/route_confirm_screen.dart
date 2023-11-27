@@ -7,8 +7,8 @@ import 'package:goshare/core/constants/route_constants.dart';
 
 import 'package:vietmap_flutter_navigation/embedded/controller.dart';
 import 'package:vietmap_flutter_navigation/helpers.dart';
+import 'package:vietmap_flutter_navigation/models/marker.dart';
 import 'package:vietmap_flutter_navigation/models/options.dart';
-import 'package:vietmap_flutter_navigation/models/route_progress_event.dart';
 import 'package:vietmap_flutter_navigation/models/way_point.dart';
 import 'package:vietmap_flutter_navigation/navigation_plugin.dart';
 import 'package:vietmap_flutter_navigation/views/navigation_view.dart';
@@ -48,13 +48,13 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
     WayPoint(
         name: "destination point", latitude: 10.762528, longitude: 106.653099)
   ];
-  Widget instructionImage = const SizedBox.shrink();
-  String guideDirection = "";
-  Widget recenterButton = const SizedBox.shrink();
-  RouteProgressEvent? routeProgressEvent;
+  // Widget instructionImage = const SizedBox.shrink();
+  // String guideDirection = "";
+  // Widget recenterButton = const SizedBox.shrink();
+  // RouteProgressEvent? routeProgressEvent;
   bool _isRouteBuilt = false;
   bool _isRunning = false;
-  FocusNode focusNode = FocusNode();
+
   bool _isLoading = false;
   String driverName = '';
   String driverPhone = '';
@@ -67,29 +67,29 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
     initialize().then((value) {
       // _showDriverInfoDialog();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        setState(() {
-          _isLoading = true;
-        });
-        print('DAY LA CHO INITTTTTTTTTTTTT');
-        print(widget.bookerId);
-        print(widget.paymentMethod);
-        print(widget.startLatitude);
-        print(widget.startLongitude);
-        print(widget.carTypeId);
-        print(widget.endLatitude);
-        print(widget.endLongitude);
-        print(
-            '===================================================================');
-        // Use setState to trigger a rebuild of the widget with the new data.
-        setState(() {
-          _isLoading = false;
-        });
+        // setState(() {
+        //   _isLoading = true;
+        // });
+        // print('DAY LA CHO INITTTTTTTTTTTTT');
+        // print(widget.bookerId);
+        // print(widget.paymentMethod);
+        // print(widget.startLatitude);
+        // print(widget.startLongitude);
+        // print(widget.carTypeId);
+        // print(widget.endLatitude);
+        // print(widget.endLongitude);
+        // print(
+        //     '===================================================================');
+        // // Use setState to trigger a rebuild of the widget with the new data.
+        // setState(() {
+        //   _isLoading = false;
+        // });
       });
 
       // Use setState to trigger a rebuild of the widget with the new data.
-      setState(() {
-        _isLoading = false;
-      });
+      // setState(() {
+      //   _isLoading = false;
+      // });
     });
 
     super.initState();
@@ -106,7 +106,7 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
     _navigationOption.apiKey =
         'c3d0f188ff669f89042771a20656579073cffec5a8a69747';
     _navigationOption.mapStyle =
-        "https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm";
+        "https://maps.vietmap.vn/api/maps/light/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747";
     _navigationOption.customLocationCenterIcon =
         await VietMapHelper.getBytesFromAsset('assets/download.jpeg');
     _vietmapNavigationPlugin.setDefaultOptions(_navigationOption);
@@ -114,12 +114,12 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
 
   //MapOptions? options;
 
-  void navigateToSearchTripRoute() {
-    context.goNamed(RouteConstants.searchTripRoute);
-  }
+  // void navigateToSearchTripRoute() {
+  //   context.replaceNamed(RouteConstants.searchTripRoute);
+  // }
 
   void navigateToFindTrip() {
-    context.goNamed(RouteConstants.findTrip, extra: {
+    context.replaceNamed(RouteConstants.findTrip, extra: {
       'startLatitude': widget.startLatitude,
       'startLongitude': widget.startLongitude,
       'endLatitude': widget.endLatitude,
@@ -177,14 +177,21 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
                 //CircularProgressIndicator(),
               ],
             ),
+            const SizedBox(
+              height: 10,
+            ),
             SizedBox(
               width: MediaQuery.of(context).size.width * .5,
               child: ElevatedButton(
                 onPressed: () {
-                  navigateToSearchTripRoute();
+                  //navigateToSearchTripRoute();
+                  context.pop();
                 },
                 child: const Text('Hủy'),
               ),
+            ),
+            const SizedBox(
+              height: 10,
             ),
             SizedBox(
               width: MediaQuery.of(context).size.width * .5,
@@ -235,15 +242,15 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
                     longitude: double.parse(widget.endLongitude),
                   ),
                 );
-                // _controller?.addImageMarkers([
-                //   Marker(
-                //     imagePath: 'assets/images/icon.png',
-                //     latLng: LatLng(
-                //       double.parse(widget.endLatitude),
-                //       double.parse(widget.endLongitude),
-                //     ),
-                //   ),
-                // ]);
+                _controller?.addImageMarkers([
+                  Marker(
+                    imagePath: 'assets/images/marker.png',
+                    latLng: LatLng(
+                      double.parse(widget.endLatitude),
+                      double.parse(widget.endLongitude),
+                    ),
+                  ),
+                ]);
                 // _controller?.addImageMarkers(Marker(child: child, latLng: latLng));
                 _controller?.buildRoute(wayPoints: wayPoints);
               },

@@ -36,11 +36,12 @@ class LoginRepository {
   LoginRepository({required this.baseUrl});
 
   Future<LoginResult> login(String phone, String passcode) async {
-    if (phone.isEmpty || passcode.isEmpty) {
-      phone = '84327885391';
-      passcode = '270602';
-    }
+    // if (phone.isEmpty || passcode.isEmpty) {
+    //   phone = '+84363111098';
+    //   passcode = '123456';
+    // }
     print(phone);
+    print(passcode);
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
@@ -52,7 +53,8 @@ class LoginRepository {
           'passcode': passcode,
         }),
       );
-
+      print(response.statusCode);
+      print(response.body);
       if (response.statusCode == 200) {
         final resultMap = json.decode(response.body);
         return LoginResult(
@@ -114,6 +116,7 @@ class LoginRepository {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final accessToken = prefs.getString('accessToken');
       final refreshToken = prefs.getString('refreshToken');
+
       final response = await http
           .post(
             Uri.parse('${Constants.apiBaseUrl}/auth/refresh-token'),
@@ -136,6 +139,7 @@ class LoginRepository {
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         final userData = UserDataModel.fromMap(jsonData);
+        print('get user dâta');
         if (jsonData.containsKey('id') &&
             jsonData.containsKey('phone') &&
             jsonData.containsKey('name') &&
@@ -148,9 +152,18 @@ class LoginRepository {
           );
           ref.read(userProvider.notifier).state = userTmp;
 
+          print('hehehehehe');
+          print(userData.currentTrip);
+
+          print(userData.dependentCurrentTrips?.length);
+
           ref
               .watch(currentOnTripIdProvider.notifier)
               .setCurrentOnTripId(userData.currentTrip);
+          ref
+              .watch(currentDependentOnTripProvider.notifier)
+              .setDependentCurrentOnTripId(
+                  userData.dependentCurrentTrips ?? []);
         }
         return right(jsonData['accessToken']);
       } else {

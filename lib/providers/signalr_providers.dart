@@ -10,10 +10,8 @@ final hubConnectionProvider = FutureProvider<HubConnection>((ref) async {
     print('signalR HUB');
     return HubConnectionBuilder()
         .withUrl(
-            "https://goshareapi.azurewebsites.net/goshareHub?access_token=$accessToken",
-            HttpConnectionOptions(
-              logging: (level, message) => print(message),
-            ))
+          "https://goshareapi.azurewebsites.net/goshareHub?access_token=$accessToken",
+        )
         .withAutomaticReconnect()
         .build();
   } catch (e) {

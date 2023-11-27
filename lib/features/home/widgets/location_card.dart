@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:goshare/models/location_model.dart';
+import 'package:goshare/theme/pallet.dart';
 
 class LocationCard extends ConsumerWidget {
   final LocationModel? locationModel;
@@ -53,7 +54,7 @@ class LocationCard extends ConsumerWidget {
                 //     fontSize: 13,
                 //   ),
                 // ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   locationModel?.address ?? '',
                   maxLines: 2,
@@ -69,6 +70,7 @@ class LocationCard extends ConsumerWidget {
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 elevation: 0,
+                backgroundColor: Pallete.primaryColor,
               ),
               onPressed: () async {
                 print(locationModel);

@@ -108,27 +108,33 @@ class _GuardianObserveDependentTripScreenState
       final hubConnection = await ref.watch(
         hubConnectionProvider.future,
       );
-      hubConnection.on(
-        'UpdateDriverLocation',
-        (arguments) {
-          final stringData = arguments?.first as String;
-          final data = jsonDecode(stringData) as Map<String, dynamic>;
-          updateMarker(
-            data['latitude'],
-            data['longitude'],
-          );
-        },
-      );
+
+      if (ModalRoute.of(context)?.isCurrent ?? false) {
+        hubConnection.on(
+          'UpdateDriverLocation',
+          (arguments) {
+            if (mounted) {
+              final stringData = arguments?.first as String;
+              print(stringData);
+              final data = jsonDecode(stringData) as Map<String, dynamic>;
+              updateMarker(
+                data['latitude'],
+                data['longitude'],
+              );
+            }
+          },
+        );
+      }
 
       hubConnection.on('NotifyPassengerTripEnded', (message) {
-        print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
         if (mounted) {
-          _handleNotifyPassengerDriverPickUp(message);
+          if (ModalRoute.of(context)?.isCurrent ?? false) {
+            _handleNotifyPassengerDriverPickUp(message);
+          }
         }
       });
 
       hubConnection.onclose((exception) async {
-        print(exception.toString() + "LOI CUA SIGNALR ON CLOSE");
         await Future.delayed(
           const Duration(seconds: 3),
           () async {
@@ -148,7 +154,9 @@ class _GuardianObserveDependentTripScreenState
       final data = message as List<dynamic>;
       final tripData = data.cast<Map<String, dynamic>>().first;
       final trip = TripModel.fromMap(tripData);
-      _showDriverInfoDialog(trip);
+      if (trip.passengerId == widget.trip.passengerId) {
+        _showDriverInfoDialog(trip);
+      }
     }
   }
 
@@ -367,13 +375,6 @@ class _GuardianObserveDependentTripScreenState
                       ],
                     ),
                   ),
-                  // _mapController == null
-                  //     ? const SizedBox.shrink()
-                  //     : MarkerLayer(
-                  //         ignorePointer: true,
-                  //         mapController: _mapController!,
-                  //         markers: temp,
-                  //       ),
                   _mapController == null
                       ? const SizedBox.shrink()
                       : MarkerLayer(
@@ -391,8 +392,10 @@ class _GuardianObserveDependentTripScreenState
                         setState(() {
                           _containerHeight += details.primaryDelta!;
                           // Clamp the height between 60 and 300
-                          _containerHeight =
-                              _containerHeight.clamp(60.0, 250.0);
+                          _containerHeight = _containerHeight.clamp(
+                            60.0,
+                            MediaQuery.of(context).size.height * .3,
+                          );
                         });
                       },
                       onVerticalDragEnd: (details) {
@@ -405,13 +408,14 @@ class _GuardianObserveDependentTripScreenState
                         } else {
                           // Swipe up
                           setState(() {
-                            _containerHeight = 250.0;
+                            _containerHeight =
+                                MediaQuery.of(context).size.height * .3;
                           });
                         }
                       },
                       child: AnimatedContainer(
                         padding: const EdgeInsets.all(12.0),
-                        duration: const Duration(milliseconds: 400),
+                        duration: const Duration(milliseconds: 300),
                         decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.vertical(
@@ -422,7 +426,7 @@ class _GuardianObserveDependentTripScreenState
                         ),
                         height: _containerHeight,
                         //color: Pallete.primaryColor,
-                        child: _containerHeight == 250
+                        child: _containerHeight > 60
                             ? Column(
                                 children: [
                                   Text(
@@ -527,12 +531,18 @@ class _GuardianObserveDependentTripScreenState
   }
 
   _markerWidget(IconData icon) {
-    return Container(
+    return SizedBox(
       width: 20,
       height: 20,
-      decoration:
-          const BoxDecoration(shape: BoxShape.circle, color: Colors.green),
-      child: Icon(icon, color: Colors.red, size: 13),
+      child: Center(
+        child: CircleAvatar(
+          radius: 20.0,
+          backgroundImage: NetworkImage(
+            widget.trip.driver?.avatarUrl ?? '',
+          ),
+          backgroundColor: Colors.transparent,
+        ),
+      ),
     );
   }
 }

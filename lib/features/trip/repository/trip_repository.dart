@@ -60,7 +60,6 @@ class TripRepository {
         return left(Failure('Co loi xay ra'));
       }
     } catch (e) {
-      print(e.toString());
       return left(Failure('Loi roi'));
     }
   }
@@ -90,7 +89,7 @@ class TripRepository {
         return left(
           UnauthorizedFailure('Unauthorized'),
         );
-      } else if (response.statusCode == 401) {
+      } else if (response.statusCode == 400) {
         Map<String, dynamic> error = json.decode(response.body);
         if (error['message'] ==
             "Passenger is already in a trip that hasn't completed. Please complete the current trip before creating a new one.") {
@@ -101,7 +100,10 @@ class TripRepository {
           return left(AlreadyInTripFailure(
               'Bạn không thể tạo chuyến vào lúc này. Nếu đây là lỗi vui lòng liên hệ cho hệ thống'));
         } else {
-          left(Failure('Có lỗi xảy ra'));
+          left(
+            AlreadyInTripFailure(
+                'Bạn không thể tạo chuyến vào lúc này. Nếu đây là lỗi vui lòng liên hệ cho hệ thống'),
+          );
         }
         return left(
           Failure('Có lỗi xảy ra'),
@@ -110,7 +112,6 @@ class TripRepository {
         return left(Failure('Co loi xay ra'));
       }
     } catch (e) {
-      print(e.toString());
       return left(Failure(e.toString()));
     }
   }
@@ -139,7 +140,6 @@ class TripRepository {
           "note": tripModel.note,
         }),
       );
-      print(response.body);
       if (response.statusCode == 200) {
         Map<String, dynamic> tripData = json.decode(response.body);
         TripModel trip = TripModel.fromMap(tripData);
@@ -152,7 +152,6 @@ class TripRepository {
         return left(Failure('Co loi xay ra'));
       }
     } catch (e) {
-      print(e.toString());
       return left(Failure(e.toString()));
     }
   }
@@ -170,7 +169,6 @@ class TripRepository {
           'Content-Type': 'application/json',
         },
       );
-      print(response.body);
       if (response.statusCode == 200) {
         Map<String, dynamic> tripData = json.decode(response.body);
         TripModel trip = TripModel.fromMap(tripData);
@@ -183,7 +181,6 @@ class TripRepository {
         return left(Failure('Co loi xay ra'));
       }
     } catch (e) {
-      print(e.toString());
       return left(Failure(e.toString()));
     }
   }
@@ -202,7 +199,6 @@ class TripRepository {
           'tripId': tripId,
         }),
       );
-      print(res.body);
       if (res.statusCode == 200) {
         if (res.body.isNotEmpty) {
           return right(true);
@@ -221,7 +217,6 @@ class TripRepository {
         );
       }
     } catch (e) {
-      print(e.toString());
       return left(
         Failure('Loi roi'),
       );

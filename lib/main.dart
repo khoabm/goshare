@@ -9,6 +9,8 @@ import 'package:goshare/features/login/controller/log_in_controller.dart';
 import 'package:goshare/firebase_options.dart';
 import 'package:goshare/router.dart';
 import 'package:goshare/theme/pallet.dart';
+import 'package:uni_links/uni_links.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,11 +31,36 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
+  String _deepLink = 'abcd1234.com';
+
   @override
   void initState() {
     super.initState();
     requestPermission();
     initInfor();
+    setupInteractedMessage();
+  }
+
+  // It is assumed that all messages contain a data field with the key 'type'
+  Future<void> setupInteractedMessage() async {
+    // Get any messages which caused the application to open from
+    // a terminated state.
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+    // If the message also contains a data property with a "type" of "chat",
+    // navigate to a chat screen
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
+    }
+
+    // Also handle any interaction when the app is in the background via a
+    // Stream listener
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+  }
+
+  void _handleMessage(RemoteMessage message) {
+    print(message);
   }
 
   // This widget is the root of your application.
@@ -104,7 +131,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           .getUserData(context, ref), // Replace with your actual token
       builder: (BuildContext context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LoaderPrimary(); // Show a loading spinner while waiting
+          return const Loader(); // Show a loading spinner while waiting
         } else {
           final initialLocation =
               snapshot.data != null && snapshot.data!.isNotEmpty
@@ -114,6 +141,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
+            title: "Go Share",
             routerConfig: AppRouter().createRouter(initialLocation),
             theme: ThemeData(
               colorScheme: ThemeData().colorScheme.copyWith(
@@ -131,23 +159,5 @@ class _MyAppState extends ConsumerState<MyApp> {
         }
       },
     );
-    // MaterialApp.router(
-    //   debugShowCheckedModeBanner: false,
-    //   // routerDelegate: AppRouter().router.routerDelegate,
-    //   //routeInformationParser: AppRouter().router.routeInformationParser,
-    //   routerConfig: AppRouter().router,
-    //   theme: ThemeData(
-    //     colorScheme: ThemeData().colorScheme.copyWith(
-    //           primary: Pallete.primaryColor,
-    //         ),
-    //     primaryColor: Pallete.primaryColor,
-    //     scaffoldBackgroundColor: Pallete.primaryColor,
-    //     fontFamily: 'Raleway',
-    //     textTheme: Theme.of(context).textTheme.apply(
-    //           displayColor: Pallete.primaryColor,
-    //           bodyColor: Pallete.primaryColor,
-    //         ),
-    //   ),
-    // );
   }
 }
