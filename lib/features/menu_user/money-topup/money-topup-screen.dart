@@ -37,6 +37,14 @@ class TransactionCard extends StatelessWidget {
       this.createTime})
       : super(key: key);
 
+  String _formatTransaction(String amount) {
+    String amount_tmp = amount;
+    for (int i = amount_tmp.length - 3; i > 1; i -= 3) {
+      amount_tmp = amount_tmp.replaceRange(i, i, '.');
+    }
+    return amount_tmp + 'đ';
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -54,8 +62,8 @@ class TransactionCard extends StatelessWidget {
                   children: [
                     Text(
                       type == 'TOPUP'
-                          ? '+' + amount.toString()
-                          : '-' + amount.toString(),
+                          ? '+' + _formatTransaction(amount.toString())
+                          : _formatTransaction(amount.toString()),
                       style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -146,17 +154,11 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
   }
 
   String _formatBalance(double balance) {
-    // Round to the nearest integer
     int roundedBalance = balance.round();
-
-    // Convert to a string
     String balanceString = roundedBalance.toString();
-
-    // Insert periods every three characters from the end
     for (int i = balanceString.length - 3; i > 0; i -= 3) {
       balanceString = balanceString.replaceRange(i, i, '.');
     }
-
     return balanceString;
   }
 
