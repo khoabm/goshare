@@ -270,6 +270,8 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                     ref.read(stageProvider.notifier).setStage(Stage.stage0);
                     context.replaceNamed(RouteConstants.rating);
                   } else {
+                    ref.watch(currentDependentOnTripProvider).removeWhere(
+                        (dep) => dep.dependentId == trip.passengerId);
                     showNavigateDashBoardDialog(trip, context);
                   }
                 }

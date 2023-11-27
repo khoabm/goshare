@@ -28,4 +28,8 @@ class CurrentDependentOnTripIdNotifier
   void addDependentCurrentOnTripId(DependentTrip trip) {
     state = [...state, trip];
   }
+
+  void removeDependentCurrentOnTripId(String depId) {
+    state = state.where((element) => element.dependentId == depId).toList();
+  }
 }

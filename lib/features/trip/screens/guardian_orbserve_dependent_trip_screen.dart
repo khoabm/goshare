@@ -108,20 +108,22 @@ class _GuardianObserveDependentTripScreenState
       final hubConnection = await ref.watch(
         hubConnectionProvider.future,
       );
-      if (mounted) {
-        if (ModalRoute.of(context)?.isCurrent ?? false) {
-          hubConnection.on(
-            'UpdateDriverLocation',
-            (arguments) {
+
+      if (ModalRoute.of(context)?.isCurrent ?? false) {
+        hubConnection.on(
+          'UpdateDriverLocation',
+          (arguments) {
+            if (mounted) {
               final stringData = arguments?.first as String;
+              print(stringData);
               final data = jsonDecode(stringData) as Map<String, dynamic>;
               updateMarker(
                 data['latitude'],
                 data['longitude'],
               );
-            },
-          );
-        }
+            }
+          },
+        );
       }
 
       hubConnection.on('NotifyPassengerTripEnded', (message) {
@@ -529,12 +531,18 @@ class _GuardianObserveDependentTripScreenState
   }
 
   _markerWidget(IconData icon) {
-    return Container(
+    return SizedBox(
       width: 20,
       height: 20,
-      decoration:
-          const BoxDecoration(shape: BoxShape.circle, color: Colors.green),
-      child: Icon(icon, color: Colors.red, size: 13),
+      child: Center(
+        child: CircleAvatar(
+          radius: 20.0,
+          backgroundImage: NetworkImage(
+            widget.trip.driver?.avatarUrl ?? '',
+          ),
+          backgroundColor: Colors.transparent,
+        ),
+      ),
     );
   }
 }
