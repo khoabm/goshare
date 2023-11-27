@@ -150,7 +150,8 @@ class LoginRepository {
             role: jsonData['role'],
           );
           ref.read(userProvider.notifier).state = userTmp;
-
+          print('hehehehehe');
+          print(userData.currentTrip);
           ref
               .read(currentOnTripIdProvider.notifier)
               .setCurrentOnTripId(userData.currentTrip);

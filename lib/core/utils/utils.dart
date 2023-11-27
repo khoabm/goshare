@@ -193,6 +193,45 @@ void showDialogInfo(TripModel? trip, BuildContext context, WidgetRef ref) {
   );
 }
 
+void showCancelDialogInfo(
+    TripModel? trip, BuildContext context, WidgetRef ref) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext abcContext) {
+      return AlertDialog(
+        title: Center(
+          child: Text(
+            '${trip?.booker.name} đã hủy tìm xe cho bạn',
+          ),
+        ),
+        content: const SizedBox.shrink(),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              ref.watch(stageProvider.notifier).setStage(Stage.stage0);
+              abcContext.pop();
+            },
+            child: const Text(
+              'Xác nhận',
+            ),
+          ),
+          // ElevatedButton(
+          //   onPressed: () {
+          //     ref.watch(stageProvider.notifier).setStage(Stage.stage0);
+
+          //     abcContext.pop();
+          //   },
+          //   child: const Text(
+          //     'Hủy',
+          //   ),
+          // ),
+        ],
+      );
+    },
+  );
+}
+
 void showDialogTripCancel(
     TripModel? trip, BuildContext context, WidgetRef ref) {
   showDialog(

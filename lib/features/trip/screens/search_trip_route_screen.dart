@@ -117,9 +117,8 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                         //dragEnabled: false,
                         compassEnabled: false,
                         myLocationEnabled: true,
-
                         styleString:
-                            'https://maps.vietmap.vn/api/maps/light/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747',
+                            'https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm',
                         initialCameraPosition: const CameraPosition(
                           zoom: 17.5,
                           target: LatLng(
@@ -165,7 +164,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                               CameraUpdate.newCameraPosition(
                                 CameraPosition(
                                     target: _marker.latLng,
-                                    zoom: 17.5,
+                                    zoom: 15.5,
                                     tilt: 0),
                               ),
                             );
@@ -184,7 +183,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                               CameraPosition(
                                   target: LatLng(currentLocation?.latitude ?? 0,
                                       currentLocation?.longitude ?? 0),
-                                  zoom: 17.5,
+                                  zoom: 15.5,
                                   tilt: 0),
                             ),
                           );
@@ -319,7 +318,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                             _containerHeight += details.primaryDelta!;
                             // Clamp the height between 60 and 300
                             _containerHeight = _containerHeight.clamp(
-                                60.0, MediaQuery.of(context).size.height * .3);
+                                60.0, MediaQuery.of(context).size.height * .4);
                           });
                         },
                         onVerticalDragEnd: (details) {
@@ -333,7 +332,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                             // Swipe up
                             setState(() {
                               _containerHeight =
-                                  MediaQuery.of(context).size.height * .3;
+                                  MediaQuery.of(context).size.height * .4;
                             });
                           }
                         },
