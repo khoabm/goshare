@@ -93,18 +93,18 @@ class _UserMenuPageState extends ConsumerState<UserMenuPage> {
           //     },
           //   ),
           // ),
-          const Divider(),
-          Container(
-            color: Colors.white,
-            child: ListTile(
-              visualDensity: const VisualDensity(
-                  vertical: -4.0), // Reduced vertical padding
-              title: const Text('Feedback'),
-              onTap: () {
-                context.push(RouteConstants.feedback);
-              },
-            ),
-          ),
+          // const Divider(),
+          // Container(
+          //   color: Colors.white,
+          //   child: ListTile(
+          //     visualDensity: const VisualDensity(
+          //         vertical: -4.0), // Reduced vertical padding
+          //     title: const Text('Feedback'),
+          //     onTap: () {
+          //       context.push(RouteConstants.feedback);
+          //     },
+          //   ),
+          // ),
           const Divider(),
           Container(
             color: Colors.white,
