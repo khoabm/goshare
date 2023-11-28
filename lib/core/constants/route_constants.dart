@@ -21,6 +21,7 @@ class RouteConstants {
   static const createDestination = 'create-destination';
   static const rating = 'rating';
   static const dependentTripList = 'dependent-trip-list';
+  static const tripHistory = 'trip-history';
 
   ///**
   ///Route url constants
@@ -58,4 +59,6 @@ class RouteConstants {
 
   static const guardianObserveDependentTripUrl = '/guardian-observe';
   static const dependentTripListUrl = '/dependent-trip-list';
+  
+  static const tripHistoryUrl = '/trip-history';
 }

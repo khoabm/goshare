@@ -278,15 +278,15 @@ class TripModel {
   final String driverId;
   final String startLocationId;
   final String endLocationId;
-  // int startTime;
-  // int endTime;
-  // int pickupTime;
+  DateTime startTime;
+  DateTime endTime;
+  DateTime pickupTime;
   final double distance;
   final double price;
   final String cartypeId;
   final int status;
-  // int createTime;
-  // int updatedTime;
+  DateTime createTime;
+  DateTime updatedTime;
   final int paymentMethod;
   final String bookerId;
   String? note;
@@ -302,10 +302,15 @@ class TripModel {
     required this.driverId,
     required this.startLocationId,
     required this.endLocationId,
+    required this.startTime,
+    required this.endTime,
+    required this.pickupTime,
     required this.distance,
     required this.price,
     required this.cartypeId,
     required this.status,
+    required this.createTime,
+    required this.updatedTime,
     required this.paymentMethod,
     required this.bookerId,
     this.note,
@@ -323,10 +328,15 @@ class TripModel {
     String? driverId,
     String? startLocationId,
     String? endLocationId,
+    DateTime? startTime,
+    DateTime? endTime,
+    DateTime? pickupTime,
     double? distance,
     double? price,
     String? cartypeId,
     int? status,
+    DateTime? createTime,
+    DateTime? updatedTime,
     int? paymentMethod,
     String? bookerId,
     ValueGetter<String?>? note,
@@ -343,10 +353,15 @@ class TripModel {
       driverId: driverId ?? this.driverId,
       startLocationId: startLocationId ?? this.startLocationId,
       endLocationId: endLocationId ?? this.endLocationId,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      pickupTime: pickupTime ?? this.pickupTime,
       distance: distance ?? this.distance,
       price: price ?? this.price,
       cartypeId: cartypeId ?? this.cartypeId,
       status: status ?? this.status,
+      createTime: createTime ?? this.createTime,
+      updatedTime: updatedTime ?? this.updatedTime,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       bookerId: bookerId ?? this.bookerId,
       note: note?.call() ?? this.note,
@@ -366,10 +381,15 @@ class TripModel {
       'driverId': driverId,
       'startLocationId': startLocationId,
       'endLocationId': endLocationId,
+      'startTime': startTime.millisecondsSinceEpoch,
+      'endTime': endTime.millisecondsSinceEpoch,
+      'pickupTime': pickupTime.millisecondsSinceEpoch,
       'distance': distance,
       'price': price,
       'cartypeId': cartypeId,
       'status': status,
+      'createTime': createTime.millisecondsSinceEpoch,
+      'updatedTime': updatedTime.millisecondsSinceEpoch,
       'paymentMethod': paymentMethod,
       'bookerId': bookerId,
       'note': note,
@@ -389,10 +409,30 @@ class TripModel {
       driverId: map['driverId'] ?? '',
       startLocationId: map['startLocationId'] ?? '',
       endLocationId: map['endLocationId'] ?? '',
+
+      //     DateTime.fromMillisecondsSinceEpoch(
+      //   DateTime.parse(map['birthday']).millisecondsSinceEpoch,
+      // )
+
+      startTime: DateTime.fromMillisecondsSinceEpoch(
+        DateTime.parse(map['startTime']).millisecondsSinceEpoch,
+      ),
+      endTime: DateTime.fromMillisecondsSinceEpoch(
+        DateTime.parse(map['endTime']).millisecondsSinceEpoch,
+      ),
+      pickupTime: DateTime.fromMillisecondsSinceEpoch(
+        DateTime.parse(map['pickupTime']).millisecondsSinceEpoch,
+      ),
       distance: map['distance']?.toDouble() ?? 0.0,
       price: map['price']?.toDouble() ?? 0.0,
       cartypeId: map['cartypeId'] ?? '',
       status: map['status']?.toInt() ?? 0,
+      createTime: DateTime.fromMillisecondsSinceEpoch(
+        DateTime.parse(map['createTime']).millisecondsSinceEpoch,
+      ),
+      updatedTime: DateTime.fromMillisecondsSinceEpoch(
+        DateTime.parse(map['updatedTime']).millisecondsSinceEpoch,
+      ),
       paymentMethod: map['paymentMethod']?.toInt() ?? 0,
       bookerId: map['bookerId'] ?? '',
       note: map['note'],
@@ -412,7 +452,7 @@ class TripModel {
 
   @override
   String toString() {
-    return 'TripModel(id: $id, passengerId: $passengerId, driverId: $driverId, startLocationId: $startLocationId, endLocationId: $endLocationId, distance: $distance, price: $price, cartypeId: $cartypeId, status: $status, paymentMethod: $paymentMethod, bookerId: $bookerId, note: $note, driver: $driver, passenger: $passenger, booker: $booker, endLocation: $endLocation, startLocation: $startLocation, cartype: $cartype)';
+    return 'TripModel(id: $id, passengerId: $passengerId, driverId: $driverId, startLocationId: $startLocationId, endLocationId: $endLocationId, startTime: $startTime, endTime: $endTime, pickupTime: $pickupTime, distance: $distance, price: $price, cartypeId: $cartypeId, status: $status, createTime: $createTime, updatedTime: $updatedTime, paymentMethod: $paymentMethod, bookerId: $bookerId, note: $note, driver: $driver, passenger: $passenger, booker: $booker, endLocation: $endLocation, startLocation: $startLocation, cartype: $cartype)';
   }
 
   @override
@@ -425,10 +465,15 @@ class TripModel {
         other.driverId == driverId &&
         other.startLocationId == startLocationId &&
         other.endLocationId == endLocationId &&
+        other.startTime == startTime &&
+        other.endTime == endTime &&
+        other.pickupTime == pickupTime &&
         other.distance == distance &&
         other.price == price &&
         other.cartypeId == cartypeId &&
         other.status == status &&
+        other.createTime == createTime &&
+        other.updatedTime == updatedTime &&
         other.paymentMethod == paymentMethod &&
         other.bookerId == bookerId &&
         other.note == note &&
@@ -447,10 +492,15 @@ class TripModel {
         driverId.hashCode ^
         startLocationId.hashCode ^
         endLocationId.hashCode ^
+        startTime.hashCode ^
+        endTime.hashCode ^
+        pickupTime.hashCode ^
         distance.hashCode ^
         price.hashCode ^
         cartypeId.hashCode ^
         status.hashCode ^
+        createTime.hashCode ^
+        updatedTime.hashCode ^
         paymentMethod.hashCode ^
         bookerId.hashCode ^
         note.hashCode ^

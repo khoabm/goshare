@@ -8,7 +8,6 @@ import 'package:goshare/features/create_destination/screens/create_destination_s
 import 'package:goshare/features/dashboard/screen/dashboard.dart';
 import 'package:goshare/features/dependent_list/screens/dependent_list_screen.dart';
 import 'package:goshare/features/dependent_list/screens/dependent_on_trip_list.dart';
-import 'package:goshare/features/dependent_mng/dependent_add/dependent_add_otp_screen.dart';
 import 'package:goshare/features/dependent_mng/dependent_add/dependent_add_screen.dart';
 import 'package:goshare/features/feedback/feedback.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
@@ -34,6 +33,7 @@ import 'package:goshare/features/trip/screens/search_trip_route_screen.dart';
 import 'package:goshare/features/signup/screen/otp_screen.dart';
 import 'package:goshare/features/signup/screen/set_passcode_screen.dart';
 import 'package:goshare/features/signup/screen/sign_up_screen.dart';
+import 'package:goshare/features/trip_history/trip_history_screen.dart';
 import 'package:goshare/models/trip_model.dart';
 
 class AppRouter {
@@ -440,6 +440,14 @@ class AppRouter {
               key: state.pageKey,
             );
           },
+        ),
+        GoRoute(
+          name: RouteConstants.tripHistory,
+          path: RouteConstants.tripHistoryUrl,
+          pageBuilder: (context, state) => SlideBottomTransition(
+            child: const TripHistoryScreen(),
+            key: state.pageKey,
+          ),
         ),
       ],
     );
