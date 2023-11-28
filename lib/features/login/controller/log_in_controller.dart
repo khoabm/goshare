@@ -20,9 +20,10 @@ class LoginController extends StateNotifier<bool> {
   Future<LoginResult> login(
     String phone,
     String passcode,
+    WidgetRef ref,
     BuildContext context,
   ) async {
-    final result = await _loginRepository.login(phone, passcode);
+    final result = await _loginRepository.login(phone, passcode, ref);
     return result;
   }
 

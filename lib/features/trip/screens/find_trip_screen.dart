@@ -591,7 +591,8 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                       });
                       if (check) {
                         if (context.mounted) {
-                          if (ref.watch(userProvider)?.id == result!.id) {
+                          if (ref.watch(userProvider)?.id ==
+                              result!.passengerId) {
                             ref
                                 .watch(currentOnTripIdProvider.notifier)
                                 .setCurrentOnTripId(null);

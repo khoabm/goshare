@@ -410,7 +410,7 @@ class AppRouter {
           pageBuilder: (context, state) {
             return SlideRightTransition(
               child:
-                  const RateDriverScreen(), // Pass the phone parameter to OtpScreen
+                  const FeedbackScreen(), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
           },
