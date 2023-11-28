@@ -193,7 +193,7 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                           ),
                           AppTextField(
                             controller: _passcodeTextController,
-                            hintText: '123456',
+                            hintText: 'Nhập mật khẩu',
                             prefixIcons: const Icon(
                               Icons.password,
                             ),

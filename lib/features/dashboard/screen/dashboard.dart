@@ -42,25 +42,11 @@ class _DashBoardState extends ConsumerState<DashBoard> {
   final List<Widget> _children = [
     const HomeScreen(),
     const TripHistoryScreen(),
-
-    // const GuardianObserveDependentTripScreen(
-
-    // ),
-    // CarChoosingScreen(
-    //   startLongitude: "106.8006742",
-    //   startLatitude: "10.8756434",
-    //   endLongitude: "106.748967",
-    //   endLatitude: "10.682559",
-    // ),
-    //Text('Second screen'),
-    //Text('Second screen'),
-    // const Center(
-    //   child: Text(
-    //     'hehe',
-    //     style: TextStyle(color: Colors.white),
-    //   ),
-    // ),
     const DependentScreen(),
+    const UserMenuPage(),
+  ];
+  final List<Widget> _children_Dependent = [
+    const HomeScreen(),
     const UserMenuPage(),
   ];
   void onTabTapped(int index) {
@@ -69,8 +55,12 @@ class _DashBoardState extends ConsumerState<DashBoard> {
     });
   }
 
+  bool isDependent = false;
+
   @override
   void initState() {
+    final user = ref.read(userProvider);
+    isDependent = user?.role.toLowerCase() == 'dependent';
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         if (!mounted) return;
@@ -269,11 +259,16 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                   ref
                       .read(currentOnTripIdProvider.notifier)
                       .setCurrentOnTripId(null);
-                  context.replaceNamed(RouteConstants.rating);
+                  context.replaceNamed(RouteConstants.rating, pathParameters: {
+                    'idTrip': trip.id,
+                  });
                 } else {
                   if (isNotifyToGuardian == false) {
                     ref.read(stageProvider.notifier).setStage(Stage.stage0);
-                    context.replaceNamed(RouteConstants.rating);
+                    context
+                        .replaceNamed(RouteConstants.rating, pathParameters: {
+                      'idTrip': trip.id,
+                    });
                   } else {
                     ref.watch(currentDependentOnTripProvider).removeWhere(
                         (dep) => dep.dependentId == trip.passengerId);
@@ -320,41 +315,67 @@ class _DashBoardState extends ConsumerState<DashBoard> {
 
   @override
   Widget build(BuildContext context) {
+    List<BottomNavigationBarItem> bottomNavItems;
+    if (isDependent) {
+      bottomNavItems = const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home_filled),
+          label: 'Trang chủ',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(
+            IconData(
+              0xf74d,
+              fontFamily: CupertinoIcons.iconFont,
+              fontPackage: CupertinoIcons.iconFontPackage,
+            ),
+          ),
+          label: 'Tài khoản',
+        ),
+      ];
+    } else {
+      bottomNavItems = const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home_filled),
+          label: 'Trang chủ',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.history_outlined),
+          label: 'Lịch sử',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.people),
+          label: 'Người phụ thuộc',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(
+            IconData(
+              0xf74d,
+              fontFamily: CupertinoIcons.iconFont,
+              fontPackage: CupertinoIcons.iconFontPackage,
+            ),
+          ),
+          label: 'Tài khoản',
+        ),
+      ];
+    }
+
     //ref.watch(locationProvider);
     print('TestWidget: ${ModalRoute.of(context)?.isCurrent}');
     return Scaffold(
       body: Center(
-        child: _isLoading ? const Loader() : _children[_currentIndex],
+        child: _isLoading
+            ? const Loader()
+            : isDependent
+                ? _children_Dependent[_currentIndex]
+                : _children[_currentIndex],
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Pallete.primaryColor,
         onTap: onTabTapped,
         currentIndex: _currentIndex,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled),
-            label: 'Trang chủ',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history_outlined),
-            label: 'Lịch sử',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history_outlined),
-            label: 'Người phụ thuộc',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              IconData(
-                0xf74d,
-                fontFamily: CupertinoIcons.iconFont,
-                fontPackage: CupertinoIcons.iconFontPackage,
-              ),
-            ),
-            label: 'Tài khoản',
-          )
-        ],
+        items: bottomNavItems,
       ),
     );
   }

@@ -20,11 +20,13 @@ class FeedbackController extends StateNotifier<bool> {
   })  : _feedbackRepository = feedbackRepository,
         super(false);
   Future<RatingResult> feedback(
+    String idTrip,
     int rating,
     String feedbackText,
     BuildContext context,
   ) async {
-    final result = await _feedbackRepository.feedback(5, 'hhee');
+    final result =
+        await _feedbackRepository.feedback(idTrip, rating, feedbackText);
     return result;
   }
 }

@@ -94,13 +94,19 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                       .read(currentOnTripIdProvider.notifier)
                       .setCurrentOnTripId(null);
                   if (mounted) {
-                    context.replaceNamed(RouteConstants.rating);
+                    context
+                        .replaceNamed(RouteConstants.rating, pathParameters: {
+                      'idTrip': widget.trip.id,
+                    });
                   }
                 } else {
                   if (isNotifyToGuardian == false) {
                     ref.read(stageProvider.notifier).setStage(Stage.stage0);
                     if (mounted) {
-                      context.replaceNamed(RouteConstants.rating);
+                      context
+                          .replaceNamed(RouteConstants.rating, pathParameters: {
+                        'idTrip': widget.trip.id,
+                      });
                     }
                   }
                 }

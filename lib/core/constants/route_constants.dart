@@ -55,7 +55,7 @@ class RouteConstants {
   static const moneyTopupUrl = '/money-topup';
   static const moneyHistoryUrl = '/money-history';
 
-  static const ratingUrl = '/rating';
+  static const ratingUrl = '/rating/:idTrip';
 
   static const guardianObserveDependentTripUrl = '/guardian-observe';
   static const dependentTripListUrl = '/dependent-trip-list';

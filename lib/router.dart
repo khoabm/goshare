@@ -277,13 +277,13 @@ class AppRouter {
         //     );
         //   },
         // ),
-        GoRoute(
-          path: RouteConstants.feedback,
-          pageBuilder: (context, state) => SlideLeftTransition(
-            child: const FeedbackScreen(),
-            key: state.pageKey,
-          ),
-        ),
+        // GoRoute(
+        //   path: RouteConstants.feedback,
+        //   pageBuilder: (context, state) => SlideLeftTransition(
+        //     child: const FeedbackScreen(),
+        //     key: state.pageKey,
+        //   ),
+        // ),
         GoRoute(
           name: RouteConstants.driverPickUp,
           path: RouteConstants.driverPickUpUrl,
@@ -408,9 +408,10 @@ class AppRouter {
           name: RouteConstants.rating,
           path: RouteConstants.ratingUrl,
           pageBuilder: (context, state) {
+            final Map<String, dynamic> params = state.pathParameters;
+            final idTrip = params['idTrip'] as String;
             return SlideRightTransition(
-              child:
-                  const RateDriverScreen(), // Pass the phone parameter to OtpScreen
+              child: FeedbackScreen(idTrip: idTrip),
               key: state.pageKey,
             );
           },
