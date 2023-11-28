@@ -84,7 +84,7 @@ class MoneyTopupRepository {
     final response = await client.get(Uri.parse('$baseUrl/wallettransaction'));
 
     if (response.statusCode == 200) {
-      final decodedData = json.decode(response.body);
+      final decodedData = json.decode(response.body) as List<dynamic>;
 
       print(decodedData);
       return decodedData.map((item) {

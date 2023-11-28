@@ -50,30 +50,30 @@ class _UserMenuPageState extends State<UserMenuPage> {
               },
             ),
           ),
-          const Divider(),
-          Container(
-            color: Colors.white,
-            child: ListTile(
-              visualDensity: const VisualDensity(
-                  vertical: -4.0), // Reduced vertical padding
-              title: const Text('Money History'),
-              onTap: () {
-                Navigator.pushNamed(context, '/moneyHistory');
-              },
-            ),
-          ),
-          const Divider(),
-          Container(
-            color: Colors.white,
-            child: ListTile(
-              visualDensity: const VisualDensity(
-                  vertical: -4.0), // Reduced vertical padding
-              title: const Text('Feedback'),
-              onTap: () {
-                context.push(RouteConstants.feedback);
-              },
-            ),
-          ),
+          // const Divider(),
+          // Container(
+          //   color: Colors.white,
+          //   child: ListTile(
+          //     visualDensity: const VisualDensity(
+          //         vertical: -4.0), // Reduced vertical padding
+          //     title: const Text('Money History'),
+          //     onTap: () {
+          //       Navigator.pushNamed(context, '/moneyHistory');
+          //     },
+          //   ),
+          // ),
+          // const Divider(),
+          // Container(
+          //   color: Colors.white,
+          //   child: ListTile(
+          //     visualDensity: const VisualDensity(
+          //         vertical: -4.0), // Reduced vertical padding
+          //     title: const Text('Feedback'),
+          //     onTap: () {
+          //       context.push(RouteConstants.feedback);
+          //     },
+          //   ),
+          // ),
           const Divider(),
           Container(
             color: Colors.white,
