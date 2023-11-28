@@ -94,7 +94,10 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                     ref
                         .read(currentOnTripIdProvider.notifier)
                         .setCurrentOnTripId(null);
-                    context.replaceNamed(RouteConstants.rating);
+                    context
+                        .replaceNamed(RouteConstants.rating, pathParameters: {
+                      'idTrip': widget.trip.id,
+                    });
                   }
                 } else {
                   if (isNotifyToGuardian == false) {
