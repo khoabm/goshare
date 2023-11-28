@@ -402,7 +402,8 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                          'Đã quá hạn tìm xe mà chúng tôi không tìm được tài xế cho bạn. Vui lòng thử lại')
+                        'Đã quá hạn tìm xe mà chúng tôi không tìm được tài xế cho bạn. Vui lòng thử lại',
+                      )
                     ],
                   ),
                 ),
@@ -540,7 +541,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           ),
         ),
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * .35,
+        height: MediaQuery.of(context).size.height * .2,
         child: Column(
           children: [
             const Row(
@@ -572,7 +573,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
               ],
             ),
             SizedBox(
-              width: MediaQuery.of(context).size.width * .5,
+              width: MediaQuery.of(context).size.width * .3,
               child: ElevatedButton(
                 onPressed: () async {
                   if (result != null) {
@@ -653,7 +654,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                 );
                 _controller?.addImageMarkers([
                   Marker(
-                    imagePath: 'assets/images/pngegg.png',
+                    imagePath: 'assets/images/marker.png',
                     latLng: LatLng(
                       double.parse(widget.endLatitude),
                       double.parse(widget.endLongitude),

@@ -257,7 +257,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                     _containerHeight += details.primaryDelta!;
                     // Clamp the height between 60 and 300
                     _containerHeight = _containerHeight.clamp(
-                        60.0, MediaQuery.of(context).size.height * .3);
+                        60.0, MediaQuery.of(context).size.height * .35);
                   });
                 },
                 onVerticalDragEnd: (details) {
@@ -271,7 +271,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                     // Swipe up
                     setState(() {
                       _containerHeight =
-                          MediaQuery.of(context).size.height * .3;
+                          MediaQuery.of(context).size.height * .35;
                     });
                   }
                 },
@@ -288,7 +288,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                   ),
                   height: _containerHeight,
                   //color: Pallete.primaryColor,
-                  child: _containerHeight > 0
+                  child: _containerHeight > 60
                       ? Column(
                           children: [
                             Text(

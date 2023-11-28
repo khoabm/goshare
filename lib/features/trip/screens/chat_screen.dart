@@ -119,10 +119,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           Container(
             margin: const EdgeInsets.only(right: 16.0),
             child: message.isCurrentUser
-                ? const CircleAvatar(child: Text('Tôi'))
+                ? const CircleAvatar(
+                    radius: 10.0,
+                    child: Text('Tôi'),
+                  )
                 : Center(
                     child: CircleAvatar(
-                      radius: 50.0,
+                      radius: 10.0,
                       backgroundImage: NetworkImage(
                         widget.driverAvatar,
                       ),

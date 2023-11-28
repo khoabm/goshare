@@ -271,6 +271,35 @@ void showDialogTripCancel(
   );
 }
 
+void showWalletInsufficient(BuildContext context) {
+  showDialog(
+    barrierDismissible: true,
+    context: context,
+    builder: (BuildContext abcContext) {
+      return AlertDialog(
+        title: const Center(
+          child: Text(
+            'Ví của bạn không đủ',
+          ),
+        ),
+        content: const Center(
+          child: Text("Mời bạn nạp lại ví hoặc thanh toán bằng tiền mặt"),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              abcContext.pop();
+            },
+            child: const Text(
+              'Xác nhận',
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 void showDialogInfoPickUp(TripModel trip, BuildContext context) {
   showDialog(
     barrierDismissible: true,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
+import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/car_model.dart';
@@ -484,10 +485,6 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                       width: MediaQuery.of(context).size.width * .5,
                       child: ElevatedButton(
                         onPressed: () async {
-                          print(
-                            passenger?.id ??
-                                ref.watch(userProvider.notifier).state?.id,
-                          );
                           setState(() {
                             _isLoading = true;
                           });
@@ -497,36 +494,112 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                           setState(() {
                             _isLoading = false;
                           });
-                          if (context.mounted) {
-                            //ref.invalidate(selectedPaymentMethodProvider);
-                            navigateToRouteConfirmScreen(
-                              context,
-                              passengerLocation != null
-                                  ? (passengerLocation?.latitude.toString() ??
-                                      '0')
-                                  : widget.startLatitude,
-                              passengerLocation != null
-                                  ? (passengerLocation?.longitude.toString() ??
-                                      '0')
-                                  : widget.startLongitude,
-                              widget.endLatitude,
-                              widget.endLongitude,
-                              ref
-                                  .watch(selectedPaymentMethodProvider.notifier)
-                                  .state,
-                              passenger == null
-                                  ? ref.watch(userProvider.notifier).state!.id
-                                  : passenger!.id,
-                              cars[ref
-                                      .watch(selectedCarIndexProvider.notifier)
-                                      .state]
-                                  .cartypeId,
-                              driverNote,
-                              cars[ref
-                                      .watch(selectedCarIndexProvider.notifier)
-                                      .state]
-                                  .capacity,
-                            );
+                          if (mounted) {
+                            final wallet = await ref
+                                .watch(tripControllerProvider.notifier)
+                                .getWallet(context);
+
+                            if (ref
+                                    .watch(
+                                        selectedPaymentMethodProvider.notifier)
+                                    .state ==
+                                0) {
+                              print(wallet -
+                                  cars[ref
+                                          .watch(
+                                              selectedCarIndexProvider.notifier)
+                                          .state]
+                                      .totalPrice);
+                              if ((wallet -
+                                      cars[ref
+                                              .watch(selectedCarIndexProvider
+                                                  .notifier)
+                                              .state]
+                                          .totalPrice) <
+                                  0) {
+                                if (mounted) {
+                                  showWalletInsufficient(context);
+                                }
+                              } else {
+                                if (mounted) {
+                                  navigateToRouteConfirmScreen(
+                                    context,
+                                    passengerLocation != null
+                                        ? (passengerLocation?.latitude
+                                                .toString() ??
+                                            '0')
+                                        : widget.startLatitude,
+                                    passengerLocation != null
+                                        ? (passengerLocation?.longitude
+                                                .toString() ??
+                                            '0')
+                                        : widget.startLongitude,
+                                    widget.endLatitude,
+                                    widget.endLongitude,
+                                    ref
+                                        .watch(selectedPaymentMethodProvider
+                                            .notifier)
+                                        .state,
+                                    passenger == null
+                                        ? ref
+                                            .watch(userProvider.notifier)
+                                            .state!
+                                            .id
+                                        : passenger!.id,
+                                    cars[ref
+                                            .watch(selectedCarIndexProvider
+                                                .notifier)
+                                            .state]
+                                        .cartypeId,
+                                    driverNote,
+                                    cars[ref
+                                            .watch(selectedCarIndexProvider
+                                                .notifier)
+                                            .state]
+                                        .capacity,
+                                  );
+                                }
+                              }
+                            } else {
+                              if (mounted) {
+                                navigateToRouteConfirmScreen(
+                                  context,
+                                  passengerLocation != null
+                                      ? (passengerLocation?.latitude
+                                              .toString() ??
+                                          '0')
+                                      : widget.startLatitude,
+                                  passengerLocation != null
+                                      ? (passengerLocation?.longitude
+                                              .toString() ??
+                                          '0')
+                                      : widget.startLongitude,
+                                  widget.endLatitude,
+                                  widget.endLongitude,
+                                  ref
+                                      .watch(selectedPaymentMethodProvider
+                                          .notifier)
+                                      .state,
+                                  passenger == null
+                                      ? ref
+                                          .watch(userProvider.notifier)
+                                          .state!
+                                          .id
+                                      : passenger!.id,
+                                  cars[ref
+                                          .watch(
+                                              selectedCarIndexProvider.notifier)
+                                          .state]
+                                      .cartypeId,
+                                  driverNote,
+                                  cars[ref
+                                          .watch(
+                                              selectedCarIndexProvider.notifier)
+                                          .state]
+                                      .capacity,
+                                );
+                              }
+                            }
                           }
                         },
                         child: const Text("Đặt xe"),

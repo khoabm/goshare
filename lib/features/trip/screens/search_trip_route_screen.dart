@@ -318,7 +318,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                             _containerHeight += details.primaryDelta!;
                             // Clamp the height between 60 and 300
                             _containerHeight = _containerHeight.clamp(
-                                60.0, MediaQuery.of(context).size.height * .4);
+                                60.0, MediaQuery.of(context).size.height * .3);
                           });
                         },
                         onVerticalDragEnd: (details) {
@@ -332,7 +332,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                             // Swipe up
                             setState(() {
                               _containerHeight =
-                                  MediaQuery.of(context).size.height * .4;
+                                  MediaQuery.of(context).size.height * .3;
                             });
                           }
                         },
