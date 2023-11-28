@@ -109,11 +109,11 @@ class _GuardianObserveDependentTripScreenState
         hubConnectionProvider.future,
       );
 
-      if (ModalRoute.of(context)?.isCurrent ?? false) {
-        hubConnection.on(
-          'UpdateDriverLocation',
-          (arguments) {
-            if (mounted) {
+      hubConnection.on(
+        'UpdateDriverLocation',
+        (arguments) {
+          if (mounted) {
+            if (ModalRoute.of(context)?.isCurrent ?? false) {
               final stringData = arguments?.first as String;
               print(stringData);
               final data = jsonDecode(stringData) as Map<String, dynamic>;
@@ -122,9 +122,9 @@ class _GuardianObserveDependentTripScreenState
                 data['longitude'],
               );
             }
-          },
-        );
-      }
+          }
+        },
+      );
 
       hubConnection.on('NotifyPassengerTripEnded', (message) {
         if (mounted) {

@@ -187,6 +187,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       );
 
       hubConnection.on('NotifyPassengerDriverOnTheWay', (message) {
+        print("ĐÂY RỒI SIGNALR ĐÂY RỒI $message");
         try {
           // setState(() {
           //   _isLoading = true;
@@ -198,7 +199,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           //   _isLoading = false;
           // });
           if (mounted) {
-            HapticFeedback.mediumImpact();
+            //HapticFeedback.mediumImpact();
             _handleNotifyPassengerDriverOnTheWay(message);
           }
         } catch (e) {
@@ -263,8 +264,9 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       driverCarType =
           driverData['car']['model'] + " " + driverData['car']['make'];
     });
-
-    _showDriverInfoDialog();
+    if (mounted) {
+      _showDriverInfoDialog();
+    }
   }
 
   void _handleNotifyPassengerTripTimedOut(dynamic message) {
@@ -287,7 +289,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     showDialog(
       barrierDismissible: true,
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext abcContext) {
         return AlertDialog(
           title: const Center(
             child: Text(
@@ -338,6 +340,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                 // setState(() {
                 //   _isLoading = false;
                 // });
+                //abcContext.pop();
                 navigateToDriverPickupScreen(
                   driverName,
                   driverCarType,
@@ -366,16 +369,16 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       // setState(() {
       //   _isLoading = false;
       // });
-      navigateToDriverPickupScreen(
-        driverName,
-        driverCarType,
-        driverPlate,
-        driverPhone,
-        driverAvatar,
-        driverId,
-        widget.endLatitude,
-        widget.endLongitude,
-      );
+      // navigateToDriverPickupScreen(
+      //   driverName,
+      //   driverCarType,
+      //   driverPlate,
+      //   driverPhone,
+      //   driverAvatar,
+      //   driverId,
+      //   widget.endLatitude,
+      //   widget.endLongitude,
+      // );
     });
   }
 
@@ -402,7 +405,8 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                          'Đã quá hạn tìm xe mà chúng tôi không tìm được tài xế cho bạn. Vui lòng thử lại')
+                        'Đã quá hạn tìm xe mà chúng tôi không tìm được tài xế cho bạn. Vui lòng thử lại',
+                      )
                     ],
                   ),
                 ),
@@ -540,7 +544,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           ),
         ),
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * .35,
+        height: MediaQuery.of(context).size.height * .2,
         child: Column(
           children: [
             const Row(
@@ -572,7 +576,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
               ],
             ),
             SizedBox(
-              width: MediaQuery.of(context).size.width * .5,
+              width: MediaQuery.of(context).size.width * .3,
               child: ElevatedButton(
                 onPressed: () async {
                   if (result != null) {
@@ -591,7 +595,8 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                       });
                       if (check) {
                         if (context.mounted) {
-                          if (ref.watch(userProvider)?.id == result!.id) {
+                          if (ref.watch(userProvider)?.id ==
+                              result!.passengerId) {
                             ref
                                 .watch(currentOnTripIdProvider.notifier)
                                 .setCurrentOnTripId(null);
@@ -652,7 +657,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                 );
                 _controller?.addImageMarkers([
                   Marker(
-                    imagePath: 'assets/images/pngegg.png',
+                    imagePath: 'assets/images/marker.png',
                     latLng: LatLng(
                       double.parse(widget.endLatitude),
                       double.parse(widget.endLongitude),

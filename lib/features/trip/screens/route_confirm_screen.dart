@@ -106,7 +106,7 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
     _navigationOption.apiKey =
         'c3d0f188ff669f89042771a20656579073cffec5a8a69747';
     _navigationOption.mapStyle =
-        "https://maps.vietmap.vn/api/maps/light/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747";
+        "https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm";
     _navigationOption.customLocationCenterIcon =
         await VietMapHelper.getBytesFromAsset('assets/download.jpeg');
     _vietmapNavigationPlugin.setDefaultOptions(_navigationOption);

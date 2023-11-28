@@ -100,9 +100,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
       );
       if (connection.state == HubConnectionState.disconnected) {
         await connection.start()?.then(
-              (value) => {
-                print('Start thanh cong'),
-              },
+              (value) => print('Start thanh cong'),
             );
       }
 
@@ -270,8 +268,9 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                       'idTrip': trip.id,
                     });
                   } else {
-                    ref.watch(currentDependentOnTripProvider).removeWhere(
-                        (dep) => dep.dependentId == trip.passengerId);
+                    ref
+                        .watch(currentDependentOnTripProvider.notifier)
+                        .removeDependentCurrentOnTripId(trip.passengerId);
                     showNavigateDashBoardDialog(trip, context);
                   }
                 }

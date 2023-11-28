@@ -224,4 +224,26 @@ class TripController extends StateNotifier<bool> {
     });
     return isSent;
   }
+
+  Future<double> getWallet(
+    BuildContext context,
+  ) async {
+    double wallet = 0;
+    final result = await _tripRepository.getWallet();
+    result.fold((l) {
+      if (l is UnauthorizedFailure) {
+        showLoginTimeOut(
+          context: context,
+        );
+      } else {
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      }
+    }, (r) {
+      wallet = r;
+    });
+    return wallet;
+  }
 }

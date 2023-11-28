@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:goshare/common/app_button.dart';
 import 'package:goshare/common/app_text_field.dart';
 import 'package:goshare/common/home_center_container.dart';
@@ -41,6 +42,7 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
+        appBar: AppBar(),
         body: Stack(
           children: [
             SingleChildScrollView(

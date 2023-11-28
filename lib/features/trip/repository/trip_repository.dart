@@ -266,4 +266,36 @@ class TripRepository {
       );
     }
   }
+
+  FutureEither<double> getWallet() async {
+    try {
+      // Map<String, dynamic> tripModelMap = tripModel.toMap();
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+
+      final client = HttpClientWithAuth(accessToken ?? '');
+      final response = await client.get(
+        Uri.parse('$baseApiUrl/wallet'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        print("WALLET THÀNH CÔNG");
+        return right(
+          double.parse(response.body),
+        );
+      } else if (response.statusCode == 429) {
+        return left(Failure('Too many request'));
+      } else if (response.statusCode == 401) {
+        return left(UnauthorizedFailure('Unauthorized'));
+      } else {
+        return left(Failure('Có lỗi xảy ra'));
+      }
+    } catch (e) {
+      return left(
+        Failure('Lỗi hệ thống'),
+      );
+    }
+  }
 }

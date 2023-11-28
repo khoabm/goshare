@@ -45,6 +45,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
   @override
   void initState() {
     // TODO: implement initState
+    if (!mounted) return;
     initialize().then((value) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         print('đang ở màn hình on trip nè');
@@ -81,8 +82,6 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
             if (mounted) {
               if (ModalRoute.of(context)?.isCurrent ?? false) {
                 final data = message as List<dynamic>;
-                //final tripData = data.cast<Map<String, dynamic>>().first;
-                //final trip = TripModel.fromMap(tripData);
                 bool isSelfBook = data.cast<bool>()[1];
                 bool isNotifyToGuardian = data.cast<bool>()[2];
                 ref
@@ -90,14 +89,12 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                     .setCurrentOnTripId(null);
 
                 if (isSelfBook == true) {
-                  ref
-                      .read(currentOnTripIdProvider.notifier)
-                      .setCurrentOnTripId(null);
+                  print("SELF BOOK");
                   if (mounted) {
-                    context
-                        .replaceNamed(RouteConstants.rating, pathParameters: {
-                      'idTrip': widget.trip.id,
-                    });
+                    ref
+                        .read(currentOnTripIdProvider.notifier)
+                        .setCurrentOnTripId(null);
+                    context.replaceNamed(RouteConstants.rating);
                   }
                 } else {
                   if (isNotifyToGuardian == false) {
@@ -263,7 +260,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                     _containerHeight += details.primaryDelta!;
                     // Clamp the height between 60 and 300
                     _containerHeight = _containerHeight.clamp(
-                        60.0, MediaQuery.of(context).size.height * .3);
+                        60.0, MediaQuery.of(context).size.height * .35);
                   });
                 },
                 onVerticalDragEnd: (details) {
@@ -277,7 +274,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                     // Swipe up
                     setState(() {
                       _containerHeight =
-                          MediaQuery.of(context).size.height * .3;
+                          MediaQuery.of(context).size.height * .35;
                     });
                   }
                 },
@@ -294,7 +291,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                   ),
                   height: _containerHeight,
                   //color: Pallete.primaryColor,
-                  child: _containerHeight > 0
+                  child: _containerHeight > 60
                       ? Column(
                           children: [
                             Text(

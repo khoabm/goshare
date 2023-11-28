@@ -250,7 +250,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   void navigateToGuardianObserverScreen(
     TripModel trip,
   ) {
-    context.goNamed(RouteConstants.guardianObserveDependentTrip, extra: {
+    context.replaceNamed(RouteConstants.guardianObserveDependentTrip, extra: {
       'trip': trip,
     });
   }
@@ -419,7 +419,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                           _containerHeight += details.primaryDelta!;
                           // Clamp the height between 60 and 300
                           _containerHeight = _containerHeight.clamp(
-                              60.0, MediaQuery.of(context).size.height * .3);
+                              60.0, MediaQuery.of(context).size.height * .35);
                         });
                       },
                       onVerticalDragEnd: (details) {
@@ -433,7 +433,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                           // Swipe up
                           setState(() {
                             _containerHeight =
-                                MediaQuery.of(context).size.height * .3;
+                                MediaQuery.of(context).size.height * .35;
                           });
                         }
                       },
