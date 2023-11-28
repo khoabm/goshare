@@ -40,18 +40,20 @@ class FeedbackRepository {
 
   FeedbackRepository({required this.baseUrl});
 
-  Future<RatingResult> feedback(int rating, String content) async {
+  Future<RatingResult> feedback(
+      String idTrip, int rating, String content) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final accessToken = prefs.getString('accessToken');
       final client = HttpClientWithAuth(accessToken ?? '');
-      final id = 10;
+      // final id = 10;
+
       final response = await client.post(
-        Uri.parse('$baseUrl/trip/rate-driver/$id'),
+        Uri.parse('$baseUrl/trip/rate-driver/$idTrip'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode({"rating": 5, "comment": "jjkkkklll"}),
+        body: jsonEncode({"rating": rating, "comment": content}),
       );
 
       print("feedbackres" + response.body);

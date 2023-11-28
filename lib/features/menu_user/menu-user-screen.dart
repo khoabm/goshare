@@ -41,6 +41,9 @@ class _UserMenuPageState extends ConsumerState<UserMenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.read(userProvider);
+    final bool isDependent = user?.role.toLowerCase() == 'dependent';
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -61,17 +64,23 @@ class _UserMenuPageState extends ConsumerState<UserMenuPage> {
               },
             ),
           ),
-          const Divider(),
-          Container(
-            color: Colors.white,
-            child: ListTile(
-              visualDensity: const VisualDensity(vertical: -4.0),
-              title: const Text('Ví của tôi'),
-              onTap: () {
-                context.push(RouteConstants.moneyTopupUrl);
-              },
+          if (!isDependent)
+            Column(
+              children: [
+                const Divider(),
+                Container(
+                  color: Colors.white,
+                  child: ListTile(
+                    visualDensity: const VisualDensity(vertical: -4.0),
+                    title: const Text('Ví của tôi'),
+                    onTap: () {
+                      context.push(RouteConstants.moneyTopupUrl);
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
+
           // const Divider(),
           // Container(
           //   color: Colors.white,

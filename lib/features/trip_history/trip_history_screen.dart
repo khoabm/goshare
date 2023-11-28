@@ -29,34 +29,6 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
         .read(TripHistoryControllerProvider.notifier)
         .tripHistory(context);
 
-    // print(result);
-
-    // List<Map<String, dynamic>> apiResponse = [
-    //   {
-    //     "id": "1",
-    //     "startTime": "2023-11-15T08:00:00",
-    //     "driver": {
-    //       "name": "tiếng việt",
-    //       "avatarUrl": 'https://imgflip.com/s/meme/Cute-Cat.jpg',
-    //       "car": {"licensePlate": "ABC123"},
-    //       "phone": "123456789",
-    //     },
-    //     "passenger": {
-    //       "name": "tiếng việt Doe",
-    //       "avatarUrl": 'https://imgflip.com/s/meme/Cute-Cat.jpg',
-    //     },
-    //     "booker": {
-    //       "name": "tiếng việt Doe",
-    //       "avatarUrl": 'https://imgflip.com/s/meme/Cute-Cat.jpg',
-    //     },
-    //     "startLocation": {"address": "tiếng việt Address"},
-    //     "endLocation": {"address": "tiếng việt Address"},
-    //     "distance": 10.0,
-    //     "price": 50.0,
-    //     "cartype": {"capacity": 4},
-    //   },
-    // ];
-
     setState(() {
       trips = result;
     });
@@ -70,7 +42,7 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
       ),
-      backgroundColor: Colors.white, // Set background color here
+      backgroundColor: Colors.white,
       body: trips.isEmpty
           ? const Center(
               child: CircularProgressIndicator(),
@@ -183,7 +155,7 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
                         children: [
                           CircleAvatar(
                             backgroundImage:
-                                NetworkImage(trip.driver?.avatarUrl ?? ''),
+                                NetworkImage(trip.booker.avatarUrl ?? ''),
                             radius: 30,
                           ),
                           const SizedBox(width: 20),
@@ -191,13 +163,13 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${trip.driver?.name}',
+                                '${trip.booker?.name}',
                                 style: const TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.w500),
                               ),
                               const SizedBox(height: 10),
                               Text(
-                                '${trip.driver?.phone}',
+                                '${trip.booker?.phone}',
                                 style: const TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.w500),
                               ),

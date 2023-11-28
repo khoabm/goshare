@@ -138,22 +138,23 @@ class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
               child: Column(
                 children: [
                   Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height * .15,
-                      child: Row(children: [
-                        Image.asset(
-                          Constants.dep1,
-                          fit: BoxFit.cover,
-                        ),
-                        Image.asset(
-                          Constants.dep2,
-                          fit: BoxFit.cover,
-                        ),
-                        Image.asset(
-                          Constants.dep3,
-                          fit: BoxFit.cover,
-                        ),
-                      ])),
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height * .15,
+                    // child: Row(children: [
+                    //   Image.asset(
+                    //     Constants.dep1,
+                    //     fit: BoxFit.cover,
+                    //   ),
+                    //   Image.asset(
+                    //     Constants.dep2,
+                    //     fit: BoxFit.cover,
+                    //   ),
+                    //   Image.asset(
+                    //     Constants.dep3,
+                    //     fit: BoxFit.cover,
+                    //   ),
+                    // ])
+                  ),
                   HomeCenterContainer(
                     width: MediaQuery.of(context).size.width * .9,
                     child: Form(

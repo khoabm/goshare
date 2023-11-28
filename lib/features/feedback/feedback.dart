@@ -7,11 +7,11 @@ import 'package:goshare/common/app_text_field.dart';
 import 'package:goshare/common/home_center_container.dart';
 import 'package:goshare/common/loader.dart';
 import 'package:goshare/core/constants/constants.dart';
-import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/features/feedback/feedback_controller.dart';
 
 class FeedbackScreen extends ConsumerStatefulWidget {
-  const FeedbackScreen({super.key});
+  final String idTrip;
+  const FeedbackScreen({super.key, required this.idTrip});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _FeedbackScreenState();
@@ -28,9 +28,10 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
     if (_rating != null && feedbackText != null) {
       print('Rating: $_rating');
       print('Feedback Text: $feedbackText');
+
       final result = await ref
           .read(FeedbackControllerProvider.notifier)
-          .feedback(5, feedbackText, context);
+          .feedback(widget.idTrip, _rating!, feedbackText, context);
     } else {
       print('Please provide both rating and feedback text.');
     }
