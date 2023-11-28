@@ -116,7 +116,7 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('accessToken', result.accessToken!);
         prefs.setString('refreshToken', result.refreshToken!);
-        ref.read(userProvider.notifier).state = result.user;
+        ref.watch(userProvider.notifier).state = result.user;
         navigateToDashBoardScreen();
       }
     }

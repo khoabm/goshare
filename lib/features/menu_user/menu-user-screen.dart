@@ -1,20 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
+import 'package:goshare/features/login/screen/log_in_screen.dart';
+import 'package:goshare/features/dependent_mng/dependent_add/dependent_add_screen.dart'
+    as depProv;
+import 'package:goshare/providers/current_on_trip_provider.dart';
+import 'package:goshare/providers/signalr_providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class UserMenuPage extends StatefulWidget {
+class UserMenuPage extends ConsumerStatefulWidget {
   const UserMenuPage({Key? key}) : super(key: key);
 
   @override
-  State<UserMenuPage> createState() => _UserMenuPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _UserMenuPageState();
 }
 
-class _UserMenuPageState extends State<UserMenuPage> {
-  void _onLogout() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.remove('accessToken');
-    context.goNamed(RouteConstants.login);
+class _UserMenuPageState extends ConsumerState<UserMenuPage> {
+  void _onLogout(WidgetRef ref) async {
+    if (mounted) {
+      final connection = await ref.read(
+        hubConnectionProvider.future,
+      );
+      ref.invalidate(userProvider);
+      ref.invalidate(depProv.userProvider);
+      ref.invalidate(currentDependentOnTripProvider);
+      ref.invalidate(currentOnTripIdProvider);
+      //ref.invalidate(userProvider);
+      await connection.stop().then(
+            (value) => print('DA STOP THANH CONG'),
+          );
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('accessToken');
+      await prefs.remove('refreshToken');
+      if (mounted) {
+        context.goNamed(RouteConstants.login);
+      }
+    }
   }
 
   @override
@@ -94,7 +116,7 @@ class _UserMenuPageState extends State<UserMenuPage> {
                       ),
                       TextButton(
                         onPressed: () {
-                          _onLogout();
+                          _onLogout(ref);
                         },
                         child: const Text('Xác nhận'),
                       ),

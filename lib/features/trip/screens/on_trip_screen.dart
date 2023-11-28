@@ -45,6 +45,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
   @override
   void initState() {
     // TODO: implement initState
+    if (!mounted) return;
     initialize().then((value) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         print('đang ở màn hình on trip nè');
@@ -81,8 +82,6 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
             if (mounted) {
               if (ModalRoute.of(context)?.isCurrent ?? false) {
                 final data = message as List<dynamic>;
-                //final tripData = data.cast<Map<String, dynamic>>().first;
-                //final trip = TripModel.fromMap(tripData);
                 bool isSelfBook = data.cast<bool>()[1];
                 bool isNotifyToGuardian = data.cast<bool>()[2];
                 ref
@@ -90,10 +89,11 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                     .setCurrentOnTripId(null);
 
                 if (isSelfBook == true) {
-                  ref
-                      .read(currentOnTripIdProvider.notifier)
-                      .setCurrentOnTripId(null);
+                  print("SELF BOOK");
                   if (mounted) {
+                    ref
+                        .read(currentOnTripIdProvider.notifier)
+                        .setCurrentOnTripId(null);
                     context.replaceNamed(RouteConstants.rating);
                   }
                 } else {

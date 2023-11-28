@@ -187,6 +187,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       );
 
       hubConnection.on('NotifyPassengerDriverOnTheWay', (message) {
+        print("ĐÂY RỒI SIGNALR ĐÂY RỒI $message");
         try {
           // setState(() {
           //   _isLoading = true;
@@ -263,8 +264,9 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       driverCarType =
           driverData['car']['model'] + " " + driverData['car']['make'];
     });
-
-    _showDriverInfoDialog();
+    if (mounted) {
+      _showDriverInfoDialog();
+    }
   }
 
   void _handleNotifyPassengerTripTimedOut(dynamic message) {
@@ -287,7 +289,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     showDialog(
       barrierDismissible: true,
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext abcContext) {
         return AlertDialog(
           title: const Center(
             child: Text(
@@ -338,6 +340,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                 // setState(() {
                 //   _isLoading = false;
                 // });
+                //abcContext.pop();
                 navigateToDriverPickupScreen(
                   driverName,
                   driverCarType,
@@ -366,16 +369,16 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       // setState(() {
       //   _isLoading = false;
       // });
-      navigateToDriverPickupScreen(
-        driverName,
-        driverCarType,
-        driverPlate,
-        driverPhone,
-        driverAvatar,
-        driverId,
-        widget.endLatitude,
-        widget.endLongitude,
-      );
+      // navigateToDriverPickupScreen(
+      //   driverName,
+      //   driverCarType,
+      //   driverPlate,
+      //   driverPhone,
+      //   driverAvatar,
+      //   driverId,
+      //   widget.endLatitude,
+      //   widget.endLongitude,
+      // );
     });
   }
 

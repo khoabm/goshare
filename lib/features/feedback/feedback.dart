@@ -41,14 +41,7 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        appBar: AppBar(actions: [
-          IconButton(
-            onPressed: () {
-              context.goNamed(RouteConstants.dashBoard);
-            },
-            icon: const Icon(Icons.arrow_back_ios_new_outlined),
-          ),
-        ]),
+        appBar: AppBar(),
         body: Stack(
           children: [
             SingleChildScrollView(
