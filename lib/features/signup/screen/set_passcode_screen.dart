@@ -36,6 +36,10 @@ class _SetPassCodeScreenState extends ConsumerState<SetPassCodeScreen> {
     super.dispose();
   }
 
+  void navigateToLogin() {
+    context.goNamed(RouteConstants.login);
+  }
+
   void _onSubmit(WidgetRef ref) async {
     if (_passCodeFormKey.currentState!.validate()) {
       setState(() {
@@ -60,7 +64,7 @@ class _SetPassCodeScreenState extends ConsumerState<SetPassCodeScreen> {
       if (result) {
         if (context.mounted) {
           showDialog(
-            barrierDismissible: false,
+            barrierDismissible: true,
             context: context,
             builder: (BuildContext abcContext) {
               return AlertDialog(
@@ -89,8 +93,9 @@ class _SetPassCodeScreenState extends ConsumerState<SetPassCodeScreen> {
                 actions: [
                   ElevatedButton(
                     onPressed: () {
-                      abcContext.pop();
-                      context.go(RouteConstants.loginUrl);
+                      //abcContext.pop();
+                      // context.go(RouteConstants.loginUrl);
+                      navigateToLogin();
                     },
                     child: const Text(
                       'Xác nhận',

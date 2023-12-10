@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/trip_model.dart';
@@ -25,7 +26,7 @@ void showLoginTimeOut({
   showDialog(
     barrierDismissible: false,
     context: context,
-    builder: (BuildContext context) {
+    builder: (BuildContext dialogContext) {
       return AlertDialog(
         title: const Text('Phiên đăng nhập hết hạn'),
         content: const Text('Vui lòng đăng nhập lại.'),
@@ -33,8 +34,9 @@ void showLoginTimeOut({
           TextButton(
             child: const Text('OK'),
             onPressed: () {
-              context.pop();
-              context.go(RouteConstants.loginUrl);
+              Navigator.of(dialogContext).pop();
+              //context.go(RouteConstants.loginUrl);
+              GoRouter.of(context).goNamed(RouteConstants.login);
             },
           ),
         ],
@@ -163,7 +165,7 @@ void showDialogInfo(TripModel? trip, BuildContext context, WidgetRef ref) {
         actions: [
           ElevatedButton(
             onPressed: () {
-              abcContext.pop();
+              context.pop();
             },
             child: const Text(
               'Xác nhận',
@@ -300,6 +302,35 @@ void showWalletInsufficient(BuildContext context) {
   );
 }
 
+void showFeedbackSuccess(BuildContext context) {
+  showDialog(
+    barrierDismissible: true,
+    context: context,
+    builder: (BuildContext abcContext) {
+      return AlertDialog(
+        title: const Center(
+          child: Text(
+            'Cảm ơn bạn đã góp ý',
+          ),
+        ),
+        content: const Center(
+          child: Text("Đánh giá của bạn đã được chúng tôi ghi nhận"),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              context.goNamed(RouteConstants.dashBoard);
+            },
+            child: const Text(
+              'Xác nhận',
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 void showDialogInfoPickUp(TripModel trip, BuildContext context) {
   showDialog(
     barrierDismissible: true,
@@ -334,7 +365,7 @@ void showDialogInfoPickUp(TripModel trip, BuildContext context) {
           TextButton(
             onPressed: () {
               //context.pop();
-              abcContext.goNamed(
+              context.pushNamed(
                 RouteConstants.onTrip,
                 extra: {
                   'trip': trip,

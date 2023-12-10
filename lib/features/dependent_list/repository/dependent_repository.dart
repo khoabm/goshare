@@ -68,7 +68,7 @@ class DependentRepository {
     double longitude,
     String address,
     String name,
-    String? userId,
+    //String? userId,
   ) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -84,7 +84,7 @@ class DependentRepository {
           "longitude": longitude,
           "address": address,
           "name": name,
-          "userId": userId,
+          //"userId": userId,
         }),
       );
       print(res.statusCode);

@@ -215,15 +215,15 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                                     TextButton(
                                       onPressed: () {
                                         context.pushNamed(
-                                          RouteConstants.signupUrl,
+                                          RouteConstants.signup,
                                         );
                                       },
                                       child: const Text('Chưa có tài khoản?'),
                                     ),
-                                    TextButton(
-                                      onPressed: () {},
-                                      child: const Text('Quên mật khẩu?'),
-                                    ),
+                                    // TextButton(
+                                    //   onPressed: () {},
+                                    //   child: const Text('Quên mật khẩu?'),
+                                    // ),
                                   ],
                                 ),
                               ),

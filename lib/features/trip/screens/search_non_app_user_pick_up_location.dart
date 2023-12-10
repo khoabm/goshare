@@ -1,27 +1,30 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/common/loader.dart';
-import 'package:goshare/core/constants/route_constants.dart';
+//import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/utils/locations_util.dart';
 import 'package:goshare/features/home/controller/home_controller.dart';
 import 'package:goshare/floating_search_bar.dart';
+import 'package:goshare/models/non_app_user_pick_up_location_model.dart';
 import 'package:goshare/models/vietmap_place_model.dart';
 import 'package:goshare/theme/pallet.dart';
-
 import 'package:location/location.dart';
+
+//import 'package:location/location.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 
 import 'package:flutter/material.dart';
 
-class SearchTripRouteScreen extends ConsumerStatefulWidget {
-  const SearchTripRouteScreen({super.key});
+class SearchNonAppUserPickUpLocationScreen extends ConsumerStatefulWidget {
+  const SearchNonAppUserPickUpLocationScreen({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
-      _SearchTripRouteScreenState();
+      _SearchNonAppUserPickUpLocationScreenState();
 }
 
-class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
+class _SearchNonAppUserPickUpLocationScreenState
+    extends ConsumerState<SearchNonAppUserPickUpLocationScreen> {
   // MapNavigationViewController? _controller;
   String currentAddress = '';
   double lat = 0.0;
@@ -37,6 +40,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
   bool _isPlaceMarker = false;
   bool _isLoading = false;
   FocusNode focusNode = FocusNode();
+  NonAppUserPickUpLocation? nonAppUserPickUpLocation;
   LocationData? currentLocation;
 
   @override
@@ -55,33 +59,34 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
     super.initState();
   }
 
-  void navigateToCarChoosingScreen(
-    BuildContext context,
-    double? startLatitude,
-    double? startLongitude,
-    double? endLatitude,
-    double? endLongitude,
-  ) {
-    context.pushNamed(RouteConstants.carChoosing, pathParameters: {
-      'startLatitude': startLatitude?.toString() ?? '',
-      'startLongitude': startLongitude?.toString() ?? '',
-      'endLatitude': endLatitude?.toString() ?? '',
-      'endLongitude': endLongitude?.toString() ?? '',
-    });
-  }
+  // void navigateToCarChoosingScreen(
+  //   BuildContext context,
+  //   double? startLatitude,
+  //   double? startLongitude,
+  //   double? endLatitude,
+  //   double? endLongitude,
+  // ) {
+  //   context.pushNamed(RouteConstants.carChoosing, pathParameters: {
+  //     'startLatitude': startLatitude?.toString() ?? '',
+  //     'startLongitude': startLongitude?.toString() ?? '',
+  //     'endLatitude': endLatitude?.toString() ?? '',
+  //     'endLongitude': endLongitude?.toString() ?? '',
+  //   });
+  // }
 
-  void navigateToCreateDestination() {
-    context.pushNamed(RouteConstants.createDestination, pathParameters: {
-      'destinationAddress': currentAddress,
-    }, extra: {
-      'latitude': lat,
-      'longitude': lon
-    });
-  }
+  // void navigateToCreateDestination() {
+  //   context.pushNamed(RouteConstants.createDestination, pathParameters: {
+  //     'destinationAddress': currentAddress,
+  //   }, extra: {
+  //     'latitude': lat,
+  //     'longitude': lon
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           // setState(() {
@@ -157,6 +162,13 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
 
                             lat = coordinates.latitude;
                             lon = coordinates.longitude;
+                            //set data for pick up model
+                            nonAppUserPickUpLocation = NonAppUserPickUpLocation(
+                              address: currentAddress,
+                              latitude: lat,
+                              longitude: lon,
+                            );
+                            //set marker for pick up location
                             _marker = Marker(
                               child: MyMarker(
                                 icon: Icons.location_on,
@@ -172,9 +184,10 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                             _mapController?.animateCamera(
                               CameraUpdate.newCameraPosition(
                                 CameraPosition(
-                                    target: _marker.latLng,
-                                    zoom: 15.5,
-                                    tilt: 0),
+                                  target: _marker.latLng,
+                                  zoom: 15.5,
+                                  tilt: 0,
+                                ),
                               ),
                             );
                             _isLoading = false;
@@ -187,17 +200,20 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                           });
                           // final location = ref.read(locationProvider);
                           // currentLocation = await location.getCurrentLocation();
-                          await _mapController?.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                              CameraPosition(
+                          if (userLocation != null) {
+                            await _mapController?.animateCamera(
+                              CameraUpdate.newCameraPosition(
+                                CameraPosition(
                                   target: LatLng(
                                     currentLocation?.latitude ?? 0,
                                     currentLocation?.longitude ?? 0,
                                   ),
                                   zoom: 15.5,
-                                  tilt: 0),
-                            ),
-                          );
+                                  tilt: 0,
+                                ),
+                              ),
+                            );
+                          }
 
                           setState(() {
                             _isLoading = false;
@@ -210,38 +226,38 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          InkWell(
-                            onTap: () {
-                              context.pop();
-                            },
-                            child: RichText(
-                              text: const TextSpan(
-                                children: [
-                                  WidgetSpan(
-                                    alignment: PlaceholderAlignment.middle,
-                                    child: Padding(
-                                      padding: EdgeInsets.only(right: 8.0),
-                                      child: Icon(
-                                        Icons.arrow_back_ios_new_outlined,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                  WidgetSpan(
-                                    alignment: PlaceholderAlignment.middle,
-                                    child: Text(
-                                      'Quay lại',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                          // InkWell(
+                          //   onTap: () {
+                          //     context.pop();
+                          //   },
+                          //   child: RichText(
+                          //     text: const TextSpan(
+                          //       children: [
+                          //         WidgetSpan(
+                          //           alignment: PlaceholderAlignment.middle,
+                          //           child: Padding(
+                          //             padding: EdgeInsets.only(right: 8.0),
+                          //             child: Icon(
+                          //               Icons.arrow_back_ios_new_outlined,
+                          //               color: Colors.black,
+                          //             ),
+                          //           ),
+                          //         ),
+                          //         WidgetSpan(
+                          //           alignment: PlaceholderAlignment.middle,
+                          //           child: Text(
+                          //             'Quay lại',
+                          //             style: TextStyle(
+                          //               fontSize: 16,
+                          //               fontWeight: FontWeight.bold,
+                          //               color: Colors.black,
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   ),
+                          // ),
                           FloatingSearchBar(
                             focusNode: focusNode,
                             onSearchItemClick: (p0) async {
@@ -269,6 +285,14 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                                       '${data?.address}, ${data?.ward}, ${data?.district}, ${data?.city}';
                                   lat = data?.lat ?? 0.0;
                                   lon = data?.lng ?? 0.0;
+//set data for pick up model
+                                  nonAppUserPickUpLocation =
+                                      NonAppUserPickUpLocation(
+                                    address: currentAddress,
+                                    latitude: lat,
+                                    longitude: lon,
+                                  );
+//add marker for pickup location
                                   _marker = Marker(
                                     child: MyMarker(
                                       icon: Icons.location_on,
@@ -372,7 +396,7 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                                             ),
                                           ),
                                           const Text(
-                                            'Chọn hành động bạn muốn với địa điểm này',
+                                            'Xác nhận địa điểm đón',
                                             style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.w500,
@@ -389,35 +413,18 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                                             child: ElevatedButton(
                                               onPressed: () {
                                                 focusNode.unfocus();
-                                                navigateToCarChoosingScreen(
-                                                  context,
-                                                  currentLocation?.latitude,
-                                                  currentLocation?.longitude,
-                                                  _marker.latLng.latitude,
-                                                  _marker.latLng.longitude,
-                                                );
+                                                context.pop(
+                                                    nonAppUserPickUpLocation);
                                               },
-                                              child: const Text('Đặt xe'),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                .5,
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                navigateToCreateDestination();
-                                              },
-                                              child: const Text(
-                                                'Lưu điểm đến',
-                                              ),
+                                              child: const Text('Xác nhận'),
                                             ),
                                           ),
                                         ],
                                       )
                                     : const Center(
-                                        child: Text('Vui lòng chọn điểm đến'),
+                                        child: Text(
+                                          'Vui lòng chọn điểm đón người thân',
+                                        ),
                                       )
                                 : Padding(
                                     padding: EdgeInsets.symmetric(
@@ -507,7 +514,6 @@ class _MyMarkerState extends State<MyMarker> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          print('hehe');
           showAddress = !showAddress;
         });
       },
@@ -519,7 +525,7 @@ class _MyMarkerState extends State<MyMarker> {
               color: Colors.white,
             ),
             child: Text(
-              showAddress ? widget.address : 'Điểm đến',
+              showAddress ? widget.address : 'Điểm đón',
             ),
           ),
           SizedBox(

@@ -7,6 +7,7 @@ import 'package:goshare/common/app_text_field.dart';
 import 'package:goshare/common/home_center_container.dart';
 import 'package:goshare/common/loader.dart';
 import 'package:goshare/core/constants/constants.dart';
+import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/feedback/feedback_controller.dart';
 
 class FeedbackScreen extends ConsumerStatefulWidget {
@@ -29,11 +30,20 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
       print('Rating: $_rating');
       print('Feedback Text: $feedbackText');
 
-      final result = await ref
-          .read(FeedbackControllerProvider.notifier)
-          .feedback(widget.idTrip, _rating!, feedbackText, context);
+      final result =
+          await ref.read(FeedbackControllerProvider.notifier).feedback(
+                widget.idTrip,
+                _rating!,
+                feedbackText,
+                context,
+              );
+      if (result.error != null) {
+        if (mounted) {
+          showFeedbackSuccess(context);
+        }
+      }
     } else {
-      print('Please provide both rating and feedback text.');
+      showSnackBar(context: context, message: 'Có lỗi khi đánh giá');
     }
   }
 

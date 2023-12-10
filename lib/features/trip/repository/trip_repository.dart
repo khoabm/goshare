@@ -280,6 +280,9 @@ class TripRepository {
           'Content-Type': 'application/json',
         },
       );
+      print(response.statusCode);
+      print(response.body);
+
       if (response.statusCode == 200) {
         print("WALLET THÀNH CÔNG");
         return right(

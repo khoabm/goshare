@@ -71,7 +71,7 @@ class DependentController extends StateNotifier<bool> {
     double longitude,
     String address,
     String name,
-    String? userId,
+    //String? userId,
   ) async {
     LocationModel? locationModel;
     final result = await _dependentRepository.createDestination(
@@ -79,7 +79,7 @@ class DependentController extends StateNotifier<bool> {
       longitude,
       address,
       name,
-      userId,
+      //userId,
     );
     result.fold((l) {
       state = false;

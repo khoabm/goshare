@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
+import 'package:goshare/core/utils/locations_util.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/find_trip_model.dart';
 import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/models/user_data_model.dart';
+import 'package:goshare/models/vietmap_route_model.dart';
 import 'package:goshare/providers/current_on_trip_provider.dart';
+import 'package:goshare/theme/pallet.dart';
 import 'package:signalr_core/signalr_core.dart';
 
 import 'package:goshare/providers/signalr_providers.dart';
-import 'package:vietmap_flutter_navigation/embedded/controller.dart';
-import 'package:vietmap_flutter_navigation/helpers.dart';
-import 'package:vietmap_flutter_navigation/models/marker.dart';
-import 'package:vietmap_flutter_navigation/models/options.dart';
-import 'package:vietmap_flutter_navigation/models/route_progress_event.dart';
-import 'package:vietmap_flutter_navigation/models/way_point.dart';
-import 'package:vietmap_flutter_navigation/navigation_plugin.dart';
-import 'package:vietmap_flutter_navigation/views/navigation_view.dart';
+import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 
 class FindTripScreen2 extends ConsumerStatefulWidget {
   final String startLongitude;
@@ -50,21 +47,16 @@ class FindTripScreen2 extends ConsumerStatefulWidget {
 
 class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
   TripModel? result;
-  MapNavigationViewController? _controller;
-  late MapOptions _navigationOption;
-  final _vietmapNavigationPlugin = VietMapNavigationPlugin();
+  VietmapController? _controller;
+  UserLocation? userLocation;
+  PolylinePoints polylinePoints = PolylinePoints();
+  VietMapRouteModel? routeModel;
+  List<Marker> temp = [];
 
-  List<WayPoint> wayPoints = [
-    WayPoint(name: "origin point", latitude: 10.759091, longitude: 106.675817),
-    WayPoint(
-        name: "destination point", latitude: 10.762528, longitude: 106.653099)
-  ];
-  Widget instructionImage = const SizedBox.shrink();
-  String guideDirection = "";
-  Widget recenterButton = const SizedBox.shrink();
-  RouteProgressEvent? routeProgressEvent;
+  // Widget instructionImage = const SizedBox.shrink();
+  // String guideDirection = "";
+  // Widget recenterButton = const SizedBox.shrink();
   bool _isRouteBuilt = false;
-  bool _isRunning = false;
   FocusNode focusNode = FocusNode();
   bool _isLoading = false;
   String driverName = '';
@@ -76,71 +68,70 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
 
   @override
   void initState() {
-    initialize().then((value) {
-      // _showDriverInfoDialog();
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        setState(() {
-          _isLoading = true;
-        });
-        await initSignalR(ref);
-        if (widget.bookerId == ref.read(userProvider.notifier).state?.id) {
-          if (context.mounted) {
-            result = await ref.read(tripControllerProvider.notifier).findDriver(
-                  context,
-                  FindTripModel(
-                    startLatitude: double.parse(widget.startLatitude),
-                    startLongitude: double.parse(widget.startLongitude),
-                    //startAddress: 'Nha Nguyen',
-                    endLatitude: double.parse(widget.endLatitude),
-                    endLongitude: double.parse(widget.endLongitude),
-                    //endAddress: 'Nga 3',
-                    cartypeId: widget.carTypeId,
-                    paymentMethod: int.parse(widget.paymentMethod),
-                  ),
-                );
-          }
-
-          if (result != null) {
-            ref
-                .read(currentOnTripIdProvider.notifier)
-                .setCurrentOnTripId(result?.id);
-          }
-        } else {
-          if (context.mounted) {
-            print('ĐẶT XE CHO NGƯỜI TA');
-            result = await ref
-                .read(tripControllerProvider.notifier)
-                .findDriverForDependent(
-                  context,
-                  FindTripModel(
-                    startLatitude: double.parse(widget.startLatitude),
-                    startLongitude: double.parse(widget.startLongitude),
-                    //startAddress: 'Nha Nguyen',
-                    endLatitude: double.parse(widget.endLatitude),
-                    endLongitude: double.parse(widget.endLongitude),
-                    //endAddress: 'Nga 3',
-                    cartypeId: widget.carTypeId,
-                    paymentMethod: int.parse(widget.paymentMethod),
-                  ),
-                  widget.bookerId,
-                );
-          }
-
-          if (result != null) {
-            ref
-                .read(currentDependentOnTripProvider.notifier)
-                .addDependentCurrentOnTripId(
-                  DependentTrip(
-                      id: result!.id,
-                      name: result!.passenger.name,
-                      dependentId: result!.passenger.id),
-                );
-          }
+    // _showDriverInfoDialog();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      setState(() {
+        _isLoading = true;
+      });
+      await initSignalR(ref);
+      if (widget.bookerId == ref.read(userProvider.notifier).state?.id) {
+        if (context.mounted) {
+          result = await ref.read(tripControllerProvider.notifier).findDriver(
+                context,
+                FindTripModel(
+                  startLatitude: double.parse(widget.startLatitude),
+                  startLongitude: double.parse(widget.startLongitude),
+                  //startAddress: 'Nha Nguyen',
+                  endLatitude: double.parse(widget.endLatitude),
+                  endLongitude: double.parse(widget.endLongitude),
+                  //endAddress: 'Nga 3',
+                  cartypeId: widget.carTypeId,
+                  paymentMethod: int.parse(widget.paymentMethod),
+                  note: widget.driverNote,
+                ),
+              );
         }
-        // Use setState to trigger a rebuild of the widget with the new data.
-        setState(() {
-          _isLoading = false;
-        });
+
+        if (result != null) {
+          ref
+              .read(currentOnTripIdProvider.notifier)
+              .setCurrentOnTripId(result?.id);
+        }
+      } else {
+        if (context.mounted) {
+          result = await ref
+              .read(tripControllerProvider.notifier)
+              .findDriverForDependent(
+                context,
+                FindTripModel(
+                  startLatitude: double.parse(widget.startLatitude),
+                  startLongitude: double.parse(widget.startLongitude),
+                  //startAddress: 'Nha Nguyen',
+                  endLatitude: double.parse(widget.endLatitude),
+                  endLongitude: double.parse(widget.endLongitude),
+                  //endAddress: 'Nga 3',
+                  cartypeId: widget.carTypeId,
+                  paymentMethod: int.parse(widget.paymentMethod),
+                  note: widget.driverNote,
+                ),
+                widget.bookerId,
+              );
+        }
+
+        if (result != null) {
+          ref
+              .read(currentDependentOnTripProvider.notifier)
+              .addDependentCurrentOnTripId(
+                DependentTrip(
+                    id: result!.id,
+                    name: result!.passenger.name,
+                    dependentId: result!.passenger.id),
+              );
+        }
+      }
+      // Use setState to trigger a rebuild of the widget with the new data.
+      setState(() {
+        _isLoading = false;
       });
     });
 
@@ -150,7 +141,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
   @override
   void dispose() {
     //revokeHub();
-    _controller?.onDispose();
+    _controller?.dispose();
     super.dispose();
   }
 
@@ -163,21 +154,6 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     hubConnection.off('NotifyPassengerTripTimedOut');
   }
 
-  Future<void> initialize() async {
-    if (!mounted) return;
-
-    _navigationOption = _vietmapNavigationPlugin.getDefaultOptions();
-    _navigationOption.simulateRoute = false;
-    _navigationOption.alternatives = false;
-    _navigationOption.apiKey =
-        'c3d0f188ff669f89042771a20656579073cffec5a8a69747';
-    _navigationOption.mapStyle =
-        "https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm";
-    _navigationOption.customLocationCenterIcon =
-        await VietMapHelper.getBytesFromAsset('assets/download.jpeg');
-    _vietmapNavigationPlugin.setDefaultOptions(_navigationOption);
-  }
-
   //MapOptions? options;
 
   Future<void> initSignalR(WidgetRef ref) async {
@@ -185,56 +161,51 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       final hubConnection = await ref.read(
         hubConnectionProvider.future,
       );
-
-      hubConnection.on('NotifyPassengerDriverOnTheWay', (message) {
-        print("ĐÂY RỒI SIGNALR ĐÂY RỒI $message");
-        try {
-          // setState(() {
-          //   _isLoading = true;
-          // });
-          // await Future.delayed(
-          //   const Duration(seconds: 1),
-          // );
-          // setState(() {
-          //   _isLoading = false;
-          // });
-          if (mounted) {
-            //HapticFeedback.mediumImpact();
-            _handleNotifyPassengerDriverOnTheWay(message);
+      if (mounted) {
+        hubConnection.on('NotifyPassengerDriverOnTheWay', (message) {
+          print("ĐÂY RỒI SIGNALR ĐÂY RỒI $message");
+          try {
+            if (mounted) {
+              HapticFeedback.mediumImpact();
+              _handleNotifyPassengerDriverOnTheWay(message);
+            }
+          } catch (e) {
+            print(e.toString());
           }
-        } catch (e) {
-          print(e.toString());
-        }
-      });
-      hubConnection.on('NotifyPassengerTripCanceled', (message) {
-        try {
-          // setState(() {
-          //   _isLoading = true;
-          // });
-          // await Future.delayed(
-          //   const Duration(seconds: 2),
-          // );
-          // setState(() {
-          //   _isLoading = false;
-          // });
-          if (mounted) {
-            _handleNotifyPassengerTripCanceled(message);
+        });
+      }
+      if (mounted) {
+        hubConnection.on('NotifyPassengerTripCanceled', (message) {
+          try {
+            // setState(() {
+            //   _isLoading = true;
+            // });
+            // await Future.delayed(
+            //   const Duration(seconds: 2),
+            // );
+            // setState(() {
+            //   _isLoading = false;
+            // });
+            if (mounted) {
+              _handleNotifyPassengerTripCanceled(message);
+            }
+          } catch (e) {
+            print(e.toString());
           }
-        } catch (e) {
-          print(e.toString());
-        }
-      });
-      hubConnection.on('NotifyPassengerTripTimedOut', (message) {
-        try {
-          if (mounted) {
-            _handleNotifyPassengerTripTimedOut(message);
+        });
+      }
+      if (mounted) {
+        hubConnection.on('NotifyPassengerTripTimedOut', (message) {
+          try {
+            if (mounted) {
+              _handleNotifyPassengerTripTimedOut(message);
+            }
+            //_handleNotifyPassengerDriverOnTheWay(message);
+          } catch (e) {
+            print(e.toString());
           }
-          //_handleNotifyPassengerDriverOnTheWay(message);
-        } catch (e) {
-          print(e.toString());
-        }
-      });
-
+        });
+      }
       hubConnection.onclose((exception) async {
         await Future.delayed(
           const Duration(seconds: 3),
@@ -340,7 +311,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                 // setState(() {
                 //   _isLoading = false;
                 // });
-                //abcContext.pop();
+                Navigator.of(abcContext).pop();
                 navigateToDriverPickupScreen(
                   driverName,
                   driverCarType,
@@ -441,7 +412,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: const Center(
             child: Text(
@@ -489,6 +460,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                 // setState(() {
                 //   _isLoading = false;
                 // });
+                dialogContext.pop();
                 navigateToDashBoardScreen();
               },
               child: const Text(
@@ -621,63 +593,144 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       body: SafeArea(
         child: Stack(
           children: [
-            NavigationView(
-              mapOptions: _navigationOption,
-              onNewRouteSelected: (p0) {
-                print(p0.toString());
-              },
-              onMapCreated: (p0) async {
-                _controller = p0;
-              },
-              //onMapMove: () => _showRecenterButton(),
-              onRouteBuilt: (p0) {
+            // NavigationView(
+            //   mapOptions: _navigationOption,
+            //   onNewRouteSelected: (p0) {
+            //     print(p0.toString());
+            //   },
+            //   onMapCreated: (p0) async {
+            //     _controller = p0;
+            //   },
+            //   //onMapMove: () => _showRecenterButton(),
+            //   onRouteBuilt: (p0) {
+            //     setState(() {
+            //       //EasyLoading.dismiss();
+            //       _isRouteBuilt = true;
+            //     });
+            //   },
+            //   onMapRendered: () async {
+            //     _controller?.setCenterIcon(
+            //       await VietMapHelper.getBytesFromAsset('assets/download.jpeg'),
+            //     );
+            //     wayPoints.clear();
+            //     wayPoints.add(
+            //       WayPoint(
+            //         name: 'origin point',
+            //         latitude: double.parse(widget.startLatitude),
+            //         longitude: double.parse(widget.startLongitude),
+            //       ),
+            //     );
+            //     wayPoints.add(
+            //       WayPoint(
+            //         name: 'destination point',
+            //         latitude: double.parse(widget.endLatitude),
+            //         longitude: double.parse(widget.endLongitude),
+            //       ),
+            //     );
+            //     _controller?.addImageMarkers([
+            //       Marker(
+            //         imagePath: 'assets/images/marker.png',
+            //         latLng: LatLng(
+            //           double.parse(widget.endLatitude),
+            //           double.parse(widget.endLongitude),
+            //         ),
+            //       ),
+            //     ]);
+            //     _controller?.buildRoute(wayPoints: wayPoints);
+            //     // _controller?.buildAndStartNavigation(
+            //     //   wayPoints: wayPoints,
+            //     // );
+            //   },
+            //   // onRouteProgressChange: (RouteProgressEvent routeProgressEvent) {
+            //   //   setState(() {
+            //   //     this.routeProgressEvent = routeProgressEvent;
+            //   //   });
+            //   //   _setInstructionImage(routeProgressEvent.currentModifier,
+            //   //       routeProgressEvent.currentModifierType);
+            //   // },
+            // ),
+            VietmapGL(
+              //dragEnabled: false,
+              compassEnabled: false,
+              myLocationEnabled: true,
+              styleString:
+                  'https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm',
+              initialCameraPosition: const CameraPosition(
+                zoom: 17.5, target: LatLng(10.736657, 106.672240),
+                // LatLng(
+                //   currentLocation?.latitude ?? 0,
+                //   currentLocation?.longitude ?? 0,
+                // ),
+              ),
+              onMapCreated: (VietmapController controller) {
                 setState(() {
-                  //EasyLoading.dismiss();
+                  _controller = controller;
+                });
+              },
+
+              onMapRenderedCallback: () async {
+                setState(() {
+                  _isLoading = true;
+                });
+
+                final data = await LocationUtils.getRoute(
+                  double.parse(widget.startLatitude),
+                  double.parse(widget.startLongitude),
+                  double.parse(widget.endLatitude),
+                  double.parse(widget.endLongitude),
+                );
+                data.fold(
+                  (l) {
+                    // showSnackBar(
+                    //   context: context,
+                    //   message: 'Có lỗi khi lấy tuyến đường tài xế',
+                    // );
+                    print("CÓ LỖI KHI LẤY TUYẾN ĐƯỜNG");
+                  },
+                  (r) => routeModel = r,
+                );
+                if (routeModel != null) {
+                  List<PointLatLng> pointLatLngList =
+                      polylinePoints.decodePolyline(
+                    routeModel!.paths[0].points,
+                  );
+                  List<LatLng> latLngList = pointLatLngList
+                      .map(
+                        (point) => LatLng(point.latitude, point.longitude),
+                      )
+                      .toList();
+                  await _controller?.addPolyline(
+                    PolylineOptions(
+                      //polylineGapWidth: 0,
+                      geometry: latLngList,
+                      polylineColor: Pallete.primaryColor,
+                      polylineWidth: 6.5,
+                      polylineOpacity: 1,
+                      draggable: false,
+                      polylineBlur: 0.8,
+                    ),
+                  );
+                }
+                _controller?.animateCamera(
+                  CameraUpdate.newCameraPosition(
+                    CameraPosition(
+                      target: LatLng(
+                        double.parse(widget.startLatitude),
+                        double.parse(widget.startLongitude),
+                      ),
+                      zoom: 14.5,
+                      tilt: 0,
+                    ),
+                  ),
+                );
+
+                setState(() {
+                  _isLoading = false;
                   _isRouteBuilt = true;
                 });
               },
-              onMapRendered: () async {
-                _controller?.setCenterIcon(
-                  await VietMapHelper.getBytesFromAsset('assets/download.jpeg'),
-                );
-                wayPoints.clear();
-                wayPoints.add(
-                  WayPoint(
-                    name: 'origin point',
-                    latitude: double.parse(widget.startLatitude),
-                    longitude: double.parse(widget.startLongitude),
-                  ),
-                );
-                wayPoints.add(
-                  WayPoint(
-                    name: 'destination point',
-                    latitude: double.parse(widget.endLatitude),
-                    longitude: double.parse(widget.endLongitude),
-                  ),
-                );
-                _controller?.addImageMarkers([
-                  Marker(
-                    imagePath: 'assets/images/marker.png',
-                    latLng: LatLng(
-                      double.parse(widget.endLatitude),
-                      double.parse(widget.endLongitude),
-                    ),
-                  ),
-                ]);
-                _controller?.buildRoute(wayPoints: wayPoints);
-                // _controller?.buildAndStartNavigation(
-                //   wayPoints: wayPoints,
-                // );
-              },
-              // onRouteProgressChange: (RouteProgressEvent routeProgressEvent) {
-              //   setState(() {
-              //     this.routeProgressEvent = routeProgressEvent;
-              //   });
-              //   _setInstructionImage(routeProgressEvent.currentModifier,
-              //       routeProgressEvent.currentModifierType);
-              // },
             ),
-            _isRunning && _isRouteBuilt
+            !_isRouteBuilt
                 ? const SizedBox.shrink()
                 : Positioned(
                     width: MediaQuery.of(context).size.width * .95,
@@ -755,102 +808,4 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       ),
     );
   }
-
-  // _showRecenterButton() {
-  //   recenterButton = TextButton(
-  //       onPressed: () {
-  //         _controller?.recenter();
-  //         setState(() {
-  //           recenterButton = const SizedBox.shrink();
-  //         });
-  //       },
-  //       child: Container(
-  //           height: 50,
-  //           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-  //           decoration: BoxDecoration(
-  //               borderRadius: BorderRadius.circular(50),
-  //               color: Colors.white,
-  //               border: Border.all(color: Colors.black45, width: 1)),
-  //           child: const Row(
-  //             children: [
-  //               Icon(
-  //                 Icons.keyboard_double_arrow_up_sharp,
-  //                 color: Colors.lightBlue,
-  //                 size: 35,
-  //               ),
-  //               Text(
-  //                 'Về giữa',
-  //                 style: TextStyle(fontSize: 18, color: Colors.lightBlue),
-  //               )
-  //             ],
-  //           )));
-  //   setState(() {});
-  // }
-
-  // _setInstructionImage(String? modifier, String? type) {
-  //   if (modifier != null && type != null) {
-  //     List<String> data = [
-  //       type.replaceAll(' ', '_'),
-  //       modifier.replaceAll(' ', '_')
-  //     ];
-  //     String path = 'assets/navigation_symbol/${data.join('_')}.svg';
-  //     setState(() {
-  //       instructionImage = SvgPicture.asset(path, color: Colors.white);
-  //     });
-  //   }
-  // }
-
-  // _onStopNavigation() {
-  //   setState(() {
-  //     routeProgressEvent = null;
-  //     _isRunning = false;
-  //   });
-  // }
-
-  // _showBottomSheetInfo(VietmapReverseModel data) {
-  //   showModalBottomSheet(
-  //       isScrollControlled: true,
-  //       context: context,
-  //       builder: (_) => AddressInfo(
-  //             data: data,
-  //             buildRoute: () async {
-  //               EasyLoading.show();
-  //               wayPoints.clear();
-  //               var location = await Geolocator.getCurrentPosition();
-
-  //               wayPoints.add(WayPoint(
-  //                   name: 'destination',
-  //                   latitude: location.latitude,
-  //                   longitude: location.longitude));
-  //               if (data.lat != null) {
-  //                 wayPoints.add(WayPoint(
-  //                     name: '', latitude: data.lat, longitude: data.lng));
-  //               }
-  //               _controller?.buildRoute(wayPoints: wayPoints);
-  //               if (!mounted) return;
-  //               Navigator.pop(context);
-  //             },
-  //             buildAndStartRoute: () async {
-  //               EasyLoading.show();
-  //               wayPoints.clear();
-  //               var location = await Geolocator.getCurrentPosition();
-  //               wayPoints.add(WayPoint(
-  //                   name: 'destination',
-  //                   latitude: location.latitude,
-  //                   longitude: location.longitude));
-  //               if (data.lat != null) {
-  //                 wayPoints.add(WayPoint(
-  //                     name: '', latitude: data.lat, longitude: data.lng));
-  //               }
-  //               _controller?.buildAndStartNavigation(
-  //                   wayPoints: wayPoints,
-  //                   profile: DrivingProfile.drivingTraffic);
-  //               setState(() {
-  //                 _isRunning = true;
-  //               });
-  //               if (!mounted) return;
-  //               Navigator.pop(context);
-  //             },
-  //           ));
-  // }
 }

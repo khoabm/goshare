@@ -17,6 +17,7 @@ class UserMenuPage extends ConsumerStatefulWidget {
 }
 
 class _UserMenuPageState extends ConsumerState<UserMenuPage> {
+  bool _isLoading = false;
   void _onLogout(WidgetRef ref) async {
     if (mounted) {
       final connection = await ref.read(
@@ -33,6 +34,7 @@ class _UserMenuPageState extends ConsumerState<UserMenuPage> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('accessToken');
       await prefs.remove('refreshToken');
+
       if (mounted) {
         context.goNamed(RouteConstants.login);
       }
@@ -51,89 +53,94 @@ class _UserMenuPageState extends ConsumerState<UserMenuPage> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
+      body: Stack(
         children: [
-          Container(
-            color: Colors.white,
-            child: ListTile(
-              visualDensity: const VisualDensity(vertical: -4.0),
-              title: const Text('Thông tin cá nhân'),
-              onTap: () {
-                context.push(RouteConstants.editProfileUrl);
-              },
-            ),
-          ),
-          if (!isDependent)
-            Column(
-              children: [
-                const Divider(),
-                Container(
-                  color: Colors.white,
-                  child: ListTile(
-                    visualDensity: const VisualDensity(vertical: -4.0),
-                    title: const Text('Ví của tôi'),
-                    onTap: () {
-                      context.push(RouteConstants.moneyTopupUrl);
-                    },
-                  ),
+          ListView(
+            padding: const EdgeInsets.all(16.0),
+            children: [
+              Container(
+                color: Colors.white,
+                child: ListTile(
+                  visualDensity: const VisualDensity(vertical: -4.0),
+                  title: const Text('Thông tin cá nhân'),
+                  onTap: () {
+                    context.push(RouteConstants.editProfileUrl);
+                  },
                 ),
-              ],
-            ),
-
-          // const Divider(),
-          // Container(
-          //   color: Colors.white,
-          //   child: ListTile(
-          //     visualDensity: const VisualDensity(
-          //         vertical: -4.0), // Reduced vertical padding
-          //     title: const Text('Money History'),
-          //     onTap: () {
-          //       Navigator.pushNamed(context, '/moneyHistory');
-          //     },
-          //   ),
-          // ),
-          // const Divider(),
-          // Container(
-          //   color: Colors.white,
-          //   child: ListTile(
-          //     visualDensity: const VisualDensity(
-          //         vertical: -4.0), // Reduced vertical padding
-          //     title: const Text('Feedback'),
-          //     onTap: () {
-          //       context.push(RouteConstants.feedback);
-          //     },
-          //   ),
-          // ),
-          const Divider(),
-          Container(
-            color: Colors.white,
-            child: ListTile(
-              visualDensity: const VisualDensity(
-                  vertical: -4.0), // Reduced vertical padding
-              title: const Text('Đăng xuất'),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('Xác nhận đăng xuất'),
-                    content: Text('Bạn có chắc chắn muốn đăng xuất?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Hủy'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          _onLogout(ref);
+              ),
+              if (!isDependent)
+                Column(
+                  children: [
+                    const Divider(),
+                    Container(
+                      color: Colors.white,
+                      child: ListTile(
+                        visualDensity: const VisualDensity(vertical: -4.0),
+                        title: const Text('Ví của tôi'),
+                        onTap: () {
+                          context.push(RouteConstants.moneyTopupUrl);
                         },
-                        child: const Text('Xác nhận'),
                       ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                    ),
+                  ],
+                ),
+
+              // const Divider(),
+              // Container(
+              //   color: Colors.white,
+              //   child: ListTile(
+              //     visualDensity: const VisualDensity(
+              //         vertical: -4.0), // Reduced vertical padding
+              //     title: const Text('Money History'),
+              //     onTap: () {
+              //       Navigator.pushNamed(context, '/moneyHistory');
+              //     },
+              //   ),
+              // ),
+              // const Divider(),
+              // Container(
+              //   color: Colors.white,
+              //   child: ListTile(
+              //     visualDensity: const VisualDensity(
+              //         vertical: -4.0), // Reduced vertical padding
+              //     title: const Text('Feedback'),
+              //     onTap: () {
+              //       context.push(RouteConstants.feedback);
+              //     },
+              //   ),
+              // ),
+              const Divider(),
+              Container(
+                color: Colors.white,
+                child: ListTile(
+                  visualDensity: const VisualDensity(
+                      vertical: -4.0), // Reduced vertical padding
+                  title: const Text('Đăng xuất'),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (abcContext) => AlertDialog(
+                        title: Text('Xác nhận đăng xuất'),
+                        content: Text('Bạn có chắc chắn muốn đăng xuất?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(abcContext),
+                            child: const Text('Hủy'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              _onLogout(ref);
+                              Navigator.pop(abcContext);
+                            },
+                            child: const Text('Xác nhận'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),

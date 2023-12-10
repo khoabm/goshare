@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
+import 'package:goshare/core/utils/locations_util.dart';
+import 'package:goshare/models/vietmap_route_model.dart';
+import 'package:goshare/theme/pallet.dart';
+import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 //import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
-
-import 'package:vietmap_flutter_navigation/embedded/controller.dart';
-import 'package:vietmap_flutter_navigation/helpers.dart';
-import 'package:vietmap_flutter_navigation/models/marker.dart';
-import 'package:vietmap_flutter_navigation/models/options.dart';
-import 'package:vietmap_flutter_navigation/models/way_point.dart';
-import 'package:vietmap_flutter_navigation/navigation_plugin.dart';
-import 'package:vietmap_flutter_navigation/views/navigation_view.dart';
 
 class RouteConfirmScreen extends ConsumerStatefulWidget {
   final String startLongitude;
@@ -22,8 +19,12 @@ class RouteConfirmScreen extends ConsumerStatefulWidget {
   final String bookerId;
   final String carTypeId;
   final String? driverNote;
+  final String? nonAppDepName;
+  final String? nonAppDepPhone;
   const RouteConfirmScreen({
     this.driverNote,
+    this.nonAppDepName,
+    this.nonAppDepPhone,
     super.key,
     required this.startLongitude,
     required this.startLatitude,
@@ -39,21 +40,17 @@ class RouteConfirmScreen extends ConsumerStatefulWidget {
 }
 
 class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
-  MapNavigationViewController? _controller;
-  late MapOptions _navigationOption;
-  final _vietmapNavigationPlugin = VietMapNavigationPlugin();
-
-  List<WayPoint> wayPoints = [
-    WayPoint(name: "origin point", latitude: 10.759091, longitude: 106.675817),
-    WayPoint(
-        name: "destination point", latitude: 10.762528, longitude: 106.653099)
-  ];
   // Widget instructionImage = const SizedBox.shrink();
   // String guideDirection = "";
   // Widget recenterButton = const SizedBox.shrink();
   // RouteProgressEvent? routeProgressEvent;
+
+  VietmapController? _controller;
+  UserLocation? userLocation;
+  PolylinePoints polylinePoints = PolylinePoints();
+  VietMapRouteModel? routeModel;
+  List<Marker> temp = [];
   bool _isRouteBuilt = false;
-  bool _isRunning = false;
 
   bool _isLoading = false;
   String driverName = '';
@@ -64,52 +61,33 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
 
   @override
   void initState() {
-    initialize().then((value) {
-      // _showDriverInfoDialog();
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        // setState(() {
-        //   _isLoading = true;
-        // });
-        // print('DAY LA CHO INITTTTTTTTTTTTT');
-        // print(widget.bookerId);
-        // print(widget.paymentMethod);
-        // print(widget.startLatitude);
-        // print(widget.startLongitude);
-        // print(widget.carTypeId);
-        // print(widget.endLatitude);
-        // print(widget.endLongitude);
-        // print(
-        //     '===================================================================');
-        // // Use setState to trigger a rebuild of the widget with the new data.
-        // setState(() {
-        //   _isLoading = false;
-        // });
-      });
-
-      // Use setState to trigger a rebuild of the widget with the new data.
+    // _showDriverInfoDialog();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // setState(() {
+      //   _isLoading = true;
+      // });
+      // print('DAY LA CHO INITTTTTTTTTTTTT');
+      // print(widget.bookerId);
+      // print(widget.paymentMethod);
+      // print(widget.startLatitude);
+      // print(widget.startLongitude);
+      // print(widget.carTypeId);
+      // print(widget.endLatitude);
+      // print(widget.endLongitude);
+      // print(
+      //     '===================================================================');
+      // // Use setState to trigger a rebuild of the widget with the new data.
       // setState(() {
       //   _isLoading = false;
       // });
     });
 
+    // Use setState to trigger a rebuild of the widget with the new data.
+    // setState(() {
+    //   _isLoading = false;
+    // });
+
     super.initState();
-  }
-
-  Future<void> initialize() async {
-    if (!mounted) return;
-
-    _navigationOption = _vietmapNavigationPlugin.getDefaultOptions();
-    _navigationOption.simulateRoute = false;
-    _navigationOption.alternatives = false;
-    _navigationOption.bearing = 0;
-    _navigationOption.tilt = 0;
-    _navigationOption.apiKey =
-        'c3d0f188ff669f89042771a20656579073cffec5a8a69747';
-    _navigationOption.mapStyle =
-        "https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm";
-    _navigationOption.customLocationCenterIcon =
-        await VietMapHelper.getBytesFromAsset('assets/download.jpeg');
-    _vietmapNavigationPlugin.setDefaultOptions(_navigationOption);
   }
 
   //MapOptions? options;
@@ -209,60 +187,142 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
         top: false,
         child: Stack(
           children: [
-            NavigationView(
-              mapOptions: _navigationOption,
-              onNewRouteSelected: (p0) {
-                print(p0.toString());
-              },
-              onMapCreated: (p0) async {
-                _controller = p0;
-              },
-              onRouteBuilt: (p0) {
+            // NavigationView(
+            //   mapOptions: _navigationOption,
+            //   onNewRouteSelected: (p0) {
+            //     print(p0.toString());
+            //   },
+            //   onMapCreated: (p0) async {
+            //     _controller = p0;
+            //   },
+            //   onRouteBuilt: (p0) {
+            //     setState(() {
+            //       //EasyLoading.dismiss();
+            //       _isRouteBuilt = true;
+            //     });
+            //   },
+            //   onMapRendered: () async {
+            //     _controller?.setCenterIcon(
+            //       await VietMapHelper.getBytesFromAsset('assets/download.jpeg'),
+            //     );
+            //     wayPoints.clear();
+            //     wayPoints.add(
+            //       WayPoint(
+            //         name: 'origin point',
+            //         latitude: double.parse(widget.startLatitude),
+            //         longitude: double.parse(widget.startLongitude),
+            //       ),
+            //     );
+            //     wayPoints.add(
+            //       WayPoint(
+            //         name: 'destination point',
+            //         latitude: double.parse(widget.endLatitude),
+            //         longitude: double.parse(widget.endLongitude),
+            //       ),
+            //     );
+            //     _controller?.addImageMarkers([
+            //       Marker(
+            //         imagePath: 'assets/images/marker.png',
+            //         latLng: LatLng(
+            //           double.parse(widget.endLatitude),
+            //           double.parse(widget.endLongitude),
+            //         ),
+            //       ),
+            //     ]);
+            //     // _controller?.addImageMarkers(Marker(child: child, latLng: latLng));
+            //     _controller?.buildRoute(wayPoints: wayPoints);
+            //   },
+            //   // onRouteProgressChange: (RouteProgressEvent routeProgressEvent) {
+            //   //   setState(() {
+            //   //     this.routeProgressEvent = routeProgressEvent;
+            //   //   });
+            //   //   _setInstructionImage(routeProgressEvent.currentModifier,
+            //   //       routeProgressEvent.currentModifierType);
+            //   // },
+            // ),
+            VietmapGL(
+              //dragEnabled: false,
+              compassEnabled: false,
+              myLocationEnabled: true,
+              styleString:
+                  'https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm',
+              initialCameraPosition: const CameraPosition(
+                zoom: 17.5, target: LatLng(10.736657, 106.672240),
+                // LatLng(
+                //   currentLocation?.latitude ?? 0,
+                //   currentLocation?.longitude ?? 0,
+                // ),
+              ),
+              onMapCreated: (VietmapController controller) {
                 setState(() {
-                  //EasyLoading.dismiss();
+                  _controller = controller;
+                });
+              },
+
+              onMapRenderedCallback: () async {
+                setState(() {
+                  _isLoading = true;
+                });
+
+                final data = await LocationUtils.getRoute(
+                  double.parse(widget.startLatitude),
+                  double.parse(widget.startLongitude),
+                  double.parse(widget.endLatitude),
+                  double.parse(widget.endLongitude),
+                );
+                data.fold(
+                  (l) {
+                    // showSnackBar(
+                    //   context: context,
+                    //   message: 'Có lỗi khi lấy tuyến đường tài xế',
+                    // );
+                    print("CÓ LỖI KHI LẤY TUYẾN ĐƯỜNG");
+                  },
+                  (r) => routeModel = r,
+                );
+                if (routeModel != null) {
+                  List<PointLatLng> pointLatLngList =
+                      polylinePoints.decodePolyline(
+                    routeModel!.paths[0].points,
+                  );
+                  List<LatLng> latLngList = pointLatLngList
+                      .map(
+                        (point) => LatLng(point.latitude, point.longitude),
+                      )
+                      .toList();
+                  await _controller?.addPolyline(
+                    PolylineOptions(
+                      //polylineGapWidth: 0,
+                      polylineOffset: 10,
+                      geometry: latLngList,
+                      polylineColor: Pallete.primaryColor,
+                      polylineWidth: 6.5,
+                      polylineOpacity: 1,
+                      draggable: false,
+                      polylineBlur: 0.8,
+                    ),
+                  );
+                }
+                _controller?.animateCamera(
+                  CameraUpdate.newCameraPosition(
+                    CameraPosition(
+                      target: LatLng(
+                        double.parse(widget.startLatitude),
+                        double.parse(widget.startLongitude),
+                      ),
+                      zoom: 14.5,
+                      tilt: 0,
+                    ),
+                  ),
+                );
+
+                setState(() {
+                  _isLoading = false;
                   _isRouteBuilt = true;
                 });
               },
-              onMapRendered: () async {
-                _controller?.setCenterIcon(
-                  await VietMapHelper.getBytesFromAsset('assets/download.jpeg'),
-                );
-                wayPoints.clear();
-                wayPoints.add(
-                  WayPoint(
-                    name: 'origin point',
-                    latitude: double.parse(widget.startLatitude),
-                    longitude: double.parse(widget.startLongitude),
-                  ),
-                );
-                wayPoints.add(
-                  WayPoint(
-                    name: 'destination point',
-                    latitude: double.parse(widget.endLatitude),
-                    longitude: double.parse(widget.endLongitude),
-                  ),
-                );
-                _controller?.addImageMarkers([
-                  Marker(
-                    imagePath: 'assets/images/marker.png',
-                    latLng: LatLng(
-                      double.parse(widget.endLatitude),
-                      double.parse(widget.endLongitude),
-                    ),
-                  ),
-                ]);
-                // _controller?.addImageMarkers(Marker(child: child, latLng: latLng));
-                _controller?.buildRoute(wayPoints: wayPoints);
-              },
-              // onRouteProgressChange: (RouteProgressEvent routeProgressEvent) {
-              //   setState(() {
-              //     this.routeProgressEvent = routeProgressEvent;
-              //   });
-              //   _setInstructionImage(routeProgressEvent.currentModifier,
-              //       routeProgressEvent.currentModifierType);
-              // },
             ),
-            _isRunning && _isRouteBuilt
+            _isRouteBuilt
                 ? const SizedBox.shrink()
                 : Positioned(
                     width: MediaQuery.of(context).size.width * .95,
@@ -316,7 +376,7 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
 
   @override
   void dispose() {
-    _controller?.onDispose();
+    _controller?.dispose();
     super.dispose();
   }
 }

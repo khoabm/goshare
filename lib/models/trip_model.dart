@@ -275,6 +275,8 @@ import 'package:flutter/widgets.dart';
 class TripModel {
   final String id;
   final String passengerId;
+  final String passengerName;
+  final String? passengerPhoneNumber;
   final String driverId;
   final String startLocationId;
   final String endLocationId;
@@ -290,6 +292,7 @@ class TripModel {
   final int paymentMethod;
   final String bookerId;
   String? note;
+  final int type;
   Driver? driver;
   final Passenger passenger;
   final Booker booker;
@@ -299,6 +302,8 @@ class TripModel {
   TripModel({
     required this.id,
     required this.passengerId,
+    required this.passengerName,
+    this.passengerPhoneNumber,
     required this.driverId,
     required this.startLocationId,
     required this.endLocationId,
@@ -314,6 +319,7 @@ class TripModel {
     required this.paymentMethod,
     required this.bookerId,
     this.note,
+    required this.type,
     required this.driver,
     required this.passenger,
     required this.booker,
@@ -325,6 +331,8 @@ class TripModel {
   TripModel copyWith({
     String? id,
     String? passengerId,
+    String? passengerName,
+    ValueGetter<String?>? passengerPhoneNumber,
     String? driverId,
     String? startLocationId,
     String? endLocationId,
@@ -340,6 +348,7 @@ class TripModel {
     int? paymentMethod,
     String? bookerId,
     ValueGetter<String?>? note,
+    int? type,
     ValueGetter<Driver?>? driver,
     Passenger? passenger,
     Booker? booker,
@@ -350,6 +359,9 @@ class TripModel {
     return TripModel(
       id: id ?? this.id,
       passengerId: passengerId ?? this.passengerId,
+      passengerName: passengerName ?? this.passengerName,
+      passengerPhoneNumber:
+          passengerPhoneNumber?.call() ?? this.passengerPhoneNumber,
       driverId: driverId ?? this.driverId,
       startLocationId: startLocationId ?? this.startLocationId,
       endLocationId: endLocationId ?? this.endLocationId,
@@ -365,6 +377,7 @@ class TripModel {
       paymentMethod: paymentMethod ?? this.paymentMethod,
       bookerId: bookerId ?? this.bookerId,
       note: note?.call() ?? this.note,
+      type: type ?? this.type,
       driver: driver?.call() ?? this.driver,
       passenger: passenger ?? this.passenger,
       booker: booker ?? this.booker,
@@ -378,6 +391,8 @@ class TripModel {
     return {
       'id': id,
       'passengerId': passengerId,
+      'passengerName': passengerName,
+      'passengerPhoneNumber': passengerPhoneNumber,
       'driverId': driverId,
       'startLocationId': startLocationId,
       'endLocationId': endLocationId,
@@ -393,6 +408,7 @@ class TripModel {
       'paymentMethod': paymentMethod,
       'bookerId': bookerId,
       'note': note,
+      'type': type,
       'driver': driver?.toMap(),
       'passenger': passenger.toMap(),
       'booker': booker.toMap(),
@@ -406,36 +422,24 @@ class TripModel {
     return TripModel(
       id: map['id'] ?? '',
       passengerId: map['passengerId'] ?? '',
+      passengerName: map['passengerName'] ?? '',
+      passengerPhoneNumber: map['passengerPhoneNumber'],
       driverId: map['driverId'] ?? '',
       startLocationId: map['startLocationId'] ?? '',
       endLocationId: map['endLocationId'] ?? '',
-
-      //     DateTime.fromMillisecondsSinceEpoch(
-      //   DateTime.parse(map['birthday']).millisecondsSinceEpoch,
-      // )
-
-      startTime: DateTime.fromMillisecondsSinceEpoch(
-        DateTime.parse(map['startTime']).millisecondsSinceEpoch,
-      ),
-      endTime: DateTime.fromMillisecondsSinceEpoch(
-        DateTime.parse(map['endTime']).millisecondsSinceEpoch,
-      ),
-      pickupTime: DateTime.fromMillisecondsSinceEpoch(
-        DateTime.parse(map['pickupTime']).millisecondsSinceEpoch,
-      ),
+      startTime: DateTime.fromMillisecondsSinceEpoch(map['startTime']),
+      endTime: DateTime.fromMillisecondsSinceEpoch(map['endTime']),
+      pickupTime: DateTime.fromMillisecondsSinceEpoch(map['pickupTime']),
       distance: map['distance']?.toDouble() ?? 0.0,
       price: map['price']?.toDouble() ?? 0.0,
       cartypeId: map['cartypeId'] ?? '',
       status: map['status']?.toInt() ?? 0,
-      createTime: DateTime.fromMillisecondsSinceEpoch(
-        DateTime.parse(map['createTime']).millisecondsSinceEpoch,
-      ),
-      updatedTime: DateTime.fromMillisecondsSinceEpoch(
-        DateTime.parse(map['updatedTime']).millisecondsSinceEpoch,
-      ),
+      createTime: DateTime.fromMillisecondsSinceEpoch(map['createTime']),
+      updatedTime: DateTime.fromMillisecondsSinceEpoch(map['updatedTime']),
       paymentMethod: map['paymentMethod']?.toInt() ?? 0,
       bookerId: map['bookerId'] ?? '',
       note: map['note'],
+      type: map['type']?.toInt() ?? 0,
       driver: map['driver'] != null ? Driver.fromMap(map['driver']) : null,
       passenger: Passenger.fromMap(map['passenger']),
       booker: Booker.fromMap(map['booker']),
@@ -452,7 +456,7 @@ class TripModel {
 
   @override
   String toString() {
-    return 'TripModel(id: $id, passengerId: $passengerId, driverId: $driverId, startLocationId: $startLocationId, endLocationId: $endLocationId, startTime: $startTime, endTime: $endTime, pickupTime: $pickupTime, distance: $distance, price: $price, cartypeId: $cartypeId, status: $status, createTime: $createTime, updatedTime: $updatedTime, paymentMethod: $paymentMethod, bookerId: $bookerId, note: $note, driver: $driver, passenger: $passenger, booker: $booker, endLocation: $endLocation, startLocation: $startLocation, cartype: $cartype)';
+    return 'TripModel(id: $id, passengerId: $passengerId, passengerName: $passengerName, passengerPhoneNumber: $passengerPhoneNumber, driverId: $driverId, startLocationId: $startLocationId, endLocationId: $endLocationId, startTime: $startTime, endTime: $endTime, pickupTime: $pickupTime, distance: $distance, price: $price, cartypeId: $cartypeId, status: $status, createTime: $createTime, updatedTime: $updatedTime, paymentMethod: $paymentMethod, bookerId: $bookerId, note: $note, type: $type, driver: $driver, passenger: $passenger, booker: $booker, endLocation: $endLocation, startLocation: $startLocation, cartype: $cartype)';
   }
 
   @override
@@ -462,6 +466,8 @@ class TripModel {
     return other is TripModel &&
         other.id == id &&
         other.passengerId == passengerId &&
+        other.passengerName == passengerName &&
+        other.passengerPhoneNumber == passengerPhoneNumber &&
         other.driverId == driverId &&
         other.startLocationId == startLocationId &&
         other.endLocationId == endLocationId &&
@@ -477,6 +483,7 @@ class TripModel {
         other.paymentMethod == paymentMethod &&
         other.bookerId == bookerId &&
         other.note == note &&
+        other.type == type &&
         other.driver == driver &&
         other.passenger == passenger &&
         other.booker == booker &&
@@ -489,6 +496,8 @@ class TripModel {
   int get hashCode {
     return id.hashCode ^
         passengerId.hashCode ^
+        passengerName.hashCode ^
+        passengerPhoneNumber.hashCode ^
         driverId.hashCode ^
         startLocationId.hashCode ^
         endLocationId.hashCode ^
@@ -504,6 +513,7 @@ class TripModel {
         paymentMethod.hashCode ^
         bookerId.hashCode ^
         note.hashCode ^
+        type.hashCode ^
         driver.hashCode ^
         passenger.hashCode ^
         booker.hashCode ^

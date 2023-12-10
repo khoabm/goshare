@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:goshare/core/utils/locations_util.dart';
 import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/models/vietmap_route_model.dart';
+import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:location/location.dart';
 import 'package:signalr_core/signalr_core.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
@@ -145,7 +146,9 @@ class _GuardianObserveDependentTripScreenState
         );
       });
     } catch (e) {
-      print(e.toString());
+      print(
+        e.toString(),
+      );
     }
   }
 
@@ -155,6 +158,9 @@ class _GuardianObserveDependentTripScreenState
       final tripData = data.cast<Map<String, dynamic>>().first;
       final trip = TripModel.fromMap(tripData);
       if (trip.passengerId == widget.trip.passengerId) {
+        ref
+            .watch(currentDependentOnTripProvider.notifier)
+            .removeDependentCurrentOnTripId(trip.passengerId);
         _showDriverInfoDialog(trip);
       }
     }

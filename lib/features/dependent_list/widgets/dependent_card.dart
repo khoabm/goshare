@@ -49,7 +49,10 @@ class DependentCard extends ConsumerWidget {
                   isGetForMySelf = false;
                   dependentLocationData = await ref
                       .watch(dependentControllerProvider.notifier)
-                      .getDependentsLocation(context, dependentModel?.id ?? '');
+                      .getDependentsLocation(
+                        context,
+                        dependentModel?.id ?? '',
+                      );
 
                   isLoading.value = true;
                 }
