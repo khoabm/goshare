@@ -336,7 +336,7 @@ class _SearchNonAppUserPickUpLocationScreenState
                     _mapController == null
                         ? const SizedBox.shrink()
                         : MarkerLayer(
-                            ignorePointer: true,
+                            //ignorePointer: true,
                             mapController: _mapController!,
                             markers: [
                               _marker,

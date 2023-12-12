@@ -229,6 +229,8 @@ class AppRouter {
             final String? carTypeId = extras['carTypeId'] as String?;
             final String? driverNote = extras['driverNote'] as String?;
             final bool? isFindingTrip = extras['isFindingTrip'] as bool?;
+            final String? nonAppDepName = extras['nonAppDepName'] as String?;
+            final String? nonAppDepPhone = extras['nonAppDepPhone'] as String?;
             //final String? driverNote = params['driverNote'] as String?;
             return SlideBottomTransition(
               child: FindTripScreen2(
@@ -241,6 +243,8 @@ class AppRouter {
                 paymentMethod: paymentMethod ?? '0',
                 carTypeId: carTypeId ?? '',
                 isFindingTrip: isFindingTrip,
+                nonAppDepName: nonAppDepName,
+                nonAppDepPhone: nonAppDepPhone,
               ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );

@@ -58,7 +58,8 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
   String driverAvatar = '';
   String driverPlate = '';
   String driverCarType = '';
-
+  double midLat = 0;
+  double midLng = 0;
   @override
   void initState() {
     // _showDriverInfoDialog();
@@ -106,6 +107,8 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
       'bookerId': widget.bookerId,
       'carTypeId': widget.carTypeId,
       'driverNote': widget.driverNote,
+      'nonAppDepName': widget.nonAppDepName,
+      'nonAppDepPhone': widget.nonAppDepPhone,
     });
   }
 
@@ -293,7 +296,7 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
                   await _controller?.addPolyline(
                     PolylineOptions(
                       //polylineGapWidth: 0,
-                      polylineOffset: 10,
+                      //polylineOffset: 10,
                       geometry: latLngList,
                       polylineColor: Pallete.primaryColor,
                       polylineWidth: 6.5,
@@ -302,7 +305,15 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
                       polylineBlur: 0.8,
                     ),
                   );
+
+                  for (var point in pointLatLngList) {
+                    midLat += point.latitude;
+                    midLng += point.longitude;
+                  }
+                  midLat /= pointLatLngList.length;
+                  midLng /= pointLatLngList.length;
                 }
+
                 _controller?.animateCamera(
                   CameraUpdate.newCameraPosition(
                     CameraPosition(
@@ -322,6 +333,22 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
                 });
               },
             ),
+            _controller == null || routeModel == null || !_isRouteBuilt
+                ? const SizedBox.shrink()
+                : MarkerLayer(
+                    ignorePointer: true,
+                    mapController: _controller!,
+                    markers: [
+                      StaticMarker(
+                        bearing: 0,
+                        child: _markerWidget(
+                          routeModel!.paths[0].distance,
+                          routeModel!.paths[0].time,
+                        ),
+                        latLng: LatLng(midLat, midLng),
+                      ),
+                    ],
+                  ),
             _isRouteBuilt
                 ? const SizedBox.shrink()
                 : Positioned(
@@ -372,6 +399,30 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
     //         child: Text('true'),
     //       )
     //     : const SizedBox();
+  }
+
+  _markerWidget(double distance, double time) {
+    Duration duration = Duration(milliseconds: time.toInt());
+    String timeStr;
+
+    if (duration.inHours == 0) {
+      timeStr = '${duration.inMinutes} phút';
+    } else {
+      timeStr = '${duration.inHours} giờ và ${duration.inMinutes % 60} phút';
+    }
+
+    return Container(
+      decoration: const BoxDecoration(color: Colors.white),
+      padding: const EdgeInsets.all(8.0),
+      child: Expanded(
+        child: Column(
+          children: [
+            Text('Khoảng cách: ${distance.toString()}'),
+            Text('Thời gian di chuyển : $timeStr'),
+          ],
+        ),
+      ),
+    );
   }
 
   @override

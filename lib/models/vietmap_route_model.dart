@@ -66,7 +66,7 @@ class VietMapRouteModel {
 class Path {
   final double distance;
   final double weight;
-  final int time;
+  final double time;
   final int transfers;
   final bool pointsEncoded;
   final List<double> bbox;
@@ -88,7 +88,7 @@ class Path {
   Path copyWith({
     double? distance,
     double? weight,
-    int? time,
+    double? time,
     int? transfers,
     bool? pointsEncoded,
     List<double>? bbox,
@@ -127,7 +127,7 @@ class Path {
     return Path(
       distance: map['distance']?.toDouble() ?? 0.0,
       weight: map['weight']?.toDouble() ?? 0.0,
-      time: map['time']?.toInt() ?? 0,
+      time: map['time']?.toDouble() ?? 0.0,
       transfers: map['transfers']?.toInt() ?? 0,
       pointsEncoded: map['pointsEncoded'] ?? false,
       bbox: List<double>.from(map['bbox']),

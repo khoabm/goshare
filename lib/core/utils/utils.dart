@@ -52,7 +52,7 @@ void showAlreadyInTripError({
   showDialog(
     barrierDismissible: false,
     context: context,
-    builder: (BuildContext context) {
+    builder: (BuildContext dialogContext) {
       return AlertDialog(
         title: const Text('Có lỗi xảy ra'),
         content: Text(message),
@@ -60,8 +60,8 @@ void showAlreadyInTripError({
           TextButton(
             child: const Text('OK'),
             onPressed: () {
-              context.pop();
-              context.go(RouteConstants.dashBoardUrl);
+              Navigator.of(dialogContext).pop();
+              GoRouter.of(context).goNamed(RouteConstants.dashBoard);
             },
           ),
         ],
@@ -77,7 +77,7 @@ void showFindTripErrorDialog({
   showDialog(
     barrierDismissible: false,
     context: context,
-    builder: (BuildContext context) {
+    builder: (BuildContext dialogContext) {
       return AlertDialog(
         title: const Text('Có lỗi xảy ra'),
         content: Text(message),
@@ -85,8 +85,8 @@ void showFindTripErrorDialog({
           TextButton(
             child: const Text('OK'),
             onPressed: () {
-              context.pop();
-              context.go(RouteConstants.dashBoardUrl);
+              Navigator.of(dialogContext).pop();
+              GoRouter.of(context).goNamed(RouteConstants.dashBoard);
             },
           ),
         ],
@@ -110,7 +110,7 @@ void showNavigateDashBoardDialog(TripModel trip, BuildContext context) {
   showDialog(
     barrierDismissible: true,
     context: context,
-    builder: (BuildContext abcContext) {
+    builder: (BuildContext dialogContext) {
       return AlertDialog(
         title: Center(
           child: Text(
@@ -138,7 +138,8 @@ void showNavigateDashBoardDialog(TripModel trip, BuildContext context) {
         actions: [
           TextButton(
             onPressed: () {
-              context.goNamed(RouteConstants.dashBoard);
+              Navigator.of(dialogContext).pop();
+              GoRouter.of(context).goNamed(RouteConstants.dashBoard);
             },
             child: const Text(
               'Xác nhận',
@@ -165,28 +166,10 @@ void showDialogInfo(TripModel? trip, BuildContext context, WidgetRef ref) {
         actions: [
           ElevatedButton(
             onPressed: () {
-              context.pop();
+              Navigator.of(abcContext).pop();
             },
             child: const Text(
               'Xác nhận',
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              bool check =
-                  await ref.watch(tripControllerProvider.notifier).cancelTrip(
-                        context,
-                        trip?.id ?? '',
-                      );
-              if (context.mounted) {
-                if (check == true) {
-                  ref.watch(stageProvider.notifier).setStage(Stage.stage0);
-                }
-                abcContext.pop();
-              }
-            },
-            child: const Text(
-              'Hủy',
             ),
           ),
         ],
@@ -212,7 +195,7 @@ void showCancelDialogInfo(
           ElevatedButton(
             onPressed: () {
               ref.watch(stageProvider.notifier).setStage(Stage.stage0);
-              abcContext.pop();
+              Navigator.of(abcContext).pop();
             },
             child: const Text(
               'Xác nhận',
@@ -250,23 +233,23 @@ void showDialogTripCancel(
         actions: [
           ElevatedButton(
             onPressed: () {
-              abcContext.pop();
+              Navigator.of(abcContext).pop();
             },
             child: const Text(
               'Xác nhận',
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              if (context.mounted) {
-                ref.watch(stageProvider.notifier).setStage(Stage.stage0);
-                abcContext.pop();
-              }
-            },
-            child: const Text(
-              'Hủy',
-            ),
-          ),
+          // ElevatedButton(
+          //   onPressed: () {
+          //     if (context.mounted) {
+          //       ref.watch(stageProvider.notifier).setStage(Stage.stage0);
+          //       Navigator.of(abcContext).pop();
+          //     }
+          //   },
+          //   child: const Text(
+          //     'Hủy',
+          //   ),
+          // ),
         ],
       );
     },
@@ -290,7 +273,7 @@ void showWalletInsufficient(BuildContext context) {
         actions: [
           ElevatedButton(
             onPressed: () {
-              abcContext.pop();
+              Navigator.of(abcContext).pop();
             },
             child: const Text(
               'Xác nhận',
@@ -319,7 +302,8 @@ void showFeedbackSuccess(BuildContext context) {
         actions: [
           ElevatedButton(
             onPressed: () {
-              context.goNamed(RouteConstants.dashBoard);
+              Navigator.of(abcContext).pop();
+              GoRouter.of(context).goNamed(RouteConstants.dashBoard);
             },
             child: const Text(
               'Xác nhận',
@@ -365,6 +349,7 @@ void showDialogInfoPickUp(TripModel trip, BuildContext context) {
           TextButton(
             onPressed: () {
               //context.pop();
+              Navigator.of(abcContext).pop();
               context.pushNamed(
                 RouteConstants.onTrip,
                 extra: {

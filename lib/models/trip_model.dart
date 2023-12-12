@@ -427,15 +427,25 @@ class TripModel {
       driverId: map['driverId'] ?? '',
       startLocationId: map['startLocationId'] ?? '',
       endLocationId: map['endLocationId'] ?? '',
-      startTime: DateTime.fromMillisecondsSinceEpoch(map['startTime']),
-      endTime: DateTime.fromMillisecondsSinceEpoch(map['endTime']),
-      pickupTime: DateTime.fromMillisecondsSinceEpoch(map['pickupTime']),
+      startTime: DateTime.fromMillisecondsSinceEpoch(
+        DateTime.parse(map['startTime']).millisecondsSinceEpoch,
+      ),
+      endTime: DateTime.fromMillisecondsSinceEpoch(
+        DateTime.parse(map['endTime']).millisecondsSinceEpoch,
+      ),
+      pickupTime: DateTime.fromMillisecondsSinceEpoch(
+        DateTime.parse(map['pickupTime']).millisecondsSinceEpoch,
+      ),
       distance: map['distance']?.toDouble() ?? 0.0,
       price: map['price']?.toDouble() ?? 0.0,
       cartypeId: map['cartypeId'] ?? '',
       status: map['status']?.toInt() ?? 0,
-      createTime: DateTime.fromMillisecondsSinceEpoch(map['createTime']),
-      updatedTime: DateTime.fromMillisecondsSinceEpoch(map['updatedTime']),
+      createTime: DateTime.fromMillisecondsSinceEpoch(
+        DateTime.parse(map['createTime']).millisecondsSinceEpoch,
+      ),
+      updatedTime: DateTime.fromMillisecondsSinceEpoch(
+        DateTime.parse(map['updatedTime']).millisecondsSinceEpoch,
+      ),
       paymentMethod: map['paymentMethod']?.toInt() ?? 0,
       bookerId: map['bookerId'] ?? '',
       note: map['note'],

@@ -75,8 +75,9 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   @override
   void initState() {
     if (!mounted) return;
+    initSignalR(ref);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await initSignalR(ref);
+      //await initSignalR(ref);
       final location = ref.read(locationProvider);
       currentLocation = await location.getCurrentLocation();
 
@@ -85,7 +86,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
     super.initState();
   }
 
-  Future<void> initSignalR(WidgetRef ref) async {
+  void initSignalR(WidgetRef ref) async {
     try {
       final hubConnection = await ref.read(
         hubConnectionProvider.future,

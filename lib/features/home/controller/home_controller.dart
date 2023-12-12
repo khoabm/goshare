@@ -5,6 +5,7 @@ import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/home/repositories/home_repository.dart';
 import 'package:goshare/models/location_model.dart';
 import 'package:goshare/models/search_places_model.dart';
+import 'package:goshare/models/user_profile_model.dart';
 import 'package:goshare/models/vietmap_autocomplete_model.dart';
 
 final homeControllerProvider =
@@ -99,6 +100,28 @@ class HomeController extends StateNotifier<bool> {
       list = r;
     });
     return list;
+  }
+
+  Future<UserProfileModel?> getUserProfile(BuildContext context) async {
+    UserProfileModel? profile;
+
+    final result = await _homeRepository.getUserProfile();
+    result.fold((l) {
+      if (l is UnauthorizedFailure) {
+        showLoginTimeOut(
+          context: context,
+        );
+      } else {
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      }
+    }, (r) {
+      // print(r.length.toString());
+      profile = r;
+    });
+    return profile;
   }
 
   Stream<List<Place>> searchPlace({

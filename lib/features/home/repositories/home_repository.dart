@@ -7,6 +7,7 @@ import 'package:goshare/core/failure.dart';
 import 'package:goshare/core/type_def.dart';
 import 'package:goshare/core/utils/http_utils.dart';
 import 'package:goshare/models/location_model.dart';
+import 'package:goshare/models/user_profile_model.dart';
 import 'package:goshare/models/vietmap_autocomplete_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -154,6 +155,37 @@ class HomeRepository {
         print(jsonData);
         list = jsonData.map((json) => LocationModel.fromMap(json)).toList();
         return right(list);
+      } else if (res.statusCode == 429) {
+        return left(Failure('Too many request'));
+      } else if (res.statusCode == 401) {
+        return left(UnauthorizedFailure('Unauthorized'));
+      } else {
+        return left(Failure('Co loi xay ra'));
+      }
+    } on TimeoutException catch (_) {
+      return left(
+        Failure('Timeout'),
+      );
+    }
+  }
+
+  FutureEither<UserProfileModel> getUserProfile() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+
+      final client = HttpClientWithAuth(accessToken ?? '');
+      final res = await client.get(
+        Uri.parse('$baseApiUrl/location'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      if (res.statusCode == 200) {
+        Map<String, dynamic> userProfileData = json.decode(res.body);
+        UserProfileModel userProfile =
+            UserProfileModel.fromMap(userProfileData);
+        return right(userProfile);
       } else if (res.statusCode == 429) {
         return left(Failure('Too many request'));
       } else if (res.statusCode == 401) {

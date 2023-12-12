@@ -6,7 +6,7 @@ import 'package:goshare/common/app_button.dart';
 import 'package:goshare/common/app_text_field.dart';
 import 'package:goshare/common/home_center_container.dart';
 import 'package:goshare/core/constants/route_constants.dart';
-import 'package:goshare/features/dependent_mng/dependent_add/dependent_add_screen.dart';
+import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/models/dependent_model.dart';
 import 'package:goshare/models/non_app_user_pick_up_location_model.dart';
 
@@ -56,6 +56,8 @@ class _CreateNonAppUserProfileForTripScreenState
     String carTypeId,
     String? driverNote,
     int capacity,
+    String nonAppDepName,
+    String nonAppDepPhone,
   ) {
     context.replaceNamed(RouteConstants.routeConfirm, extra: {
       'startLatitude': startLatitude,
@@ -118,6 +120,9 @@ class _CreateNonAppUserProfileForTripScreenState
                             nonAppUserPickUpLocation =
                                 result as NonAppUserPickUpLocation?;
                           });
+                          print(nonAppUserPickUpLocation?.latitude.toString());
+                          print(nonAppUserPickUpLocation?.longitude.toString());
+                          print(nonAppUserPickUpLocation?.address.toString());
                         },
                         child: Text(
                           nonAppUserPickUpLocation?.address ??
@@ -136,7 +141,7 @@ class _CreateNonAppUserProfileForTripScreenState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Tên người đi (* Bắt buộc)',
+                      'Tên người đi(*)',
                     ),
                     const SizedBox(
                       width: 15,
@@ -188,19 +193,22 @@ class _CreateNonAppUserProfileForTripScreenState
                   child: AppButton(
                     buttonText: 'Xác nhận',
                     onPressed: () {
-                      if (_formKey.currentState!.validate()) {}
-                      navigateToRouteConfirmScreen(
-                        context,
-                        nonAppUserPickUpLocation!.latitude.toString(),
-                        nonAppUserPickUpLocation!.longitude.toString(),
-                        widget.endLatitude,
-                        widget.endLongitude,
-                        widget.paymentMethod,
-                        ref.watch(userProvider.notifier).state!.id,
-                        widget.carTypeId,
-                        widget.driverNote,
-                        widget.capacity,
-                      );
+                      if (_formKey.currentState!.validate()) {
+                        navigateToRouteConfirmScreen(
+                          context,
+                          nonAppUserPickUpLocation!.latitude.toString(),
+                          nonAppUserPickUpLocation!.longitude.toString(),
+                          widget.endLatitude,
+                          widget.endLongitude,
+                          widget.paymentMethod,
+                          ref.watch(userProvider.notifier).state!.id,
+                          widget.carTypeId,
+                          widget.driverNote,
+                          widget.capacity,
+                          userNameTextController.text,
+                          phoneTextController.text,
+                        );
+                      }
                     },
                   ),
                 ),
