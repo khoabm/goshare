@@ -8,7 +8,6 @@ import 'package:goshare/features/trip/repository/trip_repository.dart';
 
 import 'package:goshare/models/car_model.dart';
 import 'package:goshare/models/find_trip_model.dart';
-import 'package:goshare/models/report_model.dart';
 import 'package:goshare/models/trip_model.dart';
 
 final tripControllerProvider = StateNotifierProvider<TripController, bool>(
@@ -53,79 +52,8 @@ class TripController extends StateNotifier<bool> {
         startAddress: res2.address,
       );
     }
-    print(tripModel.toString());
+
     final result = await _tripRepository.findDriver(tripModel);
-    result.fold((l) {
-      state = false;
-      if (l is UnauthorizedFailure) {
-        showLoginTimeOut(
-          context: context,
-        );
-      } else {
-        showSnackBar(
-          context: context,
-          message: l.message,
-        );
-      }
-    }, (r) {
-      trip = r;
-    });
-    return trip;
-  }
-
-  Future<Report?> reportDriverOnTrip(
-    BuildContext context,
-    ReportPostModel tripModel,
-  ) async {
-    Report? report;
-
-    final result = await _tripRepository.reportDriverOnTrip(tripModel);
-    result.fold((l) {
-      state = false;
-      if (l is UnauthorizedFailure) {
-        showLoginTimeOut(
-          context: context,
-        );
-      } else {
-        showSnackBar(
-          context: context,
-          message: l.message,
-        );
-      }
-    }, (r) {
-      report = r;
-    });
-    return report;
-  }
-
-  Future<TripModel?> findDriverForNonAppDependent(
-      BuildContext context, FindTripNonAppModel tripModel) async {
-    TripModel? trip;
-
-    final res =
-        await _ref.watch(homeControllerProvider.notifier).searchLocationReverse(
-              context,
-              tripModel.startLongitude,
-              tripModel.startLatitude,
-            );
-    if (context.mounted) {
-      final res2 = await _ref
-          .watch(homeControllerProvider.notifier)
-          .searchLocationReverse(
-            context,
-            tripModel.startLongitude,
-            tripModel.startLatitude,
-          );
-      print(res.address);
-      print(res2.address);
-      tripModel.copyWith(
-        endAddress: res.address,
-        startAddress: res2.address,
-      );
-    }
-
-    final result =
-        await _tripRepository.findDriverForNonAppDependent(tripModel);
     result.fold((l) {
       state = false;
       if (l is UnauthorizedFailure) {

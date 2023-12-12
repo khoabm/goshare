@@ -176,7 +176,7 @@ class HomeRepository {
 
       final client = HttpClientWithAuth(accessToken ?? '');
       final res = await client.get(
-        Uri.parse('$baseApiUrl/location'),
+        Uri.parse('$baseApiUrl/user/profile'),
         headers: {
           'Content-Type': 'application/json',
         },

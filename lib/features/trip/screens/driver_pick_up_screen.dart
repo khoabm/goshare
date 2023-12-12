@@ -75,9 +75,8 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   @override
   void initState() {
     if (!mounted) return;
-    initSignalR(ref);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      //await initSignalR(ref);
+      await initSignalR(ref);
       final location = ref.read(locationProvider);
       currentLocation = await location.getCurrentLocation();
 
@@ -86,7 +85,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
     super.initState();
   }
 
-  void initSignalR(WidgetRef ref) async {
+  Future<void> initSignalR(WidgetRef ref) async {
     try {
       final hubConnection = await ref.read(
         hubConnectionProvider.future,
@@ -101,15 +100,13 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
       hubConnection.on(
         'UpdateDriverLocation',
         (arguments) {
-          if (mounted) {
-            print("SIGNAL R DEP TRIP BOOK" + arguments.toString());
-            final stringData = arguments?.first as String;
-            final data = jsonDecode(stringData) as Map<String, dynamic>;
-            updateMarker(
-              data['latitude'],
-              data['longitude'],
-            );
-          }
+          print("SIGNAL R DEP TRIP BOOK" + arguments.toString());
+          final stringData = arguments?.first as String;
+          final data = jsonDecode(stringData) as Map<String, dynamic>;
+          updateMarker(
+            data['latitude'],
+            data['longitude'],
+          );
         },
       );
       hubConnection.onclose((exception) async {
@@ -152,7 +149,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
     showDialog(
       barrierDismissible: true,
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: Center(
             child: Text(
@@ -181,6 +178,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           actions: [
             TextButton(
               onPressed: () {
+                Navigator.of(dialogContext).pop();
                 navigateToOnTripScreen(trip);
               },
               child: const Text(
@@ -285,18 +283,20 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           ),
         ),
       );
-      setState(() {
-        temp = tempMarkers;
-        _mapController?.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: temp.first.latLng,
-              zoom: 15.5,
-              tilt: 0,
+      if (mounted) {
+        setState(() {
+          temp = tempMarkers;
+          _mapController?.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                target: temp.first.latLng,
+                zoom: 15.5,
+                tilt: 0,
+              ),
             ),
-          ),
-        );
-      });
+          );
+        });
+      }
     }
   }
 

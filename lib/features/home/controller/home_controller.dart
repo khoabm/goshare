@@ -102,6 +102,22 @@ class HomeController extends StateNotifier<bool> {
     return list;
   }
 
+  Stream<List<Place>> searchPlace({
+    required String query,
+    String format = 'jsonv2',
+    String countrycodes = 'vn',
+    String layer = 'address',
+    int addressdetails = 0,
+  }) {
+    return _homeRepository.searchPlaces(
+      query,
+      format,
+      countrycodes,
+      layer,
+      addressdetails,
+    );
+  }
+
   Future<UserProfileModel?> getUserProfile(BuildContext context) async {
     UserProfileModel? profile;
 
@@ -122,21 +138,5 @@ class HomeController extends StateNotifier<bool> {
       profile = r;
     });
     return profile;
-  }
-
-  Stream<List<Place>> searchPlace({
-    required String query,
-    String format = 'jsonv2',
-    String countrycodes = 'vn',
-    String layer = 'address',
-    int addressdetails = 0,
-  }) {
-    return _homeRepository.searchPlaces(
-      query,
-      format,
-      countrycodes,
-      layer,
-      addressdetails,
-    );
   }
 }

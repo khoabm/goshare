@@ -8,7 +8,6 @@ import 'package:goshare/core/type_def.dart';
 import 'package:goshare/core/utils/http_utils.dart';
 import 'package:goshare/models/car_model.dart';
 import 'package:goshare/models/find_trip_model.dart';
-import 'package:goshare/models/report_model.dart';
 import 'package:goshare/models/trip_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -108,93 +107,6 @@ class TripRepository {
         }
         return left(
           Failure('Có lỗi xảy ra'),
-        );
-      } else {
-        return left(Failure('Co loi xay ra'));
-      }
-    } catch (e) {
-      return left(Failure(e.toString()));
-    }
-  }
-
-  FutureEither<TripModel> findDriverForNonAppDependent(
-      FindTripNonAppModel tripModel) async {
-    try {
-      // Map<String, dynamic> tripModelMap = tripModel.toMap();
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final accessToken = prefs.getString('accessToken');
-      String tripModelJson = tripModel.toJson();
-      final client = HttpClientWithAuth(accessToken ?? '');
-      final response = await client.post(
-        Uri.parse('$baseApiUrl/phoneless'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: tripModelJson,
-      );
-      print(response.body);
-      if (response.statusCode == 200) {
-        Map<String, dynamic> tripData = json.decode(response.body);
-        TripModel trip = TripModel.fromMap(tripData);
-        return right(trip);
-      } else if (response.statusCode == 429) {
-        return left(Failure('Too many request'));
-      } else if (response.statusCode == 401) {
-        return left(
-          UnauthorizedFailure('Unauthorized'),
-        );
-      } else if (response.statusCode == 400) {
-        Map<String, dynamic> error = json.decode(response.body);
-        if (error['message'] ==
-            "Passenger is already in a trip that hasn't completed. Please complete the current trip before creating a new one.") {
-          return left(AlreadyInTripFailure(
-              'Bạn không thể tạo chuyến vào lúc này. Nếu đây là lỗi vui lòng liên hệ cho hệ thống'));
-        } else if (error['message'] ==
-            "You are not allow to create trip at the moment.") {
-          return left(AlreadyInTripFailure(
-              'Bạn không thể tạo chuyến vào lúc này. Nếu đây là lỗi vui lòng liên hệ cho hệ thống'));
-        } else {
-          left(
-            AlreadyInTripFailure(
-                'Bạn không thể tạo chuyến vào lúc này. Nếu đây là lỗi vui lòng liên hệ cho hệ thống'),
-          );
-        }
-        return left(
-          Failure('Có lỗi xảy ra'),
-        );
-      } else {
-        return left(Failure('Co loi xay ra'));
-      }
-    } catch (e) {
-      return left(Failure(e.toString()));
-    }
-  }
-
-  FutureEither<Report> reportDriverOnTrip(
-      ReportPostModel reportPostModel) async {
-    try {
-      // Map<String, dynamic> tripModelMap = tripModel.toMap();
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final accessToken = prefs.getString('accessToken');
-      String reportPostModelJson = reportPostModel.toJson();
-      final client = HttpClientWithAuth(accessToken ?? '');
-      final response = await client.post(
-        Uri.parse('$baseApiUrl/report'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: reportPostModelJson,
-      );
-      print(response.body);
-      if (response.statusCode == 200) {
-        Map<String, dynamic> tripData = json.decode(response.body);
-        Report report = Report.fromMap(tripData);
-        return right(report);
-      } else if (response.statusCode == 429) {
-        return left(Failure('Too many request'));
-      } else if (response.statusCode == 401) {
-        return left(
-          UnauthorizedFailure('Unauthorized'),
         );
       } else {
         return left(Failure('Co loi xay ra'));
@@ -368,9 +280,6 @@ class TripRepository {
           'Content-Type': 'application/json',
         },
       );
-      print(response.statusCode);
-      print(response.body);
-
       if (response.statusCode == 200) {
         print("WALLET THÀNH CÔNG");
         return right(

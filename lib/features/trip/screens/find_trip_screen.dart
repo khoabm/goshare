@@ -73,108 +73,113 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
   @override
   void initState() {
     // _showDriverInfoDialog();
-    initSignalR(ref);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      setState(() {
-        _isLoading = true;
-      });
-      if (widget.nonAppDepName != null && widget.nonAppDepName!.isNotEmpty) {
-        print("TÌM XE CHO DEP KHÔNG CÓ LOCATIONNNNNNNNNNNNNNNNNN");
-        if (mounted) {
-          result = await ref
-              .read(tripControllerProvider.notifier)
-              .findDriverForNonAppDependent(
-                context,
-                FindTripNonAppModel(
-                  startLatitude: double.parse(widget.startLatitude),
-                  startLongitude: double.parse(widget.startLongitude),
-                  //startAddress: 'Nha Nguyen',
-                  endLatitude: double.parse(widget.endLatitude),
-                  endLongitude: double.parse(widget.endLongitude),
-                  //endAddress: 'Nga 3',
-                  cartypeId: widget.carTypeId,
-                  paymentMethod: int.parse(widget.paymentMethod),
-                  note: widget.driverNote,
-                  dependentInfo: DependentInfo(
-                    phone: widget.nonAppDepPhone,
-                    name: widget.nonAppDepName ?? '',
-                  ),
-                ),
-              );
-          if (result != null) {
-            ref
-                .read(currentDependentOnTripProvider.notifier)
-                .addDependentCurrentOnTripId(
-                  DependentTrip(
-                    id: result!.id,
-                    name: result!.passengerName,
-                    dependentId: result!.passengerId,
-                  ),
-                );
+      try {
+        setState(() {
+          _isLoading = true;
+        });
+        await initSignalR(ref);
+        if (widget.nonAppDepName != null && widget.nonAppDepName!.isNotEmpty) {
+          print("TÌM XE CHO DEP KHÔNG CÓ LOCATIONNNNNNNNNNNNNNNNNN");
+          if (mounted) {
+            // result = await ref
+            //     .read(tripControllerProvider.notifier)
+            //     .findDriverForNonAppDependent(
+            //       context,
+            //       FindTripNonAppModel(
+            //         startLatitude: double.parse(widget.startLatitude),
+            //         startLongitude: double.parse(widget.startLongitude),
+            //         //startAddress: 'Nha Nguyen',
+            //         endLatitude: double.parse(widget.endLatitude),
+            //         endLongitude: double.parse(widget.endLongitude),
+            //         //endAddress: 'Nga 3',
+            //         cartypeId: widget.carTypeId,
+            //         paymentMethod: int.parse(widget.paymentMethod),
+            //         note: widget.driverNote,
+            //         dependentInfo: DependentInfo(
+            //           phone: widget.nonAppDepPhone,
+            //           name: widget.nonAppDepName ?? '',
+            //         ),
+            //       ),
+            //     );
+            // if (result != null) {
+            //   ref
+            //       .read(currentDependentOnTripProvider.notifier)
+            //       .addDependentCurrentOnTripId(
+            //         DependentTrip(
+            //           id: result!.id,
+            //           name: result!.passengerName,
+            //           dependentId: result!.passengerId,
+            //         ),
+            //       );
+            // }
           }
-        }
-      } else {
-        if (widget.bookerId == ref.read(userProvider.notifier).state?.id) {
-          if (context.mounted) {
-            print("TÌM XE CHO BẢN THÂN");
-            result = await ref.read(tripControllerProvider.notifier).findDriver(
-                  context,
-                  FindTripModel(
-                    startLatitude: double.parse(widget.startLatitude),
-                    startLongitude: double.parse(widget.startLongitude),
-                    //startAddress: 'Nha Nguyen',
-                    endLatitude: double.parse(widget.endLatitude),
-                    endLongitude: double.parse(widget.endLongitude),
-                    //endAddress: 'Nga 3',
-                    cartypeId: widget.carTypeId,
-                    paymentMethod: int.parse(widget.paymentMethod),
-                    note: widget.driverNote,
-                  ),
-                );
+        } else {
+          if (widget.bookerId == ref.read(userProvider.notifier).state?.id) {
+            if (context.mounted) {
+              print("TÌM XE CHO BẢN THÂN");
+              result =
+                  await ref.read(tripControllerProvider.notifier).findDriver(
+                        context,
+                        FindTripModel(
+                          startLatitude: double.parse(widget.startLatitude),
+                          startLongitude: double.parse(widget.startLongitude),
+                          //startAddress: 'Nha Nguyen',
+                          endLatitude: double.parse(widget.endLatitude),
+                          endLongitude: double.parse(widget.endLongitude),
+                          //endAddress: 'Nga 3',
+                          cartypeId: widget.carTypeId,
+                          paymentMethod: int.parse(widget.paymentMethod),
+                          note: widget.driverNote,
+                        ),
+                      );
+
+              if (result != null) {
+                ref
+                    .read(currentOnTripIdProvider.notifier)
+                    .setCurrentOnTripId(result?.id);
+              }
+            }
+          } else {
+            if (context.mounted) {
+              result = await ref
+                  .read(tripControllerProvider.notifier)
+                  .findDriverForDependent(
+                    context,
+                    FindTripModel(
+                      startLatitude: double.parse(widget.startLatitude),
+                      startLongitude: double.parse(widget.startLongitude),
+                      //startAddress: 'Nha Nguyen',
+                      endLatitude: double.parse(widget.endLatitude),
+                      endLongitude: double.parse(widget.endLongitude),
+                      //endAddress: 'Nga 3',
+                      cartypeId: widget.carTypeId,
+                      paymentMethod: int.parse(widget.paymentMethod),
+                      note: widget.driverNote,
+                    ),
+                    widget.bookerId,
+                  );
+            }
 
             if (result != null) {
               ref
-                  .read(currentOnTripIdProvider.notifier)
-                  .setCurrentOnTripId(result?.id);
+                  .read(currentDependentOnTripProvider.notifier)
+                  .addDependentCurrentOnTripId(
+                    DependentTrip(
+                        id: result!.id,
+                        name: result!.passenger.name,
+                        dependentId: result!.passenger.id),
+                  );
             }
           }
-        } else {
-          if (context.mounted) {
-            result = await ref
-                .read(tripControllerProvider.notifier)
-                .findDriverForDependent(
-                  context,
-                  FindTripModel(
-                    startLatitude: double.parse(widget.startLatitude),
-                    startLongitude: double.parse(widget.startLongitude),
-                    //startAddress: 'Nha Nguyen',
-                    endLatitude: double.parse(widget.endLatitude),
-                    endLongitude: double.parse(widget.endLongitude),
-                    //endAddress: 'Nga 3',
-                    cartypeId: widget.carTypeId,
-                    paymentMethod: int.parse(widget.paymentMethod),
-                    note: widget.driverNote,
-                  ),
-                  widget.bookerId,
-                );
-          }
-
-          if (result != null) {
-            ref
-                .read(currentDependentOnTripProvider.notifier)
-                .addDependentCurrentOnTripId(
-                  DependentTrip(
-                      id: result!.id,
-                      name: result!.passenger.name,
-                      dependentId: result!.passenger.id),
-                );
-          }
         }
+        // Use setState to trigger a rebuild of the widget with the new data.
+        setState(() {
+          _isLoading = false;
+        });
+      } catch (e) {
+        print(e.toString());
       }
-      // Use setState to trigger a rebuild of the widget with the new data.
-      setState(() {
-        _isLoading = false;
-      });
     });
 
     super.initState();
@@ -198,56 +203,61 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
 
   //MapOptions? options;
 
-  void initSignalR(WidgetRef ref) async {
+  Future<void> initSignalR(WidgetRef ref) async {
     try {
       final hubConnection = await ref.read(
         hubConnectionProvider.future,
       );
-      if (mounted) {
-        hubConnection.on('NotifyPassengerDriverOnTheWay', (message) {
-          print("ĐÂY RỒI SIGNALR ĐÂY RỒI $message");
-          try {
-            if (mounted) {
-              HapticFeedback.mediumImpact();
-              _handleNotifyPassengerDriverOnTheWay(message);
-            }
-          } catch (e) {
-            print(e.toString());
+
+      hubConnection.on('NotifyPassengerDriverOnTheWay', (message) {
+        print("ĐÂY RỒI SIGNALR ĐÂY RỒI $message");
+        try {
+          // setState(() {
+          //   _isLoading = true;
+          // });
+          // await Future.delayed(
+          //   const Duration(seconds: 1),
+          // );
+          // setState(() {
+          //   _isLoading = false;
+          // });
+          if (mounted) {
+            //HapticFeedback.mediumImpact();
+            _handleNotifyPassengerDriverOnTheWay(message);
           }
-        });
-      }
-      if (mounted) {
-        hubConnection.on('NotifyPassengerTripCanceled', (message) {
-          try {
-            // setState(() {
-            //   _isLoading = true;
-            // });
-            // await Future.delayed(
-            //   const Duration(seconds: 2),
-            // );
-            // setState(() {
-            //   _isLoading = false;
-            // });
-            if (mounted) {
-              _handleNotifyPassengerTripCanceled(message);
-            }
-          } catch (e) {
-            print(e.toString());
+        } catch (e) {
+          print(e.toString());
+        }
+      });
+      hubConnection.on('NotifyPassengerTripCanceled', (message) {
+        try {
+          // setState(() {
+          //   _isLoading = true;
+          // });
+          // await Future.delayed(
+          //   const Duration(seconds: 2),
+          // );
+          // setState(() {
+          //   _isLoading = false;
+          // });
+          if (mounted) {
+            _handleNotifyPassengerTripCanceled(message);
           }
-        });
-      }
-      if (mounted) {
-        hubConnection.on('NotifyPassengerTripTimedOut', (message) {
-          try {
-            if (mounted) {
-              _handleNotifyPassengerTripTimedOut(message);
-            }
-            //_handleNotifyPassengerDriverOnTheWay(message);
-          } catch (e) {
-            print(e.toString());
+        } catch (e) {
+          print(e.toString());
+        }
+      });
+      hubConnection.on('NotifyPassengerTripTimedOut', (message) {
+        try {
+          if (mounted) {
+            _handleNotifyPassengerTripTimedOut(message);
           }
-        });
-      }
+          //_handleNotifyPassengerDriverOnTheWay(message);
+        } catch (e) {
+          print(e.toString());
+        }
+      });
+
       hubConnection.onclose((exception) async {
         await Future.delayed(
           const Duration(seconds: 3),
@@ -363,6 +373,8 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                   driverId,
                   widget.endLatitude,
                   widget.endLongitude,
+                  widget.startLatitude,
+                  widget.startLongitude,
                 );
               },
               child: const Text(
@@ -530,6 +542,8 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     String driverId,
     String endLatitude,
     String endLongitude,
+    String startLatitude,
+    String startLongitude,
   ) {
     context.replaceNamed(RouteConstants.driverPickUp, extra: {
       'driverName': driverName,
@@ -540,6 +554,8 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       'driverId': driverId,
       'endLatitude': endLatitude,
       'endLongitude': endLongitude,
+      'startLatitude': startLatitude,
+      'startLongitude': startLongitude,
     });
   }
 
@@ -801,12 +817,20 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                                   });
                                   if (check) {
                                     if (context.mounted) {
-                                      setState(() {
+                                      if (ref.watch(userProvider)?.id ==
+                                          result!.passengerId) {
                                         ref
                                             .watch(currentOnTripIdProvider
                                                 .notifier)
                                             .setCurrentOnTripId(null);
-                                      });
+                                      } else {
+                                        ref
+                                            .watch(
+                                                currentDependentOnTripProvider
+                                                    .notifier)
+                                            .removeDependentCurrentOnTripId(
+                                                result!.id);
+                                      }
                                       context.goNamed(RouteConstants.dashBoard);
                                     }
                                   }

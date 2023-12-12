@@ -61,14 +61,13 @@ class _DashBoardState extends ConsumerState<DashBoard> {
   void initState() {
     final user = ref.read(userProvider);
     isDependent = user?.role.toLowerCase() == 'dependent';
-    initSignalR(ref);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         if (!mounted) return;
         setState(() {
           _isLoading = true;
         });
-
+        await initSignalR(ref);
         final isFcmTokenUpdated =
             await ref.read(LoginControllerProvider.notifier).updateFcmToken();
         if (isFcmTokenUpdated) {
@@ -96,12 +95,9 @@ class _DashBoardState extends ConsumerState<DashBoard> {
 
   Future<void> initSignalR(WidgetRef ref) async {
     if (mounted) {
-      print('HÊHEHEHEHEHEHEHHEHEHEHEH');
-      print('-------------------------------------');
       final connection = await ref.read(
         hubConnectionProvider.future,
       );
-      print(connection.baseUrl);
       if (connection.state == HubConnectionState.disconnected) {
         await connection.start()?.then(
               (value) => print('Start thanh cong'),
@@ -261,13 +257,14 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                   ref
                       .read(currentOnTripIdProvider.notifier)
                       .setCurrentOnTripId(null);
-                  context.pushNamed(RouteConstants.rating, pathParameters: {
+                  context.replaceNamed(RouteConstants.rating, pathParameters: {
                     'idTrip': trip.id,
                   });
                 } else {
                   if (isNotifyToGuardian == false) {
                     ref.read(stageProvider.notifier).setStage(Stage.stage0);
-                    context.pushNamed(RouteConstants.rating, pathParameters: {
+                    context
+                        .replaceNamed(RouteConstants.rating, pathParameters: {
                       'idTrip': trip.id,
                     });
                   } else {

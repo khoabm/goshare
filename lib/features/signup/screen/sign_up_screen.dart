@@ -113,7 +113,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         //resizeToAvoidBottomInset: false,
-        appBar: AppBar(),
         body: Stack(
           children: [
             SingleChildScrollView(

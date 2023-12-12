@@ -106,6 +106,13 @@ String convertPhoneNumber(String phoneNumber) {
   }
 }
 
+String convertBackPhoneNumber(String phoneNumber) {
+  if (phoneNumber.startsWith('+84')) {
+    return '0${phoneNumber.substring(3)}';
+  }
+  return phoneNumber;
+}
+
 void showNavigateDashBoardDialog(TripModel trip, BuildContext context) {
   showDialog(
     barrierDismissible: true,

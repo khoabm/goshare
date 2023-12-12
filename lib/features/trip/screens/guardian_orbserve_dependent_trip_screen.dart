@@ -146,9 +146,7 @@ class _GuardianObserveDependentTripScreenState
         );
       });
     } catch (e) {
-      print(
-        e.toString(),
-      );
+      print(e.toString());
     }
   }
 
@@ -160,7 +158,8 @@ class _GuardianObserveDependentTripScreenState
       if (trip.passengerId == widget.trip.passengerId) {
         ref
             .watch(currentDependentOnTripProvider.notifier)
-            .removeDependentCurrentOnTripId(trip.passengerId);
+            .removeDependentCurrentOnTripId(trip.id);
+
         _showDriverInfoDialog(trip);
       }
     }

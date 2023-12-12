@@ -3,12 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:goshare/common/loader.dart';
-import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/features/dependent_list/controllers/dependent_controller.dart';
 import 'package:goshare/features/dependent_list/widgets/dependent_card.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/models/dependent_model.dart';
-import 'package:goshare/theme/pallet.dart';
 
 class DependentList extends ConsumerStatefulWidget {
   final bool isGetLocation;
@@ -23,7 +21,6 @@ class DependentList extends ConsumerStatefulWidget {
 
 class _DependentListState extends ConsumerState<DependentList> {
   DependentListResponseModel? list;
-  late DependentModel nonAppDependentModel;
   ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
   @override
   void initState() {
@@ -50,13 +47,6 @@ class _DependentListState extends ConsumerState<DependentList> {
           status: 0,
           gender: 1,
         ),
-      );
-      nonAppDependentModel = DependentModel(
-        id: 'NonAppUser',
-        name: 'Non App User',
-        phone: '0987654321',
-        status: 0,
-        gender: 1,
       );
       setState(() {});
     });
@@ -132,82 +122,12 @@ class _DependentListState extends ConsumerState<DependentList> {
                                   horizontal: 8,
                                   vertical: 12.0,
                                 ),
-                                itemCount: (list?.items.length ?? 0) +
-                                    1, // Increase the itemCount by 1
-                                itemBuilder: (context, index) {
-                                  // Check if this is the last item
-                                  if (index == list?.items.length) {
-                                    // Return your InkWell wrapped custom card here
-                                    return InkWell(
-                                      onTap: () {
-                                        if (context.mounted) {
-                                          context.pop({
-                                            'dependentModel':
-                                                nonAppDependentModel,
-                                            'dependentLocationData': null,
-                                          });
-                                        }
-                                      },
-                                      child: Card(
-                                        color: const Color(0xFFD9D9D9),
-                                        child: Row(
-                                          children: [
-                                            const Expanded(
-                                              child: Column(
-                                                children: [
-                                                  Text('Chọn điểm pick up'),
-                                                  Text(
-                                                    'Chọn điểm pick up',
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            InkWell(
-                                              onTap: () {
-                                                if (context.mounted) {
-                                                  context.pop({
-                                                    'dependentModel':
-                                                        nonAppDependentModel,
-                                                    'dependentLocationData':
-                                                        null,
-                                                  });
-                                                }
-                                                // context.goNamed(
-                                                //   RouteConstants
-                                                //       .nonAppUserProfileForTrip,
-                                                //   extra: {},
-                                                // );
-                                              },
-                                              splashColor: Colors.white,
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(12.0),
-                                                height: 60,
-                                                width:
-                                                    60, // Adjust the height as needed
-                                                decoration: const BoxDecoration(
-                                                  color: Pallete.primaryColor,
-                                                ),
-                                                child: const Center(
-                                                  child: Icon(
-                                                    Icons.arrow_forward_ios,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    return DependentCard(
-                                      dependentModel: list?.items[index],
-                                      isGetLocation: widget.isGetLocation,
-                                      isLoading: isLoading,
-                                    );
-                                  }
-                                },
+                                itemCount: list?.items.length,
+                                itemBuilder: (context, index) => DependentCard(
+                                  dependentModel: list?.items[index],
+                                  isGetLocation: widget.isGetLocation,
+                                  isLoading: isLoading,
+                                ),
                               ),
                             ),
                           ],

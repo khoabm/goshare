@@ -28,7 +28,6 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
   double lon = 0.0;
   VietmapController? _mapController;
   List<Marker> temp = [];
-  UserLocation? userLocation;
   double _containerHeight = 60.0;
   Marker _marker = Marker(
     child: const SizedBox.shrink(),
@@ -84,24 +83,21 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // setState(() {
-          //   _isLoading = true;
-          // });
-          // final location = ref.read(locationProvider);
-          // currentLocation = await location.getCurrentLocation();
-          // setState(() {
-          //   _isLoading = false;
-          // });
+          setState(() {
+            _isLoading = true;
+          });
+          final location = ref.read(locationProvider);
+          currentLocation = await location.getCurrentLocation();
+          setState(() {
+            _isLoading = false;
+          });
           _mapController?.animateCamera(
             CameraUpdate.newCameraPosition(
               CameraPosition(
-                target: LatLng(
-                  userLocation?.position.latitude ?? 0,
-                  userLocation?.position.longitude ?? 0,
-                ),
-                zoom: 17.5,
-                tilt: 0,
-              ),
+                  target: LatLng(currentLocation?.latitude ?? 0,
+                      currentLocation?.longitude ?? 0),
+                  zoom: 17.5,
+                  tilt: 0),
             ),
           );
         },
@@ -137,11 +133,6 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                         onMapCreated: (VietmapController controller) {
                           setState(() {
                             _mapController = controller;
-                          });
-                        },
-                        onUserLocationUpdated: (location) {
-                          setState(() {
-                            userLocation = location;
                           });
                         },
                         onMapLongClick: (point, coordinates) async {
@@ -190,10 +181,8 @@ class _SearchTripRouteScreenState extends ConsumerState<SearchTripRouteScreen> {
                           await _mapController?.animateCamera(
                             CameraUpdate.newCameraPosition(
                               CameraPosition(
-                                  target: LatLng(
-                                    currentLocation?.latitude ?? 0,
-                                    currentLocation?.longitude ?? 0,
-                                  ),
+                                  target: LatLng(currentLocation?.latitude ?? 0,
+                                      currentLocation?.longitude ?? 0),
                                   zoom: 15.5,
                                   tilt: 0),
                             ),
