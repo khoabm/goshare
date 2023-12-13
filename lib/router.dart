@@ -22,12 +22,14 @@ import 'package:goshare/features/menu_user/money-topup/money-topup-screen.dart';
 
 import 'package:goshare/features/trip/screens/car_choosing_screen.dart';
 import 'package:goshare/features/trip/screens/chat_screen.dart';
+import 'package:goshare/features/trip/screens/create_non_app_user_profile_for_trip_screen.dart';
 import 'package:goshare/features/trip/screens/driver_pick_up_screen.dart';
 import 'package:goshare/features/trip/screens/find_trip_screen.dart';
 import 'package:goshare/features/trip/screens/guardian_orbserve_dependent_trip_screen.dart';
 import 'package:goshare/features/trip/screens/on_trip_screen.dart';
 import 'package:goshare/features/trip/screens/rate_driver_screen.dart';
 import 'package:goshare/features/trip/screens/route_confirm_screen.dart';
+import 'package:goshare/features/trip/screens/search_non_app_user_pick_up_location.dart';
 import 'package:goshare/features/trip/screens/search_trip_route_screen.dart';
 
 import 'package:goshare/features/signup/screen/otp_screen.dart';
@@ -226,6 +228,8 @@ class AppRouter {
             final String? carTypeId = extras['carTypeId'] as String?;
             final String? driverNote = extras['driverNote'] as String?;
             final bool? isFindingTrip = extras['isFindingTrip'] as bool?;
+            final String? nonAppDepName = extras['nonAppDepName'] as String?;
+            final String? nonAppDepPhone = extras['nonAppDepPhone'] as String?;
             //final String? driverNote = params['driverNote'] as String?;
             return SlideBottomTransition(
               child: FindTripScreen2(
@@ -238,6 +242,8 @@ class AppRouter {
                 paymentMethod: paymentMethod ?? '0',
                 carTypeId: carTypeId ?? '',
                 isFindingTrip: isFindingTrip,
+                nonAppDepName: nonAppDepName,
+                nonAppDepPhone: nonAppDepPhone,
               ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
@@ -447,6 +453,39 @@ class AppRouter {
           path: RouteConstants.tripHistoryUrl,
           pageBuilder: (context, state) => SlideBottomTransition(
             child: const TripHistoryScreen(),
+            key: state.pageKey,
+          ),
+        ),
+        GoRoute(
+            name: RouteConstants.nonAppUserProfileForTrip,
+            path: RouteConstants.nonAppUserProfileForTripUrl,
+            pageBuilder: (context, state) {
+              final extras = state.extra as Map<String, dynamic>;
+
+              final String? endLatitude = extras['endLatitude'] as String?;
+              final String? endLongitude = extras['endLongitude'] as String?;
+              final int paymentMethod = extras['paymentMethod'] as int;
+
+              final String? carTypeId = extras['carTypeId'] as String?;
+              final String? driverNote = extras['driverNote'] as String?;
+              final int capacity = extras['capacity'] as int;
+              return SlideBottomTransition(
+                child: CreateNonAppUserProfileForTripScreen(
+                  endLatitude: endLatitude!,
+                  endLongitude: endLongitude!,
+                  paymentMethod: paymentMethod,
+                  capacity: capacity,
+                  carTypeId: carTypeId!,
+                  driverNote: driverNote!,
+                ),
+                key: state.pageKey,
+              );
+            }),
+        GoRoute(
+          name: RouteConstants.searchNonAppUserPickUpLocation,
+          path: RouteConstants.searchNonAppUserPickUpLocationUrl,
+          pageBuilder: (context, state) => SlideBottomTransition(
+            child: const SearchNonAppUserPickUpLocationScreen(),
             key: state.pageKey,
           ),
         ),

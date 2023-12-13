@@ -40,11 +40,11 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
   bool _isLoading = false;
   @override
   void initState() {
-    initialize();
+    initialize(context);
     super.initState();
   }
 
-  void initialize() async {
+  void initialize(BuildContext context) async {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       setState(() {
         _isLoading = true;
@@ -417,7 +417,11 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                           decoration: BoxDecoration(
                                             border: Border.all(),
                                             color: const Color.fromARGB(
-                                                255, 237, 224, 224),
+                                              255,
+                                              237,
+                                              224,
+                                              224,
+                                            ),
                                             borderRadius:
                                                 const BorderRadius.all(
                                               Radius.circular(10),
@@ -454,6 +458,7 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                               'isGetLocation': true,
                                             },
                                           );
+                                          print(result);
                                           if (result != null) {
                                             Map<String, dynamic> resultMap =
                                                 result as Map<String, dynamic>;
@@ -462,17 +467,54 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                             var dependentLocationData =
                                                 resultMap[
                                                     'dependentLocationData'];
+                                            final data = dependentModel
+                                                as DependentModel?;
+                                            if (data != null) {
+                                              print(data);
+                                              if (data.id == 'NonAppUser') {
+                                                if (mounted) {
+                                                  context.pushNamed(
+                                                      RouteConstants
+                                                          .nonAppUserProfileForTrip,
+                                                      extra: {
+                                                        'endLatitude':
+                                                            widget.endLatitude,
+                                                        'endLongitude':
+                                                            widget.endLongitude,
+                                                        'paymentMethod': ref
+                                                            .watch(
+                                                                selectedPaymentMethodProvider
+                                                                    .notifier)
+                                                            .state,
+                                                        'carTypeId': cars[ref
+                                                                .watch(
+                                                                    selectedCarIndexProvider
+                                                                        .notifier)
+                                                                .state]
+                                                            .cartypeId,
+                                                        'driverNote':
+                                                            driverNote,
+                                                        'capacity': cars[ref
+                                                                .watch(
+                                                                    selectedCarIndexProvider
+                                                                        .notifier)
+                                                                .state]
+                                                            .capacity,
+                                                      });
+                                                }
+                                              } else {
+                                                setState(
+                                                  () {
+                                                    passenger = data;
+                                                    passengerLocation =
+                                                        (dependentLocationData
+                                                            as DependentLocationModel?);
+                                                  },
+                                                );
+                                              }
+                                            }
                                             // Handle the returned data
-                                            setState(() {
-                                              passenger = (dependentModel
-                                                  as DependentModel?);
-                                              passengerLocation =
-                                                  (dependentLocationData
-                                                      as DependentLocationModel?);
-                                            });
                                           }
-
-                                          print(result);
                                         },
                                       ),
                               ],

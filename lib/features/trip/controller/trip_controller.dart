@@ -31,27 +31,27 @@ class TripController extends StateNotifier<bool> {
       BuildContext context, FindTripModel tripModel) async {
     TripModel? trip;
 
-    final res =
-        await _ref.watch(homeControllerProvider.notifier).searchLocationReverse(
-              context,
-              tripModel.startLongitude,
-              tripModel.startLatitude,
-            );
-    if (context.mounted) {
-      final res2 = await _ref
-          .watch(homeControllerProvider.notifier)
-          .searchLocationReverse(
-            context,
-            tripModel.startLongitude,
-            tripModel.startLatitude,
-          );
-      print(res.address);
-      print(res2.address);
-      tripModel.copyWith(
-        endAddress: res.address,
-        startAddress: res2.address,
-      );
-    }
+    // final res =
+    //     await _ref.watch(homeControllerProvider.notifier).searchLocationReverse(
+    //           context,
+    //           tripModel.startLongitude,
+    //           tripModel.startLatitude,
+    //         );
+    // if (context.mounted) {
+    //   final res2 = await _ref
+    //       .watch(homeControllerProvider.notifier)
+    //       .searchLocationReverse(
+    //         context,
+    //         tripModel.startLongitude,
+    //         tripModel.startLatitude,
+    //       );
+    //   print(res.address);
+    //   print(res2.address);
+    //   tripModel.copyWith(
+    //     endAddress: res.address,
+    //     startAddress: res2.address,
+    //   );
+    // }
 
     final result = await _tripRepository.findDriver(tripModel);
     result.fold((l) {
@@ -78,25 +78,25 @@ class TripController extends StateNotifier<bool> {
     String dependentId,
   ) async {
     TripModel? trip;
-    final res =
-        await _ref.watch(homeControllerProvider.notifier).searchLocationReverse(
-              context,
-              tripModel.startLongitude,
-              tripModel.startLatitude,
-            );
-    if (context.mounted) {
-      final res2 = await _ref
-          .watch(homeControllerProvider.notifier)
-          .searchLocationReverse(
-            context,
-            tripModel.startLongitude,
-            tripModel.startLatitude,
-          );
-      tripModel.copyWith(
-        endAddress: res.address,
-        startAddress: res2.address,
-      );
-    }
+    // final res =
+    //     await _ref.watch(homeControllerProvider.notifier).searchLocationReverse(
+    //           context,
+    //           tripModel.startLongitude,
+    //           tripModel.startLatitude,
+    //         );
+    // if (context.mounted) {
+    //   final res2 = await _ref
+    //       .watch(homeControllerProvider.notifier)
+    //       .searchLocationReverse(
+    //         context,
+    //         tripModel.startLongitude,
+    //         tripModel.startLatitude,
+    //       );
+    //   tripModel.copyWith(
+    //     endAddress: res.address,
+    //     startAddress: res2.address,
+    //   );
+    // }
 
     final result = await _tripRepository.findDriverForDependent(
       tripModel,
@@ -245,5 +245,29 @@ class TripController extends StateNotifier<bool> {
       wallet = r;
     });
     return wallet;
+  }
+
+  Future<TripModel?> findDriverForNonAppDependent(
+      BuildContext context, FindTripNonAppModel tripModel) async {
+    TripModel? trip;
+
+    final result =
+        await _tripRepository.findDriverForNonAppDependent(tripModel);
+    result.fold((l) {
+      state = false;
+      if (l is UnauthorizedFailure) {
+        showLoginTimeOut(
+          context: context,
+        );
+      } else {
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      }
+    }, (r) {
+      trip = r;
+    });
+    return trip;
   }
 }

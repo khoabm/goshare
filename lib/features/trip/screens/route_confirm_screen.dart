@@ -640,10 +640,10 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
                   CameraUpdate.newCameraPosition(
                     CameraPosition(
                       target: LatLng(
-                        double.parse(widget.startLatitude),
-                        double.parse(widget.startLongitude),
+                        midLat,
+                        midLng,
                       ),
-                      zoom: 14.5,
+                      zoom: 10.5,
                       tilt: 0,
                     ),
                   ),
@@ -739,7 +739,7 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
       child: Expanded(
         child: Column(
           children: [
-            Text('Khoảng cách: ${distance.toString()}'),
+            Text('Khoảng cách: ${(distance / 1000).toStringAsFixed(2)}km'),
             Text('Thời gian di chuyển : $timeStr'),
           ],
         ),

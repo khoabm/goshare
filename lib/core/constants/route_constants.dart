@@ -22,6 +22,9 @@ class RouteConstants {
   static const rating = 'rating';
   static const dependentTripList = 'dependent-trip-list';
   static const tripHistory = 'trip-history';
+  static const nonAppUserProfileForTrip = 'non-app-user-profile-for-trip';
+  static const searchNonAppUserPickUpLocation =
+      'search-non-app-user-pick-up-location';
 
   ///**
   ///Route url constants
@@ -59,6 +62,9 @@ class RouteConstants {
 
   static const guardianObserveDependentTripUrl = '/guardian-observe';
   static const dependentTripListUrl = '/dependent-trip-list';
-  
+
   static const tripHistoryUrl = '/trip-history';
+  static const searchNonAppUserPickUpLocationUrl =
+      '/search-non-app-user-pick-up-location';
+  static const nonAppUserProfileForTripUrl = '/non-app-user-profile-for-trip';
 }

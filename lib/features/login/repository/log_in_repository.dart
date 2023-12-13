@@ -116,6 +116,41 @@ class LoginRepository {
     }
   }
 
+  FutureEither<bool> removeFcmToken() async {
+    try {
+      // final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+
+      // // Get FCM token
+      // String? fcmToken = await firebaseMessaging.getToken();
+
+      // if (fcmToken == null) {
+      //   return left(Failure('"Failed to get FCM token"'));
+      // }
+
+      // Make HTTP request
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+      final client = HttpClientWithAuth(accessToken ?? '');
+      final response = await client.put(
+        Uri.parse('${Constants.apiBaseUrl}/user/update-fcm'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'fcmToken': null,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return right(true);
+      } else {
+        return left(Failure('"Failed to get FCM token"'));
+      }
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
   FutureEither<String> getUserData(WidgetRef ref) async {
     try {
       print('get user data');

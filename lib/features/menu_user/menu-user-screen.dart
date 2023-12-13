@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
+import 'package:goshare/features/login/controller/log_in_controller.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/dependent_mng/dependent_add/dependent_add_screen.dart'
     as depProv;
@@ -22,14 +23,22 @@ class _UserMenuPageState extends ConsumerState<UserMenuPage> {
       final connection = await ref.read(
         hubConnectionProvider.future,
       );
+      if (mounted) {
+        await ref
+            .watch(LoginControllerProvider.notifier)
+            .removeFcmToken(context);
+      }
       ref.invalidate(userProvider);
       ref.invalidate(depProv.userProvider);
       ref.invalidate(currentDependentOnTripProvider);
       ref.invalidate(currentOnTripIdProvider);
       //ref.invalidate(userProvider);
       await connection.stop().then(
-            (value) => print('DA STOP THANH CONG'),
-          );
+        (value) {
+          print('DA STOP THANH CONG');
+          ref.invalidate(hubConnectionProvider);
+        },
+      );
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('accessToken');
       await prefs.remove('refreshToken');

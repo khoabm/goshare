@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/utils/locations_util.dart';
+import 'package:goshare/features/home/controller/home_controller.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/find_trip_model.dart';
@@ -69,7 +70,8 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
   String driverPlate = '';
   String driverCarType = '';
   String driverId = '';
-
+  String startAddress = '';
+  String endAddress = '';
   @override
   void initState() {
     // _showDriverInfoDialog();
@@ -79,97 +81,103 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           _isLoading = true;
         });
         await initSignalR(ref);
-        if (widget.nonAppDepName != null && widget.nonAppDepName!.isNotEmpty) {
-          print("TÌM XE CHO DEP KHÔNG CÓ LOCATIONNNNNNNNNNNNNNNNNN");
-          if (mounted) {
-            // result = await ref
-            //     .read(tripControllerProvider.notifier)
-            //     .findDriverForNonAppDependent(
-            //       context,
-            //       FindTripNonAppModel(
-            //         startLatitude: double.parse(widget.startLatitude),
-            //         startLongitude: double.parse(widget.startLongitude),
-            //         //startAddress: 'Nha Nguyen',
-            //         endLatitude: double.parse(widget.endLatitude),
-            //         endLongitude: double.parse(widget.endLongitude),
-            //         //endAddress: 'Nga 3',
-            //         cartypeId: widget.carTypeId,
-            //         paymentMethod: int.parse(widget.paymentMethod),
-            //         note: widget.driverNote,
-            //         dependentInfo: DependentInfo(
-            //           phone: widget.nonAppDepPhone,
-            //           name: widget.nonAppDepName ?? '',
-            //         ),
-            //       ),
-            //     );
-            // if (result != null) {
-            //   ref
-            //       .read(currentDependentOnTripProvider.notifier)
-            //       .addDependentCurrentOnTripId(
-            //         DependentTrip(
-            //           id: result!.id,
-            //           name: result!.passengerName,
-            //           dependentId: result!.passengerId,
-            //         ),
-            //       );
-            // }
-          }
-        } else {
-          if (widget.bookerId == ref.read(userProvider.notifier).state?.id) {
-            if (context.mounted) {
-              print("TÌM XE CHO BẢN THÂN");
-              result =
-                  await ref.read(tripControllerProvider.notifier).findDriver(
-                        context,
-                        FindTripModel(
-                          startLatitude: double.parse(widget.startLatitude),
-                          startLongitude: double.parse(widget.startLongitude),
-                          //startAddress: 'Nha Nguyen',
-                          endLatitude: double.parse(widget.endLatitude),
-                          endLongitude: double.parse(widget.endLongitude),
-                          //endAddress: 'Nga 3',
-                          cartypeId: widget.carTypeId,
-                          paymentMethod: int.parse(widget.paymentMethod),
-                          note: widget.driverNote,
-                        ),
-                      );
-
-              if (result != null) {
-                ref
-                    .read(currentOnTripIdProvider.notifier)
-                    .setCurrentOnTripId(result?.id);
-              }
-            }
-          } else {
-            if (context.mounted) {
+        await setAddress();
+        if (mounted) {
+          print('START ADDRESS: $startAddress');
+          print('END ADDRESS: $endAddress');
+          if (widget.nonAppDepName != null &&
+              widget.nonAppDepName!.isNotEmpty) {
+            print("TÌM XE CHO DEP KHÔNG CÓ LOCATIONNNNNNNNNNNNNNNNNN");
+            if (mounted) {
               result = await ref
                   .read(tripControllerProvider.notifier)
-                  .findDriverForDependent(
+                  .findDriverForNonAppDependent(
                     context,
-                    FindTripModel(
+                    FindTripNonAppModel(
                       startLatitude: double.parse(widget.startLatitude),
                       startLongitude: double.parse(widget.startLongitude),
-                      //startAddress: 'Nha Nguyen',
+                      startAddress: startAddress,
                       endLatitude: double.parse(widget.endLatitude),
                       endLongitude: double.parse(widget.endLongitude),
-                      //endAddress: 'Nga 3',
+                      endAddress: endAddress,
                       cartypeId: widget.carTypeId,
                       paymentMethod: int.parse(widget.paymentMethod),
                       note: widget.driverNote,
+                      dependentInfo: DependentInfo(
+                        phone: widget.nonAppDepPhone,
+                        name: widget.nonAppDepName ?? '',
+                      ),
                     ),
-                    widget.bookerId,
                   );
-            }
-
-            if (result != null) {
-              ref
-                  .read(currentDependentOnTripProvider.notifier)
-                  .addDependentCurrentOnTripId(
-                    DependentTrip(
+              if (result != null) {
+                ref
+                    .read(currentDependentOnTripProvider.notifier)
+                    .addDependentCurrentOnTripId(
+                      DependentTrip(
                         id: result!.id,
-                        name: result!.passenger.name,
-                        dependentId: result!.passenger.id),
-                  );
+                        name: result!.passengerName,
+                        dependentId: result!.passengerId,
+                      ),
+                    );
+              }
+            }
+          } else {
+            if (widget.bookerId == ref.read(userProvider.notifier).state?.id) {
+              if (context.mounted) {
+                print("TÌM XE CHO BẢN THÂN");
+                result =
+                    await ref.read(tripControllerProvider.notifier).findDriver(
+                          context,
+                          FindTripModel(
+                            startLatitude: double.parse(widget.startLatitude),
+                            startLongitude: double.parse(widget.startLongitude),
+                            startAddress: startAddress,
+                            endLatitude: double.parse(widget.endLatitude),
+                            endLongitude: double.parse(widget.endLongitude),
+                            endAddress: endAddress,
+                            cartypeId: widget.carTypeId,
+                            paymentMethod: int.parse(widget.paymentMethod),
+                            note: widget.driverNote,
+                          ),
+                        );
+
+                if (result != null) {
+                  ref
+                      .read(currentOnTripIdProvider.notifier)
+                      .setCurrentOnTripId(result?.id);
+                }
+              }
+            } else {
+              if (context.mounted) {
+                result = await ref
+                    .read(tripControllerProvider.notifier)
+                    .findDriverForDependent(
+                      context,
+                      FindTripModel(
+                        startLatitude: double.parse(widget.startLatitude),
+                        startLongitude: double.parse(widget.startLongitude),
+                        startAddress: startAddress,
+                        endLatitude: double.parse(widget.endLatitude),
+                        endLongitude: double.parse(widget.endLongitude),
+                        endAddress: endAddress,
+                        cartypeId: widget.carTypeId,
+                        paymentMethod: int.parse(widget.paymentMethod),
+                        note: widget.driverNote,
+                      ),
+                      widget.bookerId,
+                    );
+              }
+
+              if (result != null) {
+                ref
+                    .read(currentDependentOnTripProvider.notifier)
+                    .addDependentCurrentOnTripId(
+                      DependentTrip(
+                          id: result!.id,
+                          name: result!.passenger.name,
+                          dependentId: result!.passenger.id),
+                    );
+              }
             }
           }
         }
@@ -183,6 +191,27 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     });
 
     super.initState();
+  }
+
+  Future<void> setAddress() async {
+    final data =
+        await ref.watch(homeControllerProvider.notifier).searchLocationReverse(
+              context,
+              double.parse(widget.startLongitude),
+              double.parse(widget.startLatitude),
+            );
+    startAddress = data.address ?? '';
+    if (mounted) {
+      final data2 = await ref
+          .watch(homeControllerProvider.notifier)
+          .searchLocationReverse(
+            context,
+            double.parse(widget.endLongitude),
+            double.parse(widget.endLatitude),
+          );
+      endAddress = data2.address ?? '';
+      setState(() {});
+    }
   }
 
   @override
