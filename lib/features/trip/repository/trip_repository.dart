@@ -170,6 +170,7 @@ class TripRepository {
         },
       );
       if (response.statusCode == 200) {
+        print(response.body);
         Map<String, dynamic> tripData = json.decode(response.body);
         TripModel trip = TripModel.fromMap(tripData);
         return right(trip);
