@@ -6,6 +6,7 @@ import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/features/signup/controller/sign_up_controller.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/trip_model.dart';
+import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:goshare/providers/dependent_booking_stage_provider.dart';
 import 'package:goshare/theme/pallet.dart';
 import 'package:image_picker/image_picker.dart';
@@ -212,6 +213,49 @@ void showCancelDialogInfo(
             onPressed: () {
               Navigator.of(abcContext).pop();
               ref.watch(stageProvider.notifier).setStage(Stage.stage0);
+            },
+            child: const Text(
+              'Xác nhận',
+            ),
+          ),
+          // ElevatedButton(
+          //   onPressed: () {
+          //     ref.watch(stageProvider.notifier).setStage(Stage.stage0);
+
+          //     abcContext.pop();
+          //   },
+          //   child: const Text(
+          //     'Hủy',
+          //   ),
+          // ),
+        ],
+      );
+    },
+  );
+}
+
+void showAdminCancelDialogInfo(
+    TripModel? trip, BuildContext context, WidgetRef ref) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext abcContext) {
+      return AlertDialog(
+        title: const Center(
+          child: Text(
+            'Chuyến đi đã bị hủy',
+          ),
+        ),
+        content: const SizedBox.shrink(),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(abcContext).pop();
+              ref
+                  .watch(currentOnTripIdProvider.notifier)
+                  .setCurrentOnTripId(null);
+              ref.watch(stageProvider.notifier).setStage(Stage.stage0);
+              GoRouter.of(context).goNamed(RouteConstants.dashBoard);
             },
             child: const Text(
               'Xác nhận',
@@ -445,7 +489,6 @@ void showDialogInfoPickUpV2(TripModel trip, BuildContext context) {
     },
   );
 }
-
 
 // void showDialogInfoPickUp(TripModel trip, BuildContext context) {
 //   showDialog(

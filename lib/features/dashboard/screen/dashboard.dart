@@ -165,12 +165,17 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                   final trip = TripModel.fromMap(tripData);
                   bool isSelfBook = data.cast<bool>()[1];
                   bool isNotifyToGuardian = data.cast<bool>()[2];
+                  bool isCanceledByAdmin = data.cast<bool>()[3];
                   if (isSelfBook == false) {
                     if (isNotifyToGuardian == false) {
                       ref.read(stageProvider.notifier).setStage(
                             Stage.stage0,
                           );
                       showCancelDialogInfo(trip, context, ref);
+                    } else if (isCanceledByAdmin == true) {
+                      if (mounted) {
+                        context.goNamed(RouteConstants.dashBoard);
+                      }
                     }
                   }
                 }
