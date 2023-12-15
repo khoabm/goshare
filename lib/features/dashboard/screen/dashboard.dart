@@ -174,8 +174,19 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                       showCancelDialogInfo(trip, context, ref);
                     } else if (isCanceledByAdmin == true) {
                       if (mounted) {
+                        ref.read(stageProvider.notifier).setStage(
+                              Stage.stage0,
+                            );
                         context.goNamed(RouteConstants.dashBoard);
                       }
+                    }
+                  }
+                  if (isCanceledByAdmin == true) {
+                    if (mounted) {
+                      ref
+                          .read(currentOnTripIdProvider.notifier)
+                          .setCurrentOnTripId(null);
+                      context.goNamed(RouteConstants.dashBoard);
                     }
                   }
                 }

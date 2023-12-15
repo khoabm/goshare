@@ -270,6 +270,7 @@
 
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 class TripModel {
@@ -299,6 +300,7 @@ class TripModel {
   final EndLocation endLocation;
   final StartLocation startLocation;
   final CarType cartype;
+  List<TripImages>? tripImages;
   TripModel({
     required this.id,
     required this.passengerId,
@@ -326,6 +328,7 @@ class TripModel {
     required this.endLocation,
     required this.startLocation,
     required this.cartype,
+    this.tripImages,
   });
 
   TripModel copyWith({
@@ -355,6 +358,7 @@ class TripModel {
     EndLocation? endLocation,
     StartLocation? startLocation,
     CarType? cartype,
+    ValueGetter<List<TripImages>?>? tripImages,
   }) {
     return TripModel(
       id: id ?? this.id,
@@ -384,6 +388,7 @@ class TripModel {
       endLocation: endLocation ?? this.endLocation,
       startLocation: startLocation ?? this.startLocation,
       cartype: cartype ?? this.cartype,
+      tripImages: tripImages?.call() ?? this.tripImages,
     );
   }
 
@@ -415,6 +420,7 @@ class TripModel {
       'endLocation': endLocation.toMap(),
       'startLocation': startLocation.toMap(),
       'cartype': cartype.toMap(),
+      'tripImages': tripImages?.map((x) => x?.toMap())?.toList(),
     };
   }
 
@@ -456,6 +462,10 @@ class TripModel {
       endLocation: EndLocation.fromMap(map['endLocation']),
       startLocation: StartLocation.fromMap(map['startLocation']),
       cartype: CarType.fromMap(map['cartype']),
+      tripImages: map['tripImages'] != null
+          ? List<TripImages>.from(
+              map['tripImages']?.map((x) => TripImages.fromMap(x)))
+          : null,
     );
   }
 
@@ -466,7 +476,7 @@ class TripModel {
 
   @override
   String toString() {
-    return 'TripModel(id: $id, passengerId: $passengerId, passengerName: $passengerName, passengerPhoneNumber: $passengerPhoneNumber, driverId: $driverId, startLocationId: $startLocationId, endLocationId: $endLocationId, startTime: $startTime, endTime: $endTime, pickupTime: $pickupTime, distance: $distance, price: $price, cartypeId: $cartypeId, status: $status, createTime: $createTime, updatedTime: $updatedTime, paymentMethod: $paymentMethod, bookerId: $bookerId, note: $note, type: $type, driver: $driver, passenger: $passenger, booker: $booker, endLocation: $endLocation, startLocation: $startLocation, cartype: $cartype)';
+    return 'TripModel(id: $id, passengerId: $passengerId, passengerName: $passengerName, passengerPhoneNumber: $passengerPhoneNumber, driverId: $driverId, startLocationId: $startLocationId, endLocationId: $endLocationId, startTime: $startTime, endTime: $endTime, pickupTime: $pickupTime, distance: $distance, price: $price, cartypeId: $cartypeId, status: $status, createTime: $createTime, updatedTime: $updatedTime, paymentMethod: $paymentMethod, bookerId: $bookerId, note: $note, type: $type, driver: $driver, passenger: $passenger, booker: $booker, endLocation: $endLocation, startLocation: $startLocation, cartype: $cartype, tripImages: $tripImages)';
   }
 
   @override
@@ -499,7 +509,8 @@ class TripModel {
         other.booker == booker &&
         other.endLocation == endLocation &&
         other.startLocation == startLocation &&
-        other.cartype == cartype;
+        other.cartype == cartype &&
+        listEquals(other.tripImages, tripImages);
   }
 
   @override
@@ -529,7 +540,8 @@ class TripModel {
         booker.hashCode ^
         endLocation.hashCode ^
         startLocation.hashCode ^
-        cartype.hashCode;
+        cartype.hashCode ^
+        tripImages.hashCode;
   }
 }
 
@@ -923,4 +935,98 @@ class Car {
 
   @override
   int get hashCode => licensePlate.hashCode ^ make.hashCode ^ model.hashCode;
+}
+
+class TripImages {
+  final String id;
+  final String tripId;
+  final String imageUrl;
+  final int type;
+  final DateTime createTime;
+  final DateTime updatedTime;
+  TripImages({
+    required this.id,
+    required this.tripId,
+    required this.imageUrl,
+    required this.type,
+    required this.createTime,
+    required this.updatedTime,
+  });
+
+  TripImages copyWith({
+    String? id,
+    String? tripId,
+    String? imageUrl,
+    int? type,
+    DateTime? createTime,
+    DateTime? updatedTime,
+  }) {
+    return TripImages(
+      id: id ?? this.id,
+      tripId: tripId ?? this.tripId,
+      imageUrl: imageUrl ?? this.imageUrl,
+      type: type ?? this.type,
+      createTime: createTime ?? this.createTime,
+      updatedTime: updatedTime ?? this.updatedTime,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'tripId': tripId,
+      'imageUrl': imageUrl,
+      'type': type,
+      'createTime': createTime.millisecondsSinceEpoch,
+      'updatedTime': updatedTime.millisecondsSinceEpoch,
+    };
+  }
+
+  factory TripImages.fromMap(Map<String, dynamic> map) {
+    return TripImages(
+      id: map['id'] ?? '',
+      tripId: map['tripId'] ?? '',
+      imageUrl: map['imageUrl'] ?? '',
+      type: map['type']?.toInt() ?? 0,
+      createTime: DateTime.fromMillisecondsSinceEpoch(
+        DateTime.parse(map['createTime']).millisecondsSinceEpoch,
+      ),
+      updatedTime: DateTime.fromMillisecondsSinceEpoch(
+        DateTime.parse(map['updatedTime']).millisecondsSinceEpoch,
+      ),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory TripImages.fromJson(String source) =>
+      TripImages.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'TripImages(id: $id, tripId: $tripId, imageUrl: $imageUrl, type: $type, createTime: $createTime, updatedTime: $updatedTime)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is TripImages &&
+        other.id == id &&
+        other.tripId == tripId &&
+        other.imageUrl == imageUrl &&
+        other.type == type &&
+        other.createTime == createTime &&
+        other.updatedTime == updatedTime;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        tripId.hashCode ^
+        imageUrl.hashCode ^
+        type.hashCode ^
+        createTime.hashCode ^
+        updatedTime.hashCode;
+  }
 }
