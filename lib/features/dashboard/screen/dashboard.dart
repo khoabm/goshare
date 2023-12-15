@@ -10,6 +10,7 @@ import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/utils/locations_util.dart';
 import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/dependent_mng/dependent_screen.dart';
+import 'package:goshare/features/home/screen/dependent_screen.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
 import 'package:goshare/features/login/controller/log_in_controller.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
@@ -46,7 +47,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
     const UserMenuPage(),
   ];
   final List<Widget> _children_Dependent = [
-    const HomeScreen(),
+    const DependentHomeScreen(),
     const UserMenuPage(),
   ];
   void onTabTapped(int index) {
@@ -139,6 +140,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                       .cast<Map<String, dynamic>>()
                       .first;
                   final trip = TripModel.fromMap(tripData);
+                  ref.read(tripProvider.notifier).setTripData(tripData);
                   ref.read(stageProvider.notifier).setStage(
                         Stage.stage1,
                       );
@@ -165,7 +167,10 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                   bool isNotifyToGuardian = data.cast<bool>()[2];
                   if (isSelfBook == false) {
                     if (isNotifyToGuardian == false) {
-                      showDialogInfo(trip, context, ref);
+                      ref.read(stageProvider.notifier).setStage(
+                            Stage.stage0,
+                          );
+                      showCancelDialogInfo(trip, context, ref);
                     }
                   }
                 }
@@ -182,6 +187,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         (message) {
           try {
             if (mounted) {
+              print("THE DRIVER IS ON THE WAY");
               if (ModalRoute.of(context)?.isCurrent ?? false) {
                 final driverData = (message as List<dynamic>)
                     .cast<Map<String, dynamic>>()
@@ -215,13 +221,16 @@ class _DashBoardState extends ConsumerState<DashBoard> {
               if (ModalRoute.of(context)?.isCurrent ?? false) {
                 final data = message as List<dynamic>;
                 final tripData = data.cast<Map<String, dynamic>>().first;
+
                 final trip = TripModel.fromMap(tripData);
                 bool isSelfBook = data.cast<bool>()[1];
                 bool isNotifyToGuardian = data.cast<bool>()[2];
-
+                ref.read(stageProvider.notifier).setStage(
+                      Stage.stage3,
+                    );
                 if (isSelfBook == false) {
                   if (isNotifyToGuardian == false) {
-                    showDialogInfoPickUp(
+                    showDialogInfoPickUpV2(
                       trip,
                       context,
                     );
@@ -257,14 +266,13 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                   ref
                       .read(currentOnTripIdProvider.notifier)
                       .setCurrentOnTripId(null);
-                  context.replaceNamed(RouteConstants.rating, pathParameters: {
+                  context.pushNamed(RouteConstants.rating, pathParameters: {
                     'idTrip': trip.id,
                   });
                 } else {
                   if (isNotifyToGuardian == false) {
                     ref.read(stageProvider.notifier).setStage(Stage.stage0);
-                    context
-                        .replaceNamed(RouteConstants.rating, pathParameters: {
+                    context.pushNamed(RouteConstants.rating, pathParameters: {
                       'idTrip': trip.id,
                     });
                   } else {

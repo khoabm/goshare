@@ -85,8 +85,8 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
         if (mounted) {
           print('START ADDRESS: $startAddress');
           print('END ADDRESS: $endAddress');
-          if (widget.nonAppDepName != null &&
-              widget.nonAppDepName!.isNotEmpty) {
+          print('TEN NGUOI DAT DUM: ${widget.nonAppDepName}');
+          if (widget.nonAppDepName != null) {
             print("TÌM XE CHO DEP KHÔNG CÓ LOCATIONNNNNNNNNNNNNNNNNN");
             if (mounted) {
               result = await ref

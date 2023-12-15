@@ -398,6 +398,54 @@ void showDialogInfoPickUp(TripModel trip, BuildContext context) {
     },
   );
 }
+
+void showDialogInfoPickUpV2(TripModel trip, BuildContext context) {
+  showDialog(
+    barrierDismissible: true,
+    context: context,
+    builder: (BuildContext abcContext) {
+      return AlertDialog(
+        title: Center(
+          child: Text(
+            'Tài xế ${trip.driver?.name} đã đến',
+          ),
+        ),
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                      'Bạn đã đặt xe: ${trip.driver?.car.make} ${trip.driver?.car.model}'),
+                  Text('Biển số xe: ${trip.driver?.car.licensePlate}'),
+                  Text('Số điện thoại tài xế: ${trip.driver?.phone}'),
+                  const Text('Vui lòng tìm tài xế của bạn gần đó'),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              //context.pop();
+              Navigator.of(abcContext).pop();
+            },
+            child: const Text(
+              'Xác nhận',
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
 // void showDialogInfoPickUp(TripModel trip, BuildContext context) {
 //   showDialog(
 //     barrierDismissible: true,
