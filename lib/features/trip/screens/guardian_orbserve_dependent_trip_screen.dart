@@ -174,6 +174,10 @@ class _GuardianObserveDependentTripScreenState
           title: Center(
             child: Text(
               'Chuyến đi của người thân, ${trip.passenger.name} đã hoàn thành',
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Colors.blue),
             ),
           ),
           content: Row(
@@ -185,11 +189,19 @@ class _GuardianObserveDependentTripScreenState
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'Tài xế ${trip.passenger.name} đã hoàn thành chuyến cho người thân ${trip.passenger.name}',
+                    ListTile(
+                      leading: const Icon(Icons.person),
+                      title: Text(
+                        'Tài xế ${trip.passenger.name} đã hoàn thành chuyến cho người thân ${trip.passenger.name}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
-                    Text(
-                      'Số tiền thanh toán là ${trip.price} qua hình thức trả bằng ${trip.paymentMethod == 0 ? 'Ví' : 'Tiền mặt'}',
+                    ListTile(
+                      leading: const Icon(Icons.payment),
+                      title: Text(
+                        'Số tiền thanh toán là ${trip.price} qua hình thức trả bằng ${trip.paymentMethod == 0 ? 'Ví' : 'Tiền mặt'}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 ),
@@ -203,6 +215,8 @@ class _GuardianObserveDependentTripScreenState
               },
               child: const Text(
                 'Xác nhận',
+                style: TextStyle(
+                    color: Pallete.primaryColor, fontWeight: FontWeight.bold),
               ),
             ),
           ],

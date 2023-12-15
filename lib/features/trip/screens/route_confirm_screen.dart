@@ -320,6 +320,7 @@
 //     super.dispose();
 //   }
 // }
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -568,7 +569,7 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
             VietmapGL(
               //dragEnabled: false,
               compassEnabled: false,
-              myLocationEnabled: true,
+              //myLocationEnabled: true,
               styleString:
                   'https://api.maptiler.com/maps/basic-v2/style.json?key=erfJ8OKYfrgKdU6J1SXm',
               initialCameraPosition: const CameraPosition(
@@ -669,6 +670,34 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
                         ),
                         latLng: LatLng(midLat, midLng),
                       ),
+                      Marker(
+                        child: const Icon(
+                          IconData(
+                            0xf705,
+                            fontFamily: CupertinoIcons.iconFont,
+                            fontPackage: CupertinoIcons.iconFontPackage,
+                          ),
+                          color: Colors.blueAccent,
+                        ),
+                        latLng: LatLng(
+                          double.parse(widget.startLatitude),
+                          double.parse(widget.startLongitude),
+                        ),
+                      ),
+                      Marker(
+                        child: const Icon(
+                          IconData(
+                            0xf456,
+                            fontFamily: CupertinoIcons.iconFont,
+                            fontPackage: CupertinoIcons.iconFontPackage,
+                          ),
+                          color: Color.fromARGB(255, 243, 75, 63),
+                        ),
+                        latLng: LatLng(
+                          double.parse(widget.endLatitude),
+                          double.parse(widget.endLongitude),
+                        ),
+                      ),
                     ],
                   ),
             _isRouteBuilt
@@ -736,13 +765,11 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
     return Container(
       decoration: const BoxDecoration(color: Colors.white),
       padding: const EdgeInsets.all(8.0),
-      child: Expanded(
-        child: Column(
-          children: [
-            Text('Khoảng cách: ${(distance / 1000).toStringAsFixed(2)}km'),
-            Text('Thời gian di chuyển : $timeStr'),
-          ],
-        ),
+      child: Column(
+        children: [
+          Text('Khoảng cách: ${(distance / 1000).toStringAsFixed(2)}km'),
+          Text('Thời gian di chuyển : $timeStr'),
+        ],
       ),
     );
   }

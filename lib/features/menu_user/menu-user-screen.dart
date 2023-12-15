@@ -18,7 +18,7 @@ class UserMenuPage extends ConsumerStatefulWidget {
 }
 
 class _UserMenuPageState extends ConsumerState<UserMenuPage> {
-  void _onLogout(WidgetRef ref) async {
+  void _onLogout(WidgetRef ref, BuildContext context) async {
     if (mounted) {
       final connection = await ref.read(
         hubConnectionProvider.future,
@@ -43,6 +43,7 @@ class _UserMenuPageState extends ConsumerState<UserMenuPage> {
       await prefs.remove('accessToken');
       await prefs.remove('refreshToken');
       if (mounted) {
+        Navigator.of(context).pop();
         context.goNamed(RouteConstants.login);
       }
     }
@@ -124,17 +125,17 @@ class _UserMenuPageState extends ConsumerState<UserMenuPage> {
               onTap: () {
                 showDialog(
                   context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('Xác nhận đăng xuất'),
-                    content: Text('Bạn có chắc chắn muốn đăng xuất?'),
+                  builder: (dialogContext) => AlertDialog(
+                    title: const Text('Xác nhận đăng xuất'),
+                    content: const Text('Bạn có chắc chắn muốn đăng xuất?'),
                     actions: [
                       TextButton(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => Navigator.pop(dialogContext),
                         child: const Text('Hủy'),
                       ),
                       TextButton(
                         onPressed: () {
-                          _onLogout(ref);
+                          _onLogout(ref, dialogContext);
                         },
                         child: const Text('Xác nhận'),
                       ),

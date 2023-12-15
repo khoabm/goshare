@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/services.dart';
 
 import 'package:goshare/common/app_button.dart';
 import 'package:goshare/common/app_text_field.dart';
@@ -178,6 +179,10 @@ class _CreateNonAppUserProfileForTripScreenState
                       child: AppTextField(
                         controller: phoneTextController,
                         hintText: '0987654321',
+                        inputType: TextInputType.phone,
+                        formatters: [
+                          LengthLimitingTextInputFormatter(10),
+                        ],
                       ),
                     ),
                   ],
