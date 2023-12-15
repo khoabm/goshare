@@ -309,7 +309,7 @@ class TripRepository {
       String tripModelJson = tripModel.toJson();
       final client = HttpClientWithAuth(accessToken ?? '');
       final response = await client.post(
-        Uri.parse('$baseApiUrl/phoneless'),
+        Uri.parse('$baseApiUrl/trip/phoneless'),
         headers: {
           'Content-Type': 'application/json',
         },

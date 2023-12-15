@@ -375,6 +375,8 @@ class AppRouter {
             final String? bookerId = extras['bookerId'] as String?;
             final String? carTypeId = extras['carTypeId'] as String?;
             final String? driverNote = extras['driverNote'] as String?;
+            final String? nonAppDepName = extras['nonAppDepName'] as String?;
+            final String? nonAppDepPhone = extras['nonAppDepPhone'] as String?;
             final int capacity = extras['capacity'] as int;
             return SlideRightTransition(
               child: RouteConfirmScreen(
@@ -386,6 +388,8 @@ class AppRouter {
                 bookerId: bookerId ?? '',
                 paymentMethod: paymentMethod ?? '0',
                 carTypeId: carTypeId ?? '',
+                nonAppDepName: nonAppDepName,
+                nonAppDepPhone: nonAppDepPhone,
               ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );

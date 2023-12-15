@@ -386,6 +386,8 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
   void initState() {
     // _showDriverInfoDialog();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      print('----------- TRONG ROUTE CONFIRM ------------');
+      print(widget.nonAppDepName);
       // setState(() {
       //   _isLoading = true;
       // });

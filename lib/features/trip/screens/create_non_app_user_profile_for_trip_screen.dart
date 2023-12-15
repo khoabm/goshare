@@ -69,6 +69,8 @@ class _CreateNonAppUserProfileForTripScreenState
       'carTypeId': carTypeId,
       'driverNote': driverNote,
       'capacity': capacity,
+      'nonAppDepName': nonAppDepName,
+      'nonAppDepPhone': nonAppDepPhone,
     });
   }
 
@@ -194,6 +196,8 @@ class _CreateNonAppUserProfileForTripScreenState
                     buttonText: 'Xác nhận',
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
+                        print('----------- TRONG PROFILE ------------');
+                        print(userNameTextController.text);
                         navigateToRouteConfirmScreen(
                           context,
                           nonAppUserPickUpLocation!.latitude.toString(),
