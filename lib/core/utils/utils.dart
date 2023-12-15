@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
+import 'package:goshare/features/signup/controller/sign_up_controller.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/providers/dependent_booking_stage_provider.dart';
@@ -500,6 +501,57 @@ void showBannedDialog(BuildContext context, String message) {
             },
             child: const Text(
               'Xác nhận',
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void showNotVerifiedDialog(BuildContext context, WidgetRef ref, String phone) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext abcContext) {
+      return AlertDialog(
+        title: const Center(
+          child: Text(
+            'Lỗi đăng nhập',
+          ),
+        ),
+        content: const Center(
+          child: Text(
+              'Tài khoản chưa xác thực. Chọn "Xác nhận" để tiếp tục xác thực'),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () async {
+              final result = await ref
+                  .watch(signUpControllerProvider.notifier)
+                  .reSendOtpVerification(
+                    phone,
+                    context,
+                  );
+              if (context.mounted) {
+                Navigator.of(abcContext).pop();
+                if (result == true) {
+                  context.goNamed(
+                    RouteConstants.otp,
+                  );
+                }
+              }
+            },
+            child: const Text(
+              'Xác nhận',
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(abcContext).pop();
+            },
+            child: const Text(
+              'Hủy',
             ),
           ),
         ],

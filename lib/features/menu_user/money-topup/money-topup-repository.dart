@@ -10,6 +10,7 @@ import 'package:goshare/core/type_def.dart';
 import 'package:goshare/core/utils/http_utils.dart';
 import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
+import 'package:goshare/models/transaction_model.dart';
 import 'package:goshare/models/user_data_model.dart';
 import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:http/http.dart' as http;
@@ -73,6 +74,41 @@ class MoneyTopupRepository {
       }
     } catch (_) {
       return BalanceResult(error: "Fail to get balance");
+    }
+  }
+
+  FutureEither<WalletTransactionModel> getWalletTransaction(
+    //String sortBy,
+    int page,
+    int pageSize,
+  ) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('driverAccessToken');
+      final client = HttpClientWithAuth(accessToken ?? '');
+      final response = await client.get(
+        Uri.parse('$baseUrl/wallettransaction?page=$page&pageSize=$pageSize'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> walletTransactionData = json.decode(response.body);
+        print(walletTransactionData.toString());
+        WalletTransactionModel walletTransaction =
+            WalletTransactionModel.fromMap(walletTransactionData);
+
+        return right(walletTransaction);
+      } else if (response.statusCode == 429) {
+        return left(Failure('Too many request'));
+      } else if (response.statusCode == 401) {
+        return left(UnauthorizedFailure('Unauthorized'));
+      } else {
+        return left(Failure('Co loi xay ra'));
+      }
+    } catch (e) {
+      return left(Failure(e.toString()));
     }
   }
 

@@ -119,6 +119,10 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
           if (mounted) {
             showWrongPasswordDialog(context);
           }
+        } else if (result.error == LoginErrorConstants.accountNotVerified) {
+          if (mounted) {
+            showNotVerifiedDialog(context, ref, phone);
+          }
         } else {
           if (mounted) {
             showBannedDialog(context, result.error ?? 'Có lỗi xảy ra');
