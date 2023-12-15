@@ -11,6 +11,7 @@ import 'package:goshare/features/dependent_list/screens/dependent_on_trip_list.d
 import 'package:goshare/features/dependent_mng/dependent_add/dependent_add_screen.dart';
 import 'package:goshare/features/feedback/feedback.dart';
 import 'package:goshare/features/home/screen/home_screen.dart';
+import 'package:goshare/features/home/widgets/dependent_widgets/trip_notification_overlay.dart';
 
 // import 'package:goshare/features/home_trip/screen/find_trip_screen.dart';
 // import 'package:goshare/features/search_trip_route/screens/car_choosing_screen.dart';
@@ -374,6 +375,8 @@ class AppRouter {
             final String? bookerId = extras['bookerId'] as String?;
             final String? carTypeId = extras['carTypeId'] as String?;
             final String? driverNote = extras['driverNote'] as String?;
+            final String? nonAppDepName = extras['nonAppDepName'] as String?;
+            final String? nonAppDepPhone = extras['nonAppDepPhone'] as String?;
             final int capacity = extras['capacity'] as int;
             return SlideRightTransition(
               child: RouteConfirmScreen(
@@ -385,6 +388,8 @@ class AppRouter {
                 bookerId: bookerId ?? '',
                 paymentMethod: paymentMethod ?? '0',
                 carTypeId: carTypeId ?? '',
+                nonAppDepName: nonAppDepName,
+                nonAppDepPhone: nonAppDepPhone,
               ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
@@ -486,6 +491,14 @@ class AppRouter {
           path: RouteConstants.searchNonAppUserPickUpLocationUrl,
           pageBuilder: (context, state) => SlideBottomTransition(
             child: const SearchNonAppUserPickUpLocationScreen(),
+            key: state.pageKey,
+          ),
+        ),
+        GoRoute(
+          name: RouteConstants.dependentTripNotification,
+          path: RouteConstants.dependentTripNotificationUrl,
+          pageBuilder: (context, state) => SlideBottomTransition(
+            child: const TripNotificationScreen(),
             key: state.pageKey,
           ),
         ),

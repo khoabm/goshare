@@ -170,6 +170,7 @@ class TripRepository {
         },
       );
       if (response.statusCode == 200) {
+        print(response.body);
         Map<String, dynamic> tripData = json.decode(response.body);
         TripModel trip = TripModel.fromMap(tripData);
         return right(trip);
@@ -308,7 +309,7 @@ class TripRepository {
       String tripModelJson = tripModel.toJson();
       final client = HttpClientWithAuth(accessToken ?? '');
       final response = await client.post(
-        Uri.parse('$baseApiUrl/phoneless'),
+        Uri.parse('$baseApiUrl/trip/phoneless'),
         headers: {
           'Content-Type': 'application/json',
         },

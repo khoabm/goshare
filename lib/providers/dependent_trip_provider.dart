@@ -11,6 +11,10 @@ class TripNotifier extends StateNotifier<TripModel?> {
   void setTripData(Map<String, dynamic> tripData) {
     state = TripModel.fromMap(tripData);
   }
+
+  void setTripDataWithModel(TripModel? tripdata) {
+    state = tripdata;
+  }
 }
 
 final driverProvider = StateNotifierProvider<DriverNotifier, Driver?>((ref) {
