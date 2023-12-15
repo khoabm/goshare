@@ -6,6 +6,7 @@ import 'package:goshare/features/menu_user/money-topup/money-topup-repository.da
 import 'package:goshare/features/menu_user/money-topup/web-view-page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:goshare/features/menu_user/money-topup/money-topup-controller.dart';
+import 'package:goshare/models/transaction_model.dart';
 import 'package:goshare/theme/pallet.dart';
 
 class MoneyTopupPage extends ConsumerStatefulWidget {
@@ -18,7 +19,7 @@ class MoneyTopupPage extends ConsumerStatefulWidget {
 class TransactionCard extends StatelessWidget {
   final String? id;
   final String? tripId;
-  final int? amount;
+  final double? amount;
   final String? paymentMethod;
   final String? externalTransactionId;
   final String? status;
@@ -62,7 +63,7 @@ class TransactionCard extends StatelessWidget {
                   children: [
                     Text(
                       type == 'TOPUP'
-                          ? '+' + _formatTransaction(amount.toString())
+                          ? '+${_formatTransaction(amount.toString())}'
                           : _formatTransaction(amount.toString()),
                       style: TextStyle(
                         fontSize: 18.0,
@@ -72,9 +73,7 @@ class TransactionCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8.0),
                     Text(
-                      createTime.toString().substring(0, 10) +
-                          " " +
-                          createTime.toString().substring(11, 19),
+                      "${createTime.toString().substring(0, 10)} ${createTime.toString().substring(11, 19)}",
                       style: const TextStyle(
                         fontSize: 16.0,
                       ),
@@ -94,6 +93,8 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
   final TextEditingController _topupAmountController = TextEditingController();
   double currentBalance = 0.0;
   bool _showTopupForm = false;
+  final _scrollController = ScrollController();
+  WalletTransactionModel? _walletTransactionModel;
 
   // final List<Contact> contacts = [
   //   Contact(
@@ -110,10 +111,16 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
   //       createTime: "2023-11-14T18:48:03.813334"),
   // ];
 
-  List<TransactionResult> _transactionList = [];
+  // List<TransactionResult> _transactionList = [];
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        _loadMore();
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final result = await ref
           .read(MoneyTopupControllerProvider.notifier)
@@ -123,14 +130,33 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
       });
     });
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final transactionResult = await ref
-          .read(MoneyTopupControllerProvider.notifier)
-          .getTransaction(context);
-      // print("kjergherkuyrteku" + transactionResult);
-      setState(() {
-        _transactionList = transactionResult;
-      });
+      // final transactionResult = await ref
+      //     .read(MoneyTopupControllerProvider.notifier)
+      //     .getTransaction(context);
+      // // print("kjergherkuyrteku" + transactionResult);
+      // setState(() {
+      //   _transactionList = transactionResult;
+      // });
+      _loadMore();
     });
+  }
+
+  void _loadMore() async {
+    if (_walletTransactionModel == null ||
+        _walletTransactionModel!.hasNextPage) {
+      int nextPage = (_walletTransactionModel?.page ?? 0) + 1;
+      WalletTransactionModel? newPageData = await ref
+          .watch(MoneyTopupControllerProvider.notifier)
+          .getWalletTransaction(nextPage, 10, context);
+      if (_walletTransactionModel == null) {
+        _walletTransactionModel = newPageData;
+      } else {
+        _walletTransactionModel!.items.addAll(newPageData!.items);
+        //_walletTransactionModel = newPageData;
+        _walletTransactionModel!.copyWith(hasNextPage: newPageData.hasNextPage);
+      }
+      setState(() {});
+    }
   }
 
   @override
@@ -145,12 +171,14 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
     final result = await ref
         .read(MoneyTopupControllerProvider.notifier)
         .moneyTopup(topupAmount, context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => WebViewPage(url: result),
-      ),
-    );
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WebViewPage(url: result),
+        ),
+      );
+    }
   }
 
   String _formatBalance(double balance) {
@@ -182,7 +210,7 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
               ),
               child: Column(
                 children: [
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   const Text(
                     'Số dư hiện tại',
                     style: TextStyle(
@@ -190,20 +218,20 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
                         fontWeight: FontWeight.bold,
                         color: Colors.white),
                   ),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   Text(
                     '${_formatBalance(currentBalance)}đ',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                 ],
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Column(
               children: [
                 GestureDetector(
@@ -228,12 +256,12 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
                           fit: BoxFit.fill,
                         ),
                         const SizedBox(width: 10.0),
-                        Text("Nạp tiền vào ví với VNPay"),
+                        const Text("Nạp tiền vào ví với VNPay"),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 AnimatedOpacity(
                   opacity: _showTopupForm ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 200),
@@ -262,7 +290,7 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: Text('Xác nhận nạp tiền'),
+                                title: const Text('Xác nhận nạp tiền'),
                                 content: Text(
                                     'Bạn có chắc chắn muốn nạp ${topupAmount} đ vào ví của bạn không?'),
                                 actions: [
@@ -292,29 +320,30 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
                 ),
               ],
             ),
-            SizedBox(height: 16.0),
-            Text(
+            const SizedBox(height: 16.0),
+            const Text(
               "Lịch sử giao dịch",
               style: TextStyle(
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Expanded(
               child: ListView.builder(
-                itemCount: _transactionList.length,
+                controller: _scrollController,
+                itemCount: _walletTransactionModel?.items.length ?? 0,
                 itemBuilder: (context, index) {
-                  final dependent = _transactionList[index];
+                  final transaction = _walletTransactionModel?.items[index];
                   return TransactionCard(
-                    id: dependent.id,
-                    tripId: dependent.tripId,
-                    amount: dependent.amount,
-                    paymentMethod: dependent.paymentMethod,
-                    externalTransactionId: dependent.externalTransactionId,
-                    status: dependent.status,
-                    type: dependent.type,
-                    createTime: dependent.createTime,
+                    id: transaction?.id,
+                    tripId: transaction?.tripId,
+                    amount: transaction?.amount,
+                    paymentMethod: transaction?.paymentMethod,
+                    externalTransactionId: transaction?.externalTransactionId,
+                    status: transaction?.status,
+                    type: transaction?.type,
+                    createTime: transaction?.createTime.toString(),
 
                     // Add onTap or any other logic as needed
                   );
