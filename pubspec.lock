@@ -385,7 +385,7 @@ packages:
     source: hosted
     version: "1.0.4"
   image_picker_android:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: image_picker_android
       sha256: d6a6e78821086b0b737009b09363018309bbc6de3fd88cc5c26bc2bb44a4957f
@@ -425,7 +425,7 @@ packages:
     source: hosted
     version: "0.2.1+1"
   image_picker_platform_interface:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: image_picker_platform_interface
       sha256: ed9b00e63977c93b0d2d2b343685bed9c324534ba5abafbb3dfbd6a780b1b514

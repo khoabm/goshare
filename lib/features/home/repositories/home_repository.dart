@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
@@ -189,6 +190,65 @@ class HomeRepository {
       } else if (res.statusCode == 429) {
         return left(Failure('Too many request'));
       } else if (res.statusCode == 401) {
+        return left(UnauthorizedFailure('Unauthorized'));
+      } else {
+        return left(Failure('Co loi xay ra'));
+      }
+    } on TimeoutException catch (_) {
+      return left(
+        Failure('Timeout'),
+      );
+    }
+  }
+
+  FutureEither<UserProfileModel> editUserProfile(
+    String name,
+    String? imagePath,
+    int gender,
+    DateTime birth,
+  ) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+
+      // final client = HttpClientWithAuth(accessToken ?? '');
+      // final res = await client.put(
+      //   Uri.parse('$baseApiUrl/user/profile'),
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      // );
+      var uri = Uri.parse('$baseApiUrl/user/profile');
+      var request = http.MultipartRequest('POST', uri)
+        ..fields['name'] = name
+        ..fields['gender'] = gender.toString()
+        ..fields['birth'] = birth.toIso8601String();
+      if (imagePath != null) {
+        // Read the file as bytes
+        var fileBytes = await File(imagePath).readAsBytes();
+
+        // Add the image file to the multipart request
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'image',
+            fileBytes,
+            filename: 'image', // Provide a filename for the image
+          ),
+        );
+      }
+      request.headers.addAll(<String, String>{
+        'Authorization': 'Bearer $accessToken',
+      });
+      var response = await request.send();
+      String responseData = await response.stream.bytesToString();
+      if (response.statusCode == 200) {
+        Map<String, dynamic> userProfileData = json.decode(responseData);
+        UserProfileModel userProfile =
+            UserProfileModel.fromMap(userProfileData);
+        return right(userProfile);
+      } else if (response.statusCode == 429) {
+        return left(Failure('Too many request'));
+      } else if (response.statusCode == 401) {
         return left(UnauthorizedFailure('Unauthorized'));
       } else {
         return left(Failure('Co loi xay ra'));

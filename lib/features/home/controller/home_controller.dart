@@ -139,4 +139,37 @@ class HomeController extends StateNotifier<bool> {
     });
     return profile;
   }
+
+  Future<UserProfileModel?> editUserProfile(
+    BuildContext context,
+    String name,
+    String? imagePath,
+    int gender,
+    DateTime birth,
+  ) async {
+    UserProfileModel? profile;
+
+    final result = await _homeRepository.editUserProfile(
+      name,
+      imagePath,
+      gender,
+      birth,
+    );
+    result.fold((l) {
+      if (l is UnauthorizedFailure) {
+        showLoginTimeOut(
+          context: context,
+        );
+      } else {
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      }
+    }, (r) {
+      // print(r.length.toString());
+      profile = r;
+    });
+    return profile;
+  }
 }

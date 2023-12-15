@@ -6,6 +6,7 @@ import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/providers/dependent_booking_stage_provider.dart';
+import 'package:image_picker/image_picker.dart';
 
 void showSnackBar({
   required BuildContext context,
@@ -111,6 +112,12 @@ String convertBackPhoneNumber(String phoneNumber) {
     return '0${phoneNumber.substring(3)}';
   }
   return phoneNumber;
+}
+
+Future<XFile?> pickImage() async {
+  final ImagePicker picker = ImagePicker();
+  final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+  return image;
 }
 
 void showNavigateDashBoardDialog(TripModel trip, BuildContext context) {
