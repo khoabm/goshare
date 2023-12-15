@@ -11,10 +11,12 @@ import 'package:goshare/common/app_text_field.dart';
 import 'package:goshare/common/home_center_container.dart';
 import 'package:goshare/common/loader.dart';
 import 'package:goshare/core/constants/constants.dart';
+import 'package:goshare/core/constants/login_error_constants.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/date_time_formatters.dart';
 import 'package:goshare/core/input_formatters.dart';
 import 'package:goshare/core/input_validator.dart';
+import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/login/controller/log_in_controller.dart';
 import 'package:goshare/features/login/repository/log_in_repository.dart';
 
@@ -112,6 +114,16 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
 
       if (result.error != null) {
         print('Error: ${result.error}');
+        if (result.error == LoginErrorConstants.phoneNumberNotExist ||
+            result.error == LoginErrorConstants.wrongPassword) {
+          if (mounted) {
+            showWrongPasswordDialog(context);
+          }
+        } else {
+          if (mounted) {
+            showBannedDialog(context, result.error ?? 'Có lỗi xảy ra');
+          }
+        }
       } else {
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('accessToken', result.accessToken!);

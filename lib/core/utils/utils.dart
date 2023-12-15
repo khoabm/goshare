@@ -6,6 +6,7 @@ import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/providers/dependent_booking_stage_provider.dart';
+import 'package:goshare/theme/pallet.dart';
 import 'package:image_picker/image_picker.dart';
 
 void showSnackBar({
@@ -208,8 +209,8 @@ void showCancelDialogInfo(
         actions: [
           ElevatedButton(
             onPressed: () {
-              ref.watch(stageProvider.notifier).setStage(Stage.stage0);
               Navigator.of(abcContext).pop();
+              ref.watch(stageProvider.notifier).setStage(Stage.stage0);
             },
             child: const Text(
               'Xác nhận',
@@ -333,11 +334,12 @@ void showDialogInfoPickUp(TripModel trip, BuildContext context) {
   showDialog(
     barrierDismissible: true,
     context: context,
-    builder: (BuildContext abcContext) {
+    builder: (BuildContext dialogContext) {
       return AlertDialog(
         title: Center(
           child: Text(
             'Tài xế ${trip.driver?.name} đã đến',
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
           ),
         ),
         content: Row(
@@ -349,11 +351,31 @@ void showDialogInfoPickUp(TripModel trip, BuildContext context) {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                      'Bạn đã đặt xe: ${trip.driver?.car.make} ${trip.driver?.car.model}'),
-                  Text('Biển số xe: ${trip.driver?.car.licensePlate}'),
-                  Text('Số điện thoại tài xế: ${trip.driver?.phone}'),
-                  const Text('Vui lòng tìm tài xế của bạn gần đó'),
+                  ListTile(
+                    leading: const Icon(Icons.directions_car),
+                    title: Text(
+                      'Bạn đã đặt xe: ${trip.driver?.car.make} ${trip.driver?.car.model}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.confirmation_number),
+                    title: Text(
+                      'Biển số xe: ${trip.driver?.car.licensePlate}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.phone),
+                    title: Text(
+                      'Số điện thoại tài xế:${trip.driver?.phone}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const ListTile(
+                    leading: Icon(Icons.location_on),
+                    title: Text('Vui lòng tìm tài xế của bạn gần đó'),
+                  ),
                 ],
               ),
             ),
@@ -362,17 +384,13 @@ void showDialogInfoPickUp(TripModel trip, BuildContext context) {
         actions: [
           TextButton(
             onPressed: () {
-              //context.pop();
-              Navigator.of(abcContext).pop();
-              context.pushNamed(
-                RouteConstants.onTrip,
-                extra: {
-                  'trip': trip,
-                },
-              );
+              Navigator.of(dialogContext).pop();
+              //navigateToOnTripScreen(trip);
             },
             child: const Text(
               'Xác nhận',
+              style: TextStyle(
+                  color: Pallete.primaryColor, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -430,7 +448,7 @@ void showDialogInfoPickUpV2(TripModel trip, BuildContext context) {
 
 // void showDialogInfoPickUp(TripModel trip, BuildContext context) {
 //   showDialog(
-//     barrierDismissible: false,
+//     barrierDismissible: true,
 //     context: context,
 //     builder: (BuildContext abcContext) {
 //       return AlertDialog(
@@ -439,16 +457,152 @@ void showDialogInfoPickUpV2(TripModel trip, BuildContext context) {
 //             'Tài xế ${trip.driver?.name} đã đến',
 //           ),
 //         ),
-//         content: const SizedBox.shrink(),
+//         content: Row(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Expanded(
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                 mainAxisSize: MainAxisSize.min,
+//                 children: [
+//                   Text(
+//                       'Bạn đã đặt xe: ${trip.driver?.car.make} ${trip.driver?.car.model}'),
+//                   Text('Biển số xe: ${trip.driver?.car.licensePlate}'),
+//                   Text('Số điện thoại tài xế: ${trip.driver?.phone}'),
+//                   const Text('Vui lòng tìm tài xế của bạn gần đó'),
+//                 ],
+//               ),
+//             ),
+//           ],
+//         ),
 //         actions: [
-//           ElevatedButton(
+//           TextButton(
 //             onPressed: () {
-//               abcContext.goNamed(
+//               //context.pop();
+//               Navigator.of(abcContext).pop();
+//               context.pushNamed(
 //                 RouteConstants.onTrip,
 //                 extra: {
 //                   'trip': trip,
 //                 },
 //               );
+//             },
+//             child: const Text(
+//               'Xác nhận',
+//             ),
+//           ),
+//         ],
+//       );
+//     },
+//   );
+// }
+
+void showWrongPasswordDialog(BuildContext context) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext abcContext) {
+      return AlertDialog(
+        title: const Center(
+          child: Text(
+            'Lỗi đăng nhập',
+          ),
+        ),
+        content: const Center(
+          child: Text('Số điện thoại hoặc mật khẩu không chính xác'),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(abcContext).pop();
+            },
+            child: const Text(
+              'Xác nhận',
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void showBannedDialog(BuildContext context, String message) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext abcContext) {
+      return AlertDialog(
+        title: const Center(
+          child: Text(
+            'Lỗi đăng nhập',
+          ),
+        ),
+        content: Center(
+          child: Text(message),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(abcContext).pop();
+            },
+            child: const Text(
+              'Xác nhận',
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void showFeedBackError(BuildContext context, String message) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext abcContext) {
+      return AlertDialog(
+        title: const Center(
+          child: Text(
+            'Lỗi phản hồi',
+          ),
+        ),
+        content: Center(
+          child: Text(message),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(abcContext).pop();
+            },
+            child: const Text(
+              'Xác nhận',
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+// void showWrongPhoneNumberDialog(BuildContext context) {
+//   showDialog(
+//     barrierDismissible: false,
+//     context: context,
+//     builder: (BuildContext abcContext) {
+//       return AlertDialog(
+//         title: const Center(
+//           child: Text(
+//             'Lỗi đăng nhập',
+//           ),
+//         ),
+//         content: const Center(
+//           child: Text('Số điện thoại không chính xác'),
+//         ),
+//         actions: [
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.of(abcContext).pop();
 //             },
 //             child: const Text(
 //               'Xác nhận',
