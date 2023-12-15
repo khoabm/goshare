@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:goshare/core/constants/constants.dart';
+import 'package:goshare/core/constants/login_error_constants.dart';
 import 'package:goshare/core/failure.dart';
 import 'package:goshare/core/type_def.dart';
 import 'package:goshare/core/utils/http_utils.dart';
@@ -53,8 +54,8 @@ class LoginRepository {
           'passcode': passcode,
         }),
       );
+      final resultMap = json.decode(response.body);
       if (response.statusCode == 200) {
-        final resultMap = json.decode(response.body);
         final Map<String, dynamic> jsonData = json.decode(response.body);
         final userData = UserDataModel.fromMap(jsonData);
         ref
@@ -73,6 +74,20 @@ class LoginRepository {
             role: resultMap['role'],
           ),
         );
+      } else if (response.statusCode == 404) {
+        if (resultMap['message'] == 'Phone number not found') {
+          return LoginResult(error: LoginErrorConstants.phoneNumberNotExist);
+        }
+        return LoginResult();
+      } else if (response.statusCode == 401) {
+        if (resultMap['message'] == 'User is not verified') {
+          return LoginResult(error: LoginErrorConstants.accountNotVerified);
+        } else if (resultMap['message'] == 'Wrong passcode') {
+          return LoginResult(error: LoginErrorConstants.wrongPassword);
+        }
+        return LoginResult();
+      } else if (response.statusCode == 403) {
+        return LoginResult(error: resultMap['message']);
       } else {
         return LoginResult(error: 'Login failed');
       }
