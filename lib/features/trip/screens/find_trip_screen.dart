@@ -322,7 +322,9 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
   }
 
   void _handleNotifyPassengerTripTimedOut(dynamic message) {
-    _showFindTripTimeOutDialog();
+    if (mounted) {
+      _showFindTripTimeOutDialog();
+    }
   }
 
   void _handleNotifyPassengerTripCanceled(dynamic message) {
@@ -333,7 +335,9 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     bool isSelfBook = data.cast<bool>()[1];
     //bool isNotifyToGuardian = data.cast<bool>()[2];
     if (isSelfBook == false) {
-      _showCanceledTripDialog(trip);
+      if (mounted) {
+        _showCanceledTripDialog(trip);
+      }
     }
   }
 
@@ -499,7 +503,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
         return AlertDialog(
           title: const Center(
             child: Text(
-              'Thời gian tìm xe đã hết',
+              'Chuyến xe đã bị hủy',
             ),
           ),
           content: ConstrainedBox(
@@ -514,7 +518,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Đã quá hạn tìm xe mà chúng tôi không tìm được tài xế cho bạn. Vui lòng thử lại',
+                        'Chuyến xe bạn tìm đã bị hủy.',
                       )
                     ],
                   ),
@@ -543,7 +547,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                 // setState(() {
                 //   _isLoading = false;
                 // });
-                dialogContext.pop();
+                Navigator.of(dialogContext).pop();
                 navigateToDashBoardScreen();
               },
               child: const Text(

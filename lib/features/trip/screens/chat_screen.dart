@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
+import 'package:goshare/providers/chat_provider.dart';
 import 'package:goshare/providers/signalr_providers.dart';
 import 'package:signalr_core/signalr_core.dart';
 
@@ -26,7 +27,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final TextEditingController _textController = TextEditingController();
-  final List<ChatMessage> _messages = [];
+  // final List<ChatMessage> _messages = [];
   @override
   void initState() {
     super.initState();
@@ -35,17 +36,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
   }
 
-  void _handleSubmitted(String text) {
+  void _handleSubmitted(String text) async {
     _textController.clear();
-    ref.read(tripControllerProvider.notifier).sendChat(
+    await ref.read(tripControllerProvider.notifier).sendChat(
           context,
           text,
           widget.receiver,
         );
-    setState(() {
-      _messages.insert(0, ChatMessage(text, true));
-      // Add a message from the other user for testing
-    });
+    ref.read(chatMessagesProvider.notifier).addMessage(ChatMessage(text, true));
+
+    // setState(() {
+    //   _messages.insert(0, ChatMessage(text, true));
+    //   // Add a message from the other user for testing
+    // });
   }
 
   Future<void> initSignalR(WidgetRef ref) async {
@@ -58,8 +61,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         print(
             "${message.toString()} DAY ROI SIGNAL R DAY ROI RECEIVE SMS MESSAGE");
         setState(() {
-          _messages.insert(
-              0, ChatMessage(message?.first.toString() ?? '', false));
+          // _messages.insert(
+          //     0, ChatMessage(message?.first.toString() ?? '', false));
+          ref
+              .read(chatMessagesProvider.notifier)
+              .addMessage(ChatMessage(message?.first.toString() ?? '', false));
         });
       });
 
@@ -152,15 +158,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Chat Screen')),
+      appBar: AppBar(title: const Text('Nhắn tin')),
       body: Column(
         children: <Widget>[
           Flexible(
             child: ListView.builder(
               padding: const EdgeInsets.all(8.0),
               reverse: true,
-              itemBuilder: (_, int index) => _buildMessage(_messages[index]),
-              itemCount: _messages.length,
+              itemBuilder: (_, int index) =>
+                  _buildMessage(ref.watch(chatMessagesProvider)[index]),
+              itemCount: ref.watch(chatMessagesProvider).length,
             ),
           ),
           const Divider(height: 1.0),
