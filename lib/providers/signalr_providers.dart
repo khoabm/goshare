@@ -15,6 +15,8 @@ final hubConnectionProvider = FutureProvider<HubConnection>((ref) async {
         .withAutomaticReconnect()
         .build();
   } catch (e) {
+    print('LOI SIGNAL R NEF');
+    print(e.toString());
     rethrow; // Re-throw the exception
   }
 });

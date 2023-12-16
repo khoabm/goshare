@@ -99,6 +99,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
       final connection = await ref.read(
         hubConnectionProvider.future,
       );
+
       if (connection.state == HubConnectionState.disconnected) {
         await connection.start()?.then(
               (value) => print('Start thanh cong'),
@@ -295,11 +296,25 @@ class _DashBoardState extends ConsumerState<DashBoard> {
           }
         },
       );
+      connection.onreconnected((connectionId) async {
+        await connection.start()?.then(
+              (value) => print('Start thanh cong'),
+            );
+      });
 
       connection.onclose(
-        (exception) {
+        (exception) async {
+          print('LOI SIGNALR CONNECTION DASHBOARD');
           print(
             exception.toString(),
+          );
+          await Future.delayed(
+            const Duration(seconds: 3),
+            () async {
+              await connection.start()?.then(
+                    (value) => print('Start thanh cong'),
+                  );
+            },
           );
         },
       );

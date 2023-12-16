@@ -69,8 +69,8 @@ class _DependentListTripState extends ConsumerState<DependentListTrip> {
                 if (result.status == 1) {
                   navigateToDriverPickupScreen(
                     result.driver?.name ?? 'Không rõ',
-                    result.driver?.car.make ?? '',
-                    result.driver?.car.licensePlate ?? '',
+                    result.driver?.car?.make ?? '',
+                    result.driver?.car?.licensePlate ?? '',
                     result.driver?.phone ?? '',
                     result.driver?.avatarUrl ?? '',
                     result.driver?.id ?? '',

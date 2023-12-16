@@ -510,7 +510,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                         .setCurrentOnTripId(null);
                     context
                         .replaceNamed(RouteConstants.rating, pathParameters: {
-                      'idTrip': widget.trip.id,
+                      'idTrip': widget.trip.id, //widget.trip.id,
                     });
                   }
                 } else {
@@ -816,7 +816,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                                         height: 8,
                                       ),
                                       Text(
-                                        widget.trip.driver?.car.make ??
+                                        widget.trip.driver?.car?.make ??
                                             'Xe không rõ',
                                         style: const TextStyle(
                                           fontSize: 25,
@@ -827,7 +827,7 @@ class _OnTripScreenState extends ConsumerState<OnTripScreen> {
                                         height: 8,
                                       ),
                                       Text(
-                                        widget.trip.driver?.car.licensePlate ??
+                                        widget.trip.driver?.car?.licensePlate ??
                                             'Không rõ',
                                         style: const TextStyle(
                                           fontSize: 25,

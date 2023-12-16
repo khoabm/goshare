@@ -160,8 +160,8 @@ class _TripInformationCardWidgetState
                                   .watch(driverProvider.notifier)
                                   .driverData
                                   ?.car
-                                  .licensePlate ??
-                              trip?.driver?.car.licensePlate ??
+                                  ?.licensePlate ??
+                              trip?.driver?.car?.licensePlate ??
                               '',
                           textAlign: TextAlign.right,
                           style: const TextStyle(
@@ -199,8 +199,8 @@ class _TripInformationCardWidgetState
                                       .watch(driverProvider.notifier)
                                       .driverData
                                       ?.car
-                                      .make ??
-                                  trip?.driver?.car.make ??
+                                      ?.make ??
+                                  trip?.driver?.car?.make ??
                                   '',
                               textAlign: TextAlign.center,
                               style: const TextStyle(
@@ -225,8 +225,8 @@ class _TripInformationCardWidgetState
                                       .watch(driverProvider.notifier)
                                       .driverData
                                       ?.car
-                                      .model ??
-                                  trip?.driver?.car.model ??
+                                      ?.model ??
+                                  trip?.driver?.car?.model ??
                                   '',
                               textAlign: TextAlign.center,
                               style: const TextStyle(

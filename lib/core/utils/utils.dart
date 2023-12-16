@@ -399,14 +399,14 @@ void showDialogInfoPickUp(TripModel trip, BuildContext context) {
                   ListTile(
                     leading: const Icon(Icons.directions_car),
                     title: Text(
-                      'Bạn đã đặt xe: ${trip.driver?.car.make} ${trip.driver?.car.model}',
+                      'Bạn đã đặt xe: ${trip.driver?.car?.make} ${trip.driver?.car?.model}',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                   ListTile(
                     leading: const Icon(Icons.confirmation_number),
                     title: Text(
-                      'Biển số xe: ${trip.driver?.car.licensePlate}',
+                      'Biển số xe: ${trip.driver?.car?.licensePlate}',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -465,8 +465,8 @@ void showDialogInfoPickUpV2(TripModel trip, BuildContext context) {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                      'Bạn đã đặt xe: ${trip.driver?.car.make} ${trip.driver?.car.model}'),
-                  Text('Biển số xe: ${trip.driver?.car.licensePlate}'),
+                      'Bạn đã đặt xe: ${trip.driver?.car?.make} ${trip.driver?.car?.model}'),
+                  Text('Biển số xe: ${trip.driver?.car?.licensePlate}'),
                   Text('Số điện thoại tài xế: ${trip.driver?.phone}'),
                   const Text('Vui lòng tìm tài xế của bạn gần đó'),
                 ],

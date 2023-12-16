@@ -4,6 +4,7 @@ import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/features/trip_history/trip_history_controller.dart';
 import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/theme/pallet.dart';
+import 'package:intl/intl.dart';
 
 class TripHistoryScreen extends ConsumerStatefulWidget {
   const TripHistoryScreen({super.key});
@@ -38,7 +39,7 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lịch sử chuyến'),
+        title: const Text('Lịch sử chuyến'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
       ),
@@ -77,13 +78,15 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
   }
 
   void _showTripDetails(BuildContext context, TripModel trip) {
+    final oCcy = NumberFormat("#,##0", "vi_VN");
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Chi tiết chuyến đi'),
           content: IntrinsicHeight(
-            child: Container(
+            child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.8,
               child: Column(
                 mainAxisSize: MainAxisSize.min, // Set to MainAxisSize.min
@@ -92,12 +95,12 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('${trip.price}đ',
+                      Text('${oCcy.format(trip.price)}đ',
                           style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
                               color: Pallete.green)),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Text(
                         'Chuyến đi đã bắt đầu từ ${trip.startLocation.address} đến ${trip.endLocation.address}',
                         style: const TextStyle(
@@ -142,7 +145,7 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Biển số xe ${trip.driver?.car.licensePlate}',
+                        'Biển số xe ${trip.driver?.car?.licensePlate}',
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w400),
                       ),

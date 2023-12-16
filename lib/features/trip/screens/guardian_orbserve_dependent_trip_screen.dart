@@ -473,7 +473,7 @@ class _GuardianObserveDependentTripScreenState
                                               height: 8,
                                             ),
                                             Text(
-                                              widget.trip.driver?.car.make ??
+                                              widget.trip.driver?.car?.make ??
                                                   'Không rõ',
                                               style: const TextStyle(
                                                 fontSize: 25,
@@ -485,7 +485,7 @@ class _GuardianObserveDependentTripScreenState
                                             ),
                                             Text(
                                               widget.trip.driver?.car
-                                                      .licensePlate ??
+                                                      ?.licensePlate ??
                                                   'Không rõ',
                                               style: const TextStyle(
                                                 fontSize: 25,

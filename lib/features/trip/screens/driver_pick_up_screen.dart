@@ -93,9 +93,13 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
       );
 
       hubConnection.on('NotifyPassengerDriverPickup', (message) {
-        if (mounted) {
-          print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
-          _handleNotifyPassengerDriverPickUp(message);
+        try {
+          if (mounted) {
+            print("${message.toString()} DAY ROI SIGNAL R DAY ROI");
+            _handleNotifyPassengerDriverPickUp(message);
+          }
+        } catch (e) {
+          print(e.toString());
         }
       });
       hubConnection.on(
@@ -132,14 +136,37 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
       if (ModalRoute.of(context)?.isCurrent ?? false) {
         final data = message as List<dynamic>;
         final tripData = data.cast<Map<String, dynamic>>().first;
+        print("TRIP DATAAAAAAA");
+        print(tripData);
+        print('id: ${tripData['id']}');
+        print('passengerId: ${tripData['passengerId']}');
+        print('passengerName: ${tripData['passengerName']}');
+        print('driverId: ${tripData['driverId']}');
+        print('startLocationId: ${tripData['startLocationId']}');
+        print('startTime: ${tripData['startTime']}');
+        print('endTime: ${tripData['endTime']}');
+        print('pickupTime: ${tripData['pickupTime']}');
+        print('distance: ${tripData['distance']}');
+        print('price: ${tripData['price']}');
+        print('cartypeId: ${tripData['cartypeId']}');
+        print('status: ${tripData['status']}');
+        print('createTime: ${tripData['createTime']}');
+        print('updatedTime: ${tripData['updatedTime']}');
+        print('paymentMethod: ${tripData['paymentMethod']}');
+        print('bookerId: ${tripData['bookerId']}');
         final trip = TripModel.fromMap(tripData);
+        print('DA CAST THANH CONG');
         bool isSelfBook = data.cast<bool>()[1];
         bool isNotifyToGuardian = data.cast<bool>()[2];
         if (isSelfBook == true) {
-          _showDriverInfoDialog(trip);
+          if (mounted) {
+            _showDriverInfoDialog(trip);
+          }
         } else {
           if (isNotifyToGuardian == true) {
-            _showDependentDriverInfoDialog(trip);
+            if (mounted) {
+              _showDependentDriverInfoDialog(trip);
+            }
           }
         }
       }
@@ -170,14 +197,14 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                     ListTile(
                       leading: const Icon(Icons.directions_car),
                       title: Text(
-                        'Bạn đã đặt xe: ${trip.driver?.car.make} ${trip.driver?.car.model}',
+                        'Bạn đã đặt xe: ${trip.driver?.car?.make} ${trip.driver?.car?.model}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                     ListTile(
                       leading: const Icon(Icons.confirmation_number),
                       title: Text(
-                        'Biển số xe: ${trip.driver?.car.licensePlate}',
+                        'Biển số xe: ${trip.driver?.car?.licensePlate}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -190,7 +217,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                     ),
                     const ListTile(
                       leading: Icon(Icons.location_on),
-                      title: const Text('Vui lòng tìm tài xế của bạn gần đó'),
+                      title: Text('Vui lòng tìm tài xế của bạn gần đó'),
                     ),
                   ],
                 ),
@@ -239,14 +266,14 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                     ListTile(
                       leading: const Icon(Icons.directions_car),
                       title: Text(
-                        'Bạn đã đặt xe: ${trip.driver?.car.make} ${trip.driver?.car.model}',
+                        'Bạn đã đặt xe: ${trip.driver?.car?.make} ${trip.driver?.car?.model}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                     ListTile(
                       leading: const Icon(Icons.confirmation_number),
                       title: Text(
-                        'Biển số xe: ${trip.driver?.car.licensePlate}',
+                        'Biển số xe: ${trip.driver?.car?.licensePlate}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
