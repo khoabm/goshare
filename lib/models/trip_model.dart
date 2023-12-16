@@ -991,6 +991,7 @@ class TripImages {
 
   factory TripImages.fromMap(Map<String, dynamic> map) {
     print('CAST TRIP IMAGE MODEL');
+
     return TripImages(
       id: map['id'] ?? '',
       tripId: map['tripId'] ?? '',
