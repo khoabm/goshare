@@ -12,6 +12,7 @@ import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:goshare/providers/dependent_booking_stage_provider.dart';
 import 'package:goshare/providers/dependent_trip_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../widgets/dependent_widgets/greeting.dart';
 
@@ -141,9 +142,15 @@ class _DependentHomeScreenState extends ConsumerState<DependentHomeScreen> {
                     children: [
                       FloatingActionButton(
                         backgroundColor: const Color.fromARGB(255, 60, 188, 60),
-                        onPressed: () {
+                        onPressed: () async {
                           // Add your action for the first button
                           print('First Button Pressed');
+                          final call = Uri.parse('tel:+91 9830268966');
+                          if (await canLaunchUrl(call)) {
+                            launchUrl(call);
+                          } else {
+                            throw 'Could not launch $call';
+                          }
                         },
                         child: const Icon(Icons.call),
                       ), // Add some spacing between the buttons
