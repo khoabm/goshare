@@ -425,8 +425,8 @@ class TripModel {
   }
 
   factory TripModel.fromMap(Map<String, dynamic> map) {
-    print('CAST TRIP MODEL');
-    print(map.toString());
+    // print('CAST TRIP MODEL');
+    // print(map.toString());
     return TripModel(
       id: map['id'] ?? '',
       passengerId: map['passengerId'] ?? '',

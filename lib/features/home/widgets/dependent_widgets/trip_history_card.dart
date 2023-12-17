@@ -25,6 +25,8 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
           tripHistories = await ref
               .watch(TripHistoryControllerProvider.notifier)
               .tripHistory(context);
+          print('----------------------------------');
+          print(tripHistories[0].startLocation.address);
           if (mounted) {
             setState(() {});
           }
@@ -95,7 +97,7 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
                                       textAlign: TextAlign.right,
                                       style: const TextStyle(
                                         color: Colors.black,
-                                        fontSize: 15,
+                                        fontSize: 13,
                                         fontStyle: FontStyle.italic,
                                         fontFamily: 'Raleway',
                                         fontWeight: FontWeight.w300,
@@ -138,7 +140,7 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
                                                               FontStyle.italic,
                                                           fontFamily: 'Raleway',
                                                           fontWeight:
-                                                              FontWeight.w300,
+                                                              FontWeight.w600,
                                                         ),
                                                       ),
                                                     ),
@@ -146,17 +148,18 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
                                                       flex: 7,
                                                       child: SizedBox(
                                                         child: Text(
-                                                          "${trip.startLocation.address}",
+                                                          trip.startLocation
+                                                              .address,
                                                           textAlign:
                                                               TextAlign.right,
                                                           style:
                                                               const TextStyle(
                                                             color: Colors.black,
-                                                            fontSize: 20,
+                                                            fontSize: 15,
                                                             fontFamily:
                                                                 'Raleway',
                                                             fontWeight:
-                                                                FontWeight.w400,
+                                                                FontWeight.w500,
                                                           ),
                                                         ),
                                                       ),
@@ -184,7 +187,7 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
                                                               FontStyle.italic,
                                                           fontFamily: 'Raleway',
                                                           fontWeight:
-                                                              FontWeight.w300,
+                                                              FontWeight.w600,
                                                         ),
                                                       ),
                                                     ),
@@ -198,11 +201,11 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
                                                           style:
                                                               const TextStyle(
                                                             color: Colors.black,
-                                                            fontSize: 20,
+                                                            fontSize: 15,
                                                             fontFamily:
                                                                 'Raleway',
                                                             fontWeight:
-                                                                FontWeight.w400,
+                                                                FontWeight.w500,
                                                           ),
                                                         ),
                                                       ),

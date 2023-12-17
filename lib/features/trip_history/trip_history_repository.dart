@@ -34,7 +34,7 @@ class TripHistoryRepository {
       );
       if (res.statusCode == 200) {
         final dynamic responseData = jsonDecode(res.body);
-        print(responseData.toString());
+        //print(responseData.toString());
         if (responseData.isEmpty || responseData is! List) {
           throw Exception('Unexpected response format');
         }
@@ -44,7 +44,8 @@ class TripHistoryRepository {
         final List<TripModel> trips = List<Map<String, dynamic>>.from(data)
             .map((tripData) => TripModel.fromMap(tripData))
             .toList();
-
+        print('THONG TIN TRIP HISTORY');
+        print(trips[0].startLocation.toJson());
         return right(trips);
       } else {
         throw Exception('Failed to load trip history');
