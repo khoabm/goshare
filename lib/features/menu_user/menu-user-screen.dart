@@ -18,11 +18,11 @@ class UserMenuPage extends ConsumerStatefulWidget {
 }
 
 class _UserMenuPageState extends ConsumerState<UserMenuPage> {
-  void _onLogout(WidgetRef ref, BuildContext context) async {
+  void _onLogout(WidgetRef ref) async {
     if (mounted) {
-      final connection = await ref.read(
-        hubConnectionProvider.future,
-      );
+      // final connection = await ref.read(
+      //   hubConnectionProvider.future,
+      // );
       if (mounted) {
         await ref
             .watch(LoginControllerProvider.notifier)
@@ -33,18 +33,18 @@ class _UserMenuPageState extends ConsumerState<UserMenuPage> {
       ref.invalidate(currentDependentOnTripProvider);
       ref.invalidate(currentOnTripIdProvider);
       //ref.invalidate(userProvider);
-      await connection.stop().then(
-        (value) {
-          print('DA STOP THANH CONG');
-          ref.invalidate(hubConnectionProvider);
-        },
-      );
+      // await connection.stop().then(
+      //   (value) {
+      //     print('DA STOP THANH CONG');
+      //   },
+      // );
+      ref.invalidate(hubConnectionProvider);
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('accessToken');
       await prefs.remove('refreshToken');
       if (mounted) {
-        Navigator.of(context).pop();
-        context.goNamed(RouteConstants.login);
+        //Navigator.of(context).pop();
+        GoRouter.of(context).goNamed(RouteConstants.login);
       }
     }
   }
@@ -135,7 +135,8 @@ class _UserMenuPageState extends ConsumerState<UserMenuPage> {
                       ),
                       TextButton(
                         onPressed: () {
-                          _onLogout(ref, dialogContext);
+                          Navigator.of(dialogContext).pop();
+                          _onLogout(ref);
                         },
                         child: const Text('Xác nhận'),
                       ),

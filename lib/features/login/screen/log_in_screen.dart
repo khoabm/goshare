@@ -236,10 +236,10 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                                       },
                                       child: const Text('Chưa có tài khoản?'),
                                     ),
-                                    TextButton(
-                                      onPressed: () {},
-                                      child: const Text('Quên mật khẩu?'),
-                                    ),
+                                    // TextButton(
+                                    //   onPressed: () {},
+                                    //   child: const Text('Quên mật khẩu?'),
+                                    // ),
                                   ],
                                 ),
                               ),

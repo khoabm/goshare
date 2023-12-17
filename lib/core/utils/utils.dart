@@ -553,8 +553,13 @@ void showWrongPasswordDialog(BuildContext context) {
             'Lỗi đăng nhập',
           ),
         ),
-        content: const Center(
-          child: Text('Số điện thoại hoặc mật khẩu không chính xác'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Text('Số điện thoại hoặc mật khẩu không chính xác'),
+            ),
+          ],
         ),
         actions: [
           ElevatedButton(

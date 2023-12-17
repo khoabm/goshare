@@ -101,9 +101,10 @@ class _DashBoardState extends ConsumerState<DashBoard> {
       );
 
       if (connection.state == HubConnectionState.disconnected) {
-        await connection.start()?.then(
-              (value) => print('Start thanh cong'),
-            );
+        await connection.start()?.then((value) {
+          print('Start thanh cong');
+          print(connection.baseUrl);
+        });
       }
 
       final location = ref.read(locationProvider);
@@ -307,11 +308,11 @@ class _DashBoardState extends ConsumerState<DashBoard> {
           }
         },
       );
-      connection.onreconnected((connectionId) async {
-        await connection.start()?.then(
-              (value) => print('Start thanh cong'),
-            );
-      });
+      // connection.onreconnected((connectionId) async {
+      //   await connection.start()?.then(
+      //         (value) => print('Start thanh cong'),
+      //       );
+      // });
 
       connection.onclose(
         (exception) async {
@@ -319,14 +320,17 @@ class _DashBoardState extends ConsumerState<DashBoard> {
           print(
             exception.toString(),
           );
-          await Future.delayed(
-            const Duration(seconds: 3),
-            () async {
-              await connection.start()?.then(
-                    (value) => print('Start thanh cong'),
-                  );
-            },
-          );
+          if (connection.state == HubConnectionState.disconnected) {
+            await Future.delayed(
+              const Duration(seconds: 3),
+              () async {
+                await connection.start()?.then((value) {
+                  print('Start thanh cong');
+                  print(connection.baseUrl);
+                });
+              },
+            );
+          }
         },
       );
     }

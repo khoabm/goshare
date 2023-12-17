@@ -8,6 +8,7 @@ import 'package:goshare/common/app_button.dart';
 import 'package:goshare/core/constants/constants.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/utils/locations_util.dart';
+import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/home/controller/home_controller.dart';
 import 'package:goshare/features/home/repositories/home_repository.dart';
 import 'package:goshare/features/home/widgets/dependent_widgets/driver_pick_up_card.dart';
@@ -130,6 +131,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void navigateToSearchTripRoute(BuildContext context) {
     context.pushNamed(RouteConstants.searchTripRoute);
+  }
+
+  void navigateToDetails(BuildContext context) {
+    context.go('/details');
   }
 
   Future<DependentModel?> navigateToDependentList(BuildContext context) async {
@@ -318,16 +323,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       onPressed: () async {
                         //final data = await navigateToDependentList(context);
                         //print(data);
-                        navigateToFindTrip(
-                          currentLocation?.latitude?.toString() ?? '',
-                          currentLocation?.longitude?.toString() ?? '',
-                          latitude?.toString() ?? '',
-                          longitude?.toString() ?? '',
-                          cars[ref
-                                  .watch(selectedCarIndexProvider.notifier)
-                                  .state]
-                              .cartypeId,
-                        );
+                        final wallet = await ref
+                            .watch(tripControllerProvider.notifier)
+                            .getWallet(context);
+                        if ((wallet -
+                                cars[ref
+                                        .watch(
+                                            selectedCarIndexProvider.notifier)
+                                        .state]
+                                    .totalPrice) <
+                            0) {
+                          if (mounted) {
+                            showWalletInsufficient(context);
+                          }
+                        } else {
+                          navigateToFindTrip(
+                            currentLocation?.latitude?.toString() ?? '',
+                            currentLocation?.longitude?.toString() ?? '',
+                            latitude?.toString() ?? '',
+                            longitude?.toString() ?? '',
+                            cars[ref
+                                    .watch(selectedCarIndexProvider.notifier)
+                                    .state]
+                                .cartypeId,
+                          );
+                        }
                       },
                       child: const Text(
                         'Xác nhận',

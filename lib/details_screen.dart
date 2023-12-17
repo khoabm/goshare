@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:goshare/core/constants/route_constants.dart';
 
 class DetailsScreen extends ConsumerStatefulWidget {
   const DetailsScreen({super.key});
@@ -23,8 +24,8 @@ class _DetailsScreenState extends ConsumerState<DetailsScreen> {
       body: Center(
         child: ElevatedButton(
           onPressed: () async {
-            final result = await context.pushNamed('dependent-list');
-            print(result);
+            final result = context.goNamed(RouteConstants.dashBoard);
+            //print(result);
           },
           child: const Text('Go back to the Home screen'),
         ),
