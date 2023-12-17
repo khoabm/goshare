@@ -203,28 +203,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               builder: (BuildContext context, StateSetter setStateCarIndex) =>
                   Container(
                 decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(50),
+                  borderRadius: BorderRadius.horizontal(
+                    left: Radius.circular(50),
+                    right: Radius.circular(50),
                   ),
                 ),
                 height: MediaQuery.of(context).size.height * .6,
                 child: Column(
                   children: [
-                    const Text(
-                      'Chọn loại xe',
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Text(
-                      'Cuộn để xem thêm lựa chọn',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                      ),
+                    const Expanded(
+                      flex: 2,
+                      child: Column(children: [
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          'Chọn loại xe',
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Cuộn để xem thêm lựa chọn',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                      ]),
                     ),
                     Expanded(
+                      flex: 8,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: cars.length,
@@ -276,7 +289,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     padding: const EdgeInsets.all(8.0),
                                     child: Image.network(
                                       cars[index].image,
-                                      width: 200,
+                                      width: 190,
+                                      height: 190,
                                       fit: BoxFit.contain,
                                     ),
                                   ),
@@ -571,7 +585,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   itemBuilder: (context, index) {
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(
-                                          vertical: 12),
+                                          vertical: 10),
                                       child: LocationCard(
                                         locationModel: ref
                                             .watch(userLocationProvider)[index],

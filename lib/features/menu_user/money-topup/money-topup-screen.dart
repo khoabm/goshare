@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:goshare/features/menu_user/money-topup/money-topup-controller.dart';
 import 'package:goshare/models/transaction_model.dart';
 import 'package:goshare/theme/pallet.dart';
+import 'package:intl/intl.dart';
 
 class MoneyTopupPage extends ConsumerStatefulWidget {
   const MoneyTopupPage({super.key});
@@ -21,7 +22,7 @@ class TransactionCard extends StatelessWidget {
   final String? externalTransactionId;
   final String? status;
   final String? type;
-  final String? createTime;
+  final DateTime? createTime;
 
   const TransactionCard(
       {Key? key,
@@ -35,52 +36,73 @@ class TransactionCard extends StatelessWidget {
       this.createTime})
       : super(key: key);
 
-  String _formatTransaction(String amount) {
-    String amount_tmp = amount;
-    for (int i = amount_tmp.length - 3; i > 1; i -= 3) {
-      amount_tmp = amount_tmp.replaceRange(i, i, '.');
-    }
-    return amount_tmp + 'đ';
-  }
-
   @override
   Widget build(BuildContext context) {
+    final oCcy = NumberFormat("#,##0", "vi_VN");
     return GestureDetector(
       onTap: () => print('hehehheeehhehe'),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(width: 16.0),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      type == 'TOPUP'
-                          ? '+${_formatTransaction(amount.toString())}'
-                          : _formatTransaction(amount.toString()),
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: type == 'TOPUP' ? Pallete.green : Pallete.red,
-                      ),
+      child: Stack(
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(width: 16.0),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          // amount! >= 0
+                          //     ? '+${oCcy.format(amount)}đ'
+                          //     : '${oCcy.format(amount)}đ',
+                          amount! >= 0 && status == 'SUCCESSFULL'
+                              ? '+${oCcy.format(amount)}đ'
+                              : amount! < 0 || status == 'SUCCESSFULL'
+                                  ? '${oCcy.format(amount)}đ'
+                                  : status == 'FAILED'
+                                      ? '${oCcy.format(amount)}đ - Hết hạn'
+                                      : '+${oCcy.format(amount)}đ',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            color: amount! >= 0 && status == 'SUCCESSFULL'
+                                ? Pallete.green
+                                : amount! < 0 || status == 'SUCCESSFULL'
+                                    ? Pallete.red
+                                    : status == 'FAILED'
+                                        ? Pallete.red
+                                        : Colors.grey[400],
+                          ),
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          DateFormat('HH:mm - dd/MM/yyyy').format(createTime!),
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8.0),
-                    Text(
-                      "${createTime.toString().substring(0, 10)} ${createTime.toString().substring(11, 19)}",
-                      style: const TextStyle(
-                        fontSize: 16.0,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            top: 10.0,
+            right: 10.0,
+            child: Stack(
+              children: [
+                Text(
+                  amount! <= 0 ? "Thanh toán chuyến" : "Nạp tiền vào ví",
+                ) //
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -174,7 +196,17 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
         MaterialPageRoute(
           builder: (context) => WebViewPage(url: result),
         ),
-      );
+      ).then((value) async {
+        print('MAN HINH POP');
+        final balanceResult = await ref
+            .read(MoneyTopupControllerProvider.notifier)
+            .getBalance(context);
+        setState(() {
+          currentBalance = double.parse(balanceResult.balance!);
+          _walletTransactionModel = null;
+          _loadMore();
+        });
+      });
     }
   }
 
@@ -189,6 +221,7 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final oCcy = NumberFormat("#,##0", "vi_VN");
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -289,7 +322,7 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
                               builder: (context) => AlertDialog(
                                 title: const Text('Xác nhận nạp tiền'),
                                 content: Text(
-                                    'Bạn có chắc chắn muốn nạp ${topupAmount} đ vào ví của bạn không?'),
+                                    'Bạn có chắc chắn muốn nạp ${oCcy.format(topupAmount)}đ vào ví của bạn không?'),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(context),
@@ -340,7 +373,7 @@ class _MoneyTopupPageState extends ConsumerState<MoneyTopupPage> {
                     externalTransactionId: transaction?.externalTransactionId,
                     status: transaction?.status,
                     type: transaction?.type,
-                    createTime: transaction?.createTime.toString(),
+                    createTime: transaction?.createTime,
 
                     // Add onTap or any other logic as needed
                   );

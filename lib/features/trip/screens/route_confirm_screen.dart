@@ -452,7 +452,7 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
           ),
         ),
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * .25,
+        height: MediaQuery.of(context).size.height * 0.3,
         child: Column(
           children: [
             const Row(
@@ -487,25 +487,34 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
               height: 10,
             ),
             SizedBox(
-              width: MediaQuery.of(context).size.width * .5,
-              child: ElevatedButton(
-                onPressed: () {
-                  //navigateToSearchTripRoute();
-                  context.pop();
-                },
-                child: const Text('Hủy'),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * .5,
+              width: MediaQuery.of(context).size.width * .4,
+              height: MediaQuery.of(context).size.height * 0.06,
               child: ElevatedButton(
                 onPressed: () {
                   navigateToFindTrip();
                 },
-                child: const Text('Tiếp tục'),
+                child: const Text(
+                  'Tiếp tục',
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 7,
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * .3,
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.grey[600]!),
+                ),
+                onPressed: () {
+                  //navigateToSearchTripRoute();
+                  context.pop();
+                },
+                child: const Text(
+                  'Hủy',
+                ),
               ),
             ),
           ],
