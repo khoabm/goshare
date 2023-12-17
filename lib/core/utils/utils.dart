@@ -548,10 +548,15 @@ void showWrongPasswordDialog(BuildContext context) {
     context: context,
     builder: (BuildContext abcContext) {
       return AlertDialog(
-        title: const Center(
-          child: Text(
-            'Lỗi đăng nhập',
-          ),
+        title: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Text(
+                'Lỗi đăng nhập',
+              ),
+            ),
+          ],
         ),
         content: const Center(
           child: Text('Số điện thoại hoặc mật khẩu không chính xác'),
@@ -577,10 +582,15 @@ void showBannedDialog(BuildContext context, String message) {
     context: context,
     builder: (BuildContext abcContext) {
       return AlertDialog(
-        title: const Center(
-          child: Text(
-            'Lỗi đăng nhập',
-          ),
+        title: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Text(
+                'Lỗi đăng nhập',
+              ),
+            ),
+          ],
         ),
         content: Center(
           child: Text(message),

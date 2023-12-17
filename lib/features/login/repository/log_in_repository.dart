@@ -55,6 +55,8 @@ class LoginRepository {
         }),
       );
       final resultMap = json.decode(response.body);
+      print(response.statusCode);
+      print(resultMap);
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         final userData = UserDataModel.fromMap(jsonData);
