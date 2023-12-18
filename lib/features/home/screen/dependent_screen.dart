@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
+import 'package:goshare/core/utils/utils.dart';
+import 'package:goshare/features/home/controller/home_controller.dart';
 import 'package:goshare/features/home/widgets/dependent_widgets/broadcast_location_card.dart';
 import 'package:goshare/features/home/widgets/dependent_widgets/matching_card.dart';
 import 'package:goshare/features/home/widgets/dependent_widgets/trip_history_card.dart';
@@ -9,9 +11,11 @@ import 'package:goshare/features/home/widgets/dependent_widgets/trip_information
 import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/trip_model.dart';
+import 'package:goshare/models/user_data_model.dart';
 import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:goshare/providers/dependent_booking_stage_provider.dart';
 import 'package:goshare/providers/dependent_trip_provider.dart';
+import 'package:goshare/providers/guardian_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../widgets/dependent_widgets/greeting.dart';
@@ -41,6 +45,14 @@ class _DependentHomeScreenState extends ConsumerState<DependentHomeScreen> {
     // TODO: implement initState
     super.initState();
     if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (context.mounted) {
+        final u = await ref
+            .watch(homeControllerProvider.notifier)
+            .getGuardianProfile(context);
+        ref.watch(guardianProfileProvider.notifier).setGuardianDataWithModel(u);
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         tripId = ref.watch(currentOnTripIdProvider.notifier).currentTripId;
@@ -145,7 +157,13 @@ class _DependentHomeScreenState extends ConsumerState<DependentHomeScreen> {
                         onPressed: () async {
                           // Add your action for the first button
                           print('First Button Pressed');
-                          final call = Uri.parse('tel:+91 9830268966');
+                          final guardianPhone = ref
+                                  .watch(guardianProfileProvider.notifier)
+                                  .guardianData
+                                  ?.phone ??
+                              "";
+                          final call = Uri.parse(
+                              'tel:${convertPhoneNumber(guardianPhone)}');
                           if (await canLaunchUrl(call)) {
                             launchUrl(call);
                           } else {

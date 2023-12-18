@@ -25,8 +25,6 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
           tripHistories = await ref
               .watch(TripHistoryControllerProvider.notifier)
               .tripHistory(context);
-          print('----------------------------------');
-          print(tripHistories[0].startLocation.address);
           if (mounted) {
             setState(() {});
           }
@@ -54,160 +52,405 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
           ),
         ),
         const SizedBox(height: 15),
-        ListView.builder(
-            shrinkWrap: true,
-            itemCount: tripHistories.length,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (BuildContext context, int index) {
-              TripModel trip = tripHistories[index];
-              //print('${trip.id}\n');
-              if (trip.status != 3) {
-                return const SizedBox.shrink();
-              } else {
-                return Column(
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
-                            decoration: ShapeDecoration(
-                              color: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 10),
+        tripHistories.isNotEmpty
+            ? ListView.builder(
+                shrinkWrap: true,
+                itemCount: tripHistories.length,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (BuildContext context, int index) {
+                  TripModel trip = tripHistories[index];
+                  return trip.status == 3
+                      ? Column(
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  SizedBox(
+                                  Container(
                                     width: double.infinity,
-                                    child: Text(
-                                      DateFormat('HH:mm - dd/MM/yyyy')
-                                          .format(trip.createTime),
-                                      textAlign: TextAlign.right,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 13,
-                                        fontStyle: FontStyle.italic,
-                                        fontFamily: 'Raleway',
-                                        fontWeight: FontWeight.w300,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 8),
+                                    decoration: ShapeDecoration(
+                                      color: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 10),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: Text(
+                                              DateFormat('HH:mm - dd/MM/yyyy')
+                                                  .format(trip.createTime),
+                                              textAlign: TextAlign.right,
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 13,
+                                                fontStyle: FontStyle.italic,
+                                                fontFamily: 'Raleway',
+                                                fontWeight: FontWeight.w300,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                  width: double.infinity,
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      SizedBox(
+                                                        width: double.infinity,
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            const Expanded(
+                                                              flex: 3,
+                                                              child: Text(
+                                                                'Từ',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  fontSize: 16,
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .italic,
+                                                                  fontFamily:
+                                                                      'Raleway',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Expanded(
+                                                              flex: 7,
+                                                              child: SizedBox(
+                                                                child: Text(
+                                                                  trip.startLocation
+                                                                      .address,
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .right,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontSize:
+                                                                        15,
+                                                                    fontFamily:
+                                                                        'Raleway',
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 10),
+                                                      SizedBox(
+                                                        width: double.infinity,
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            const Expanded(
+                                                              flex: 3,
+                                                              child: Text(
+                                                                'Đến',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  fontSize: 16,
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .italic,
+                                                                  fontFamily:
+                                                                      'Raleway',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Expanded(
+                                                              flex: 10,
+                                                              child: SizedBox(
+                                                                child: Text(
+                                                                  '${trip.endLocation.address}',
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .right,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontSize:
+                                                                        15,
+                                                                    fontFamily:
+                                                                        'Raleway',
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 10),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: double.infinity,
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            )
+                          ],
+                        )
+                      : (trip.status == 2 || trip.status == 1)
+                          ? Column(
+                              children: [
+                                const Text(
+                                  'Chuyến đang đi',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 17,
+                                    fontFamily: 'Raleway',
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 8),
+                                        decoration: ShapeDecoration(
+                                          color: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                        ),
+                                        child: Container(
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 10),
                                           child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                CrossAxisAlignment.center,
                                             children: [
                                               SizedBox(
                                                 width: double.infinity,
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    const Expanded(
-                                                      flex: 3,
-                                                      child: Text(
-                                                        'Từ',
-                                                        style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 16,
-                                                          fontStyle:
-                                                              FontStyle.italic,
-                                                          fontFamily: 'Raleway',
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 7,
-                                                      child: SizedBox(
-                                                        child: Text(
-                                                          trip.startLocation
-                                                              .address,
-                                                          textAlign:
-                                                              TextAlign.right,
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 15,
-                                                            fontFamily:
-                                                                'Raleway',
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
+                                                child: Text(
+                                                  DateFormat(
+                                                          'HH:mm - dd/MM/yyyy')
+                                                      .format(trip.createTime),
+                                                  textAlign: TextAlign.right,
+                                                  style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 13,
+                                                    fontStyle: FontStyle.italic,
+                                                    fontFamily: 'Raleway',
+                                                    fontWeight: FontWeight.w300,
+                                                  ),
                                                 ),
                                               ),
                                               const SizedBox(height: 10),
                                               SizedBox(
                                                 width: double.infinity,
-                                                child: Row(
+                                                child: Column(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.start,
                                                   crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
+                                                      CrossAxisAlignment.start,
                                                   children: [
-                                                    const Expanded(
-                                                      flex: 3,
-                                                      child: Text(
-                                                        'Đến',
-                                                        style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 16,
-                                                          fontStyle:
-                                                              FontStyle.italic,
-                                                          fontFamily: 'Raleway',
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 10,
-                                                      child: SizedBox(
-                                                        child: Text(
-                                                          '${trip.endLocation.address}',
-                                                          textAlign:
-                                                              TextAlign.right,
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 15,
-                                                            fontFamily:
-                                                                'Raleway',
-                                                            fontWeight:
-                                                                FontWeight.w500,
+                                                    SizedBox(
+                                                      width: double.infinity,
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          SizedBox(
+                                                            width:
+                                                                double.infinity,
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                const Expanded(
+                                                                  flex: 3,
+                                                                  child: Text(
+                                                                    'Từ',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          16,
+                                                                      fontStyle:
+                                                                          FontStyle
+                                                                              .italic,
+                                                                      fontFamily:
+                                                                          'Raleway',
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 7,
+                                                                  child:
+                                                                      SizedBox(
+                                                                    child: Text(
+                                                                      trip.startLocation
+                                                                          .address,
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .right,
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontFamily:
+                                                                            'Raleway',
+                                                                        fontWeight:
+                                                                            FontWeight.w500,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
                                                           ),
-                                                        ),
+                                                          const SizedBox(
+                                                              height: 10),
+                                                          SizedBox(
+                                                            width:
+                                                                double.infinity,
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                const Expanded(
+                                                                  flex: 3,
+                                                                  child: Text(
+                                                                    'Đến',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          16,
+                                                                      fontStyle:
+                                                                          FontStyle
+                                                                              .italic,
+                                                                      fontFamily:
+                                                                          'Raleway',
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                Expanded(
+                                                                  flex: 10,
+                                                                  child:
+                                                                      SizedBox(
+                                                                    child: Text(
+                                                                      '${trip.endLocation.address}',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .right,
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontFamily:
+                                                                            'Raleway',
+                                                                        fontWeight:
+                                                                            FontWeight.w500,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
                                                   ],
@@ -216,23 +459,37 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
                                             ],
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    )
-                  ],
-                );
-              }
-            }),
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Divider(
+                                  color: Colors.grey[400],
+                                  thickness: 0.7,
+                                  indent: 50,
+                                  endIndent: 50,
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                )
+                              ],
+                            )
+                          : SizedBox.shrink();
+                },
+              )
+            : const Text(
+                'Bạn chưa có chuyến đi nào',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 17,
+                  fontFamily: 'Raleway',
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
       ],
     );
   }

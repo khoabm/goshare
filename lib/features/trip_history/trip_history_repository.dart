@@ -3,9 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:goshare/core/constants/constants.dart';
 import 'package:goshare/core/failure.dart';
-import 'package:goshare/core/type_def.dart';
 import 'package:goshare/core/utils/http_utils.dart';
-import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/models/trip_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,10 +30,10 @@ class TripHistoryRepository {
           'Content-Type': 'application/json',
         },
       );
+      print(res.body);
       if (res.statusCode == 200) {
         final dynamic responseData = jsonDecode(res.body);
-        //print(responseData.toString());
-        if (responseData.isEmpty || responseData is! List) {
+        if (responseData is! List) {
           throw Exception('Unexpected response format');
         }
 
@@ -44,8 +42,6 @@ class TripHistoryRepository {
         final List<TripModel> trips = List<Map<String, dynamic>>.from(data)
             .map((tripData) => TripModel.fromMap(tripData))
             .toList();
-        print('THONG TIN TRIP HISTORY');
-        print(trips[0].startLocation.toJson());
         return right(trips);
       } else {
         throw Exception('Failed to load trip history');

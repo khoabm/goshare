@@ -20,18 +20,25 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
 
   @override
   void initState() {
+    if (!mounted) return;
     super.initState();
     // Fetch data from API and update trips list
     fetchData();
   }
 
   void fetchData() async {
-    final result = await ref
-        .read(TripHistoryControllerProvider.notifier)
-        .tripHistory(context);
-    setState(() {
-      trips = result;
-    });
+    if (mounted) {
+      final result = await ref
+          .read(TripHistoryControllerProvider.notifier)
+          .tripHistory(context);
+      if (mounted) {
+        setState(() {
+          if (mounted) {
+            trips = result;
+          }
+        });
+      }
+    }
   }
 
   @override
