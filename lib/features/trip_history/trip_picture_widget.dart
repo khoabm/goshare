@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:goshare/models/trip_model.dart';
 
@@ -24,22 +23,46 @@ class TripPicturesWidget extends StatelessWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
-                Image(
-                  image: NetworkImage(images
+                Image.network(
+                  images
                           ?.firstWhere((element) => element?.type == 0)!
                           .imageUrl ??
-                      ''),
+                      '',
                   fit: BoxFit.contain,
                   alignment: Alignment.center,
+                  loadingBuilder: (BuildContext context, Widget child,
+                      ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 10),
-                Image(
-                  image: NetworkImage(images
+                Image.network(
+                  images
                           ?.firstWhere((element) => element?.type == 1)!
                           .imageUrl ??
-                      ''),
+                      '',
                   fit: BoxFit.contain,
                   alignment: Alignment.center,
+                  loadingBuilder: (BuildContext context, Widget child,
+                      ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(width: 10),
               ],

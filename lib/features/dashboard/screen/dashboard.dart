@@ -104,6 +104,8 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         await connection.start()?.then((value) {
           print('Start thanh cong');
           print(connection.baseUrl);
+
+          //HubConnection._handshakeProtocol;
         });
       }
 

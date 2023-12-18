@@ -470,7 +470,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   // }
 
   void navigateToChatScreen() {
-    context.pushNamed(RouteConstants.chat, pathParameters: {
+    context.pushNamed(RouteConstants.chat, extra: {
       'receiver': widget.driverId,
       'driverAvatar': widget.driverAvatar,
     });

@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:signalr_core/signalr_core.dart';
+
 import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/providers/chat_provider.dart';
 import 'package:goshare/providers/signalr_providers.dart';
-import 'package:signalr_core/signalr_core.dart';
 
 class ChatMessage {
   final String message;
   final bool isCurrentUser;
 
-  ChatMessage(this.message, this.isCurrentUser);
+  ChatMessage(
+    this.message,
+    this.isCurrentUser,
+  );
 }
 
 class ChatScreen extends ConsumerStatefulWidget {
@@ -30,6 +34,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   // final List<ChatMessage> _messages = [];
   @override
   void initState() {
+    if (!mounted) return;
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await initSignalR(ref);
@@ -43,12 +48,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           text,
           widget.receiver,
         );
-    ref.read(chatMessagesProvider.notifier).addMessage(ChatMessage(text, true));
-
-    // setState(() {
-    //   _messages.insert(0, ChatMessage(text, true));
-    //   // Add a message from the other user for testing
-    // });
+    ref.read(chatMessagesProvider.notifier).addMessage(
+          ChatMessage(
+            text,
+            true,
+          ),
+          widget.receiver,
+        );
   }
 
   Future<void> initSignalR(WidgetRef ref) async {
@@ -58,15 +64,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       );
 
       hubConnection.on('ReceiveSMSMessages', (message) {
-        print(
-            "${message.toString()} DAY ROI SIGNAL R DAY ROI RECEIVE SMS MESSAGE");
-        setState(() {
-          // _messages.insert(
-          //     0, ChatMessage(message?.first.toString() ?? '', false));
-          ref
-              .read(chatMessagesProvider.notifier)
-              .addMessage(ChatMessage(message?.first.toString() ?? '', false));
-        });
+        if (mounted) {
+          print(
+              "${message.toString()} DAY ROI SIGNAL R DAY ROI RECEIVE SMS MESSAGE");
+          setState(() {
+            // _messages.insert(
+            //     0, ChatMessage(message?.first.toString() ?? '', false));
+            ref.read(chatMessagesProvider.notifier).addMessage(
+                  ChatMessage(
+                    message?.first.toString() ?? '',
+                    false,
+                  ),
+                  widget.receiver,
+                );
+          });
+        }
       });
 
       hubConnection.onclose((exception) async {
@@ -156,6 +168,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Get the ChatProviderItem for the current receiver
+    var chatProviderItem = ref.watch(chatMessagesProvider).firstWhere(
+          (item) => item.driverId == widget.receiver,
+          orElse: () =>
+              ChatProviderItem(driverId: widget.receiver, messages: []),
+        );
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Nhắn tin')),
@@ -166,8 +185,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               padding: const EdgeInsets.all(8.0),
               reverse: true,
               itemBuilder: (_, int index) =>
-                  _buildMessage(ref.watch(chatMessagesProvider)[index]),
-              itemCount: ref.watch(chatMessagesProvider).length,
+                  _buildMessage(chatProviderItem.messages[index]),
+              itemCount: chatProviderItem.messages.length,
             ),
           ),
           const Divider(height: 1.0),
