@@ -11,3 +11,7 @@ class UnauthorizedFailure extends Failure {
 class AlreadyInTripFailure extends Failure {
   AlreadyInTripFailure(super.message);
 }
+
+class UpdateProfileFailure extends Failure {
+  UpdateProfileFailure(super.message);
+}

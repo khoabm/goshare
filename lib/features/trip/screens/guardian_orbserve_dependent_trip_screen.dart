@@ -135,16 +135,16 @@ class _GuardianObserveDependentTripScreenState
         }
       });
 
-      hubConnection.onclose((exception) async {
-        await Future.delayed(
-          const Duration(seconds: 3),
-          () async {
-            if (hubConnection.state == HubConnectionState.disconnected) {
-              await hubConnection.start();
-            }
-          },
-        );
-      });
+      // hubConnection.onclose((exception) async {
+      //   await Future.delayed(
+      //     const Duration(seconds: 3),
+      //     () async {
+      //       if (hubConnection.state == HubConnectionState.disconnected) {
+      //         await hubConnection.start();
+      //       }
+      //     },
+      //   );
+      // });
     } catch (e) {
       print(e.toString());
     }

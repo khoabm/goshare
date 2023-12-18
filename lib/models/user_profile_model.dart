@@ -53,7 +53,7 @@ class UserProfileModel {
       avatarUrl: map['avatarUrl'],
       gender: map['gender']?.toInt() ?? 0,
       birth: DateTime.fromMillisecondsSinceEpoch(
-        DateTime.parse(map['createTime']).millisecondsSinceEpoch,
+        DateTime.parse(map['birth']).millisecondsSinceEpoch,
       ),
     );
   }

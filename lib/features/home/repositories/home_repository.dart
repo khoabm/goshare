@@ -179,13 +179,17 @@ class HomeRepository {
       final res = await client.get(
         Uri.parse('$baseApiUrl/user/profile'),
         headers: {
-          'Content-Type': 'application/json',
+          //'Content-Type': 'application/json',
+          "Cache-Control": "no-cache"
         },
       );
+      print(res.request.toString());
+      print(res.request?.headers.toString());
       if (res.statusCode == 200) {
         Map<String, dynamic> userProfileData = json.decode(res.body);
         UserProfileModel userProfile =
             UserProfileModel.fromMap(userProfileData);
+        print(userProfileData.toString());
         return right(userProfile);
       } else if (res.statusCode == 429) {
         return left(Failure('Too many request'));
@@ -218,8 +222,9 @@ class HomeRepository {
       //     'Content-Type': 'application/json',
       //   },
       // );
+      print(birth.toIso8601String());
       var uri = Uri.parse('$baseApiUrl/user/profile');
-      var request = http.MultipartRequest('POST', uri)
+      var request = http.MultipartRequest('Put', uri)
         ..fields['name'] = name
         ..fields['gender'] = gender.toString()
         ..fields['birth'] = birth.toIso8601String();
@@ -241,6 +246,7 @@ class HomeRepository {
       });
       var response = await request.send();
       String responseData = await response.stream.bytesToString();
+      print(responseData);
       if (response.statusCode == 200) {
         Map<String, dynamic> userProfileData = json.decode(responseData);
         UserProfileModel userProfile =
@@ -250,8 +256,15 @@ class HomeRepository {
         return left(Failure('Too many request'));
       } else if (response.statusCode == 401) {
         return left(UnauthorizedFailure('Unauthorized'));
+      } else if (response.statusCode == 400) {
+        Map<String, dynamic> data = json.decode(responseData);
+        return left(
+          UpdateProfileFailure(
+            data['message'][0][0],
+          ),
+        );
       } else {
-        return left(Failure('Co loi xay ra'));
+        return left(Failure('Có lỗi xảy ra'));
       }
     } on TimeoutException catch (_) {
       return left(

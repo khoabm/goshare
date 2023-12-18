@@ -106,6 +106,8 @@ class _DashBoardState extends ConsumerState<DashBoard> {
           print(connection.baseUrl);
 
           //HubConnection._handshakeProtocol;
+        }).catchError((error) {
+          print('Error: $error');
         });
       }
 

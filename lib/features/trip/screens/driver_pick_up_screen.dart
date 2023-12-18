@@ -114,17 +114,17 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           );
         },
       );
-      hubConnection.onclose((exception) async {
-        await Future.delayed(
-          const Duration(seconds: 3),
-          () async {
-            if (mounted &&
-                hubConnection.state == HubConnectionState.disconnected) {
-              await hubConnection.start();
-            }
-          },
-        );
-      });
+      // hubConnection.onclose((exception) async {
+      //   await Future.delayed(
+      //     const Duration(seconds: 3),
+      //     () async {
+      //       if (mounted &&
+      //           hubConnection.state == HubConnectionState.disconnected) {
+      //         await hubConnection.start();
+      //       }
+      //     },
+      //   );
+      // });
     } catch (e) {
       rethrow;
       //print(e.toString());
@@ -136,26 +136,8 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
       if (ModalRoute.of(context)?.isCurrent ?? false) {
         final data = message as List<dynamic>;
         final tripData = data.cast<Map<String, dynamic>>().first;
-        print("TRIP DATAAAAAAA");
-        print(tripData);
-        print('id: ${tripData['id']}');
-        print('passengerId: ${tripData['passengerId']}');
-        print('passengerName: ${tripData['passengerName']}');
-        print('driverId: ${tripData['driverId']}');
-        print('startLocationId: ${tripData['startLocationId']}');
-        print('startTime: ${tripData['startTime']}');
-        print('endTime: ${tripData['endTime']}');
-        print('pickupTime: ${tripData['pickupTime']}');
-        print('distance: ${tripData['distance']}');
-        print('price: ${tripData['price']}');
-        print('cartypeId: ${tripData['cartypeId']}');
-        print('status: ${tripData['status']}');
-        print('createTime: ${tripData['createTime']}');
-        print('updatedTime: ${tripData['updatedTime']}');
-        print('paymentMethod: ${tripData['paymentMethod']}');
-        print('bookerId: ${tripData['bookerId']}');
         final trip = TripModel.fromMap(tripData);
-        print('DA CAST THANH CONG');
+        // print('DA CAST THANH CONG');
         bool isSelfBook = data.cast<bool>()[1];
         bool isNotifyToGuardian = data.cast<bool>()[2];
         if (isSelfBook == true) {

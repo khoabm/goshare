@@ -79,14 +79,18 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 context,
                 _nameTextController.text,
                 avatar?.path,
-                _gender!.index + 1,
+                _gender!.index,
                 DateTimeFormatters.convertStringToDate(
-                    _birthDateTextController.text),
+                  _birthDateTextController.text,
+                ),
               );
       if (data != null) {
-        setState(() {
-          profile = data;
-        });
+        if (mounted) {
+          showUpdateProfileSuccessDialog(context);
+          setState(() {
+            profile = data;
+          });
+        }
       }
       setState(() {
         _isLoading = false;

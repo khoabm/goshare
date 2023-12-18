@@ -160,6 +160,11 @@ class HomeController extends StateNotifier<bool> {
         showLoginTimeOut(
           context: context,
         );
+      } else if (l is UpdateProfileFailure) {
+        showErrorDialog(
+          context,
+          l.message,
+        );
       } else {
         showSnackBar(
           context: context,
