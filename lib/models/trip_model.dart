@@ -425,8 +425,6 @@ class TripModel {
   }
 
   factory TripModel.fromMap(Map<String, dynamic> map) {
-    // print('CAST TRIP MODEL');
-    // print(map.toString());
     return TripModel(
       id: map['id'] ?? '',
       passengerId: map['passengerId'] ?? '',
@@ -591,7 +589,6 @@ class Passenger {
   }
 
   factory Passenger.fromMap(Map<String, dynamic> map) {
-    print('CAST PASSENGER MODEL');
     return Passenger(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
@@ -642,7 +639,6 @@ class Booker {
   }
 
   factory Booker.fromMap(Map<String, dynamic> map) {
-    print('CAST BOOKER MODEL');
     return Booker(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
@@ -697,7 +693,6 @@ class EndLocation {
   }
 
   factory EndLocation.fromMap(Map<String, dynamic> map) {
-    print('CAST EndLocation MODEL');
     return EndLocation(
       id: map['id'] ?? '',
       userId: map['userId'] ?? '',
@@ -754,7 +749,6 @@ class StartLocation {
   }
 
   factory StartLocation.fromMap(Map<String, dynamic> map) {
-    print("CAST StartLocation MODEL");
     return StartLocation(
       id: map['id'] ?? '',
       userId: map['userId'] ?? '',
@@ -791,7 +785,6 @@ class CarType {
   }
 
   factory CarType.fromMap(Map<String, dynamic> map) {
-    print('CAST CarType MODEL');
     return CarType(
       capacity: map['capacity']?.toInt() ?? 0,
     );
@@ -990,8 +983,6 @@ class TripImages {
   }
 
   factory TripImages.fromMap(Map<String, dynamic> map) {
-    print('CAST TRIP IMAGE MODEL');
-
     return TripImages(
       id: map['id'] ?? '',
       tripId: map['tripId'] ?? '',

@@ -205,6 +205,38 @@ class HomeRepository {
     }
   }
 
+  FutureEither<UserProfileModel> getGuardianProfile() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+
+      final client = HttpClientWithAuth(accessToken ?? '');
+      final res = await client.get(
+        Uri.parse('$baseApiUrl/user/guardian-info'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      if (res.statusCode == 200) {
+        print("Get guardian info success");
+        Map<String, dynamic> userProfileData = json.decode(res.body);
+        UserProfileModel userProfile =
+            UserProfileModel.fromMap(userProfileData);
+        return right(userProfile);
+      } else if (res.statusCode == 429) {
+        return left(Failure('Too many request'));
+      } else if (res.statusCode == 401) {
+        return left(UnauthorizedFailure('Unauthorized'));
+      } else {
+        return left(Failure('Co loi xay ra'));
+      }
+    } on TimeoutException catch (_) {
+      return left(
+        Failure('Timeout'),
+      );
+    }
+  }
+
   FutureEither<UserProfileModel> editUserProfile(
     String name,
     String? imagePath,
