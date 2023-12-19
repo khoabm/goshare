@@ -213,14 +213,16 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                               const SizedBox(
                                 height: 10,
                               ),
-                              AppTextField(
-                                prefixIcons: const Icon(Icons.abc),
-                                controller: _nameTextController,
-                                hintText: 'Nhập tên của bạn',
-                                validator: (value) =>
-                                    InputValidator.nullValidate(
-                                  value,
-                                  'Tên không được trống',
+                              IgnorePointer(
+                                child: AppTextField(
+                                  prefixIcons: const Icon(Icons.abc),
+                                  controller: _nameTextController,
+                                  hintText: 'Nhập tên của bạn',
+                                  validator: (value) =>
+                                      InputValidator.nullValidate(
+                                    value,
+                                    'Tên không được trống',
+                                  ),
                                 ),
                               ),
                               const SizedBox(
@@ -232,23 +234,25 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                               const SizedBox(
                                 height: 10,
                               ),
-                              AppTextField(
-                                hintText: 'dd/MM/yyyy',
-                                prefixIcons: const Icon(Icons.calendar_today),
-                                inputType: TextInputType.phone,
-                                controller: _birthDateTextController,
-                                formatters: [
-                                  DateTextFormatter(),
-                                  LengthLimitingTextInputFormatter(10),
-                                  FilteringTextInputFormatter
-                                      .singleLineFormatter,
-                                ],
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Ngày sinh không được trống';
-                                  }
-                                  return null;
-                                },
+                              IgnorePointer(
+                                child: AppTextField(
+                                  hintText: 'dd/MM/yyyy',
+                                  prefixIcons: const Icon(Icons.calendar_today),
+                                  inputType: TextInputType.phone,
+                                  controller: _birthDateTextController,
+                                  formatters: [
+                                    DateTextFormatter(),
+                                    LengthLimitingTextInputFormatter(10),
+                                    FilteringTextInputFormatter
+                                        .singleLineFormatter,
+                                  ],
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Ngày sinh không được trống';
+                                    }
+                                    return null;
+                                  },
+                                ),
                               ),
                               const SizedBox(
                                 height: 20,
@@ -259,33 +263,35 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                               const SizedBox(
                                 height: 10,
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  const Text('Nam'),
-                                  Radio<Gender>(
-                                    activeColor: Pallete.primaryColor,
-                                    value: Gender.male,
-                                    groupValue: _gender,
-                                    onChanged: (Gender? value) {
-                                      setState(() {
-                                        _gender = value;
-                                      });
-                                    },
-                                  ),
-                                  const Text('Nữ'),
-                                  Radio<Gender>(
-                                    activeColor: Pallete.primaryColor,
-                                    value: Gender.female,
-                                    groupValue: _gender,
-                                    onChanged: (Gender? value) {
-                                      setState(() {
-                                        _gender = value;
-                                      });
-                                    },
-                                  ),
-                                ],
+                              IgnorePointer(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    const Text('Nam'),
+                                    Radio<Gender>(
+                                      activeColor: Pallete.primaryColor,
+                                      value: Gender.male,
+                                      groupValue: _gender,
+                                      onChanged: (Gender? value) {
+                                        setState(() {
+                                          _gender = value;
+                                        });
+                                      },
+                                    ),
+                                    const Text('Nữ'),
+                                    Radio<Gender>(
+                                      activeColor: Pallete.primaryColor,
+                                      value: Gender.female,
+                                      groupValue: _gender,
+                                      onChanged: (Gender? value) {
+                                        setState(() {
+                                          _gender = value;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
                               const SizedBox(
                                 height: 40,

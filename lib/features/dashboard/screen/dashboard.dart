@@ -247,11 +247,12 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                 final trip = TripModel.fromMap(tripData);
                 bool isSelfBook = data.cast<bool>()[1];
                 bool isNotifyToGuardian = data.cast<bool>()[2];
-                ref.read(stageProvider.notifier).setStage(
-                      Stage.stage3,
-                    );
+
                 if (isSelfBook == false) {
                   if (isNotifyToGuardian == false) {
+                    ref.read(stageProvider.notifier).setStage(
+                          Stage.stage3,
+                        );
                     showDialogInfoPickUpV2(
                       trip,
                       context,

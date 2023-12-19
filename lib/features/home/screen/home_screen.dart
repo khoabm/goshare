@@ -571,18 +571,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         )
                       : const SizedBox.shrink(),
 
-                  ref.watch(stageProvider) == Stage.stage1
-                      ? const FindingDriverCard()
-                      : const SizedBox.shrink(),
-                  ref.watch(stageProvider) == Stage.stage2
-                      ? DriverInfoCard(
-                          driver:
-                              ref.watch(driverProvider.notifier).driverData!,
-                        )
-                      : const SizedBox.shrink(),
-                  ref.watch(stageProvider) == Stage.stage3
-                      ? const FindingDriverCard()
-                      : const SizedBox.shrink(),
+                  // ref.watch(stageProvider) == Stage.stage1
+                  //     ? const FindingDriverCard()
+                  //     : const SizedBox.shrink(),
+                  // ref.watch(stageProvider) == Stage.stage2
+                  //     ? DriverInfoCard(
+                  //         driver:
+                  //             ref.watch(driverProvider.notifier).driverData!,
+                  //       )
+                  //     : const SizedBox.shrink(),
+                  // ref.watch(stageProvider) == Stage.stage3
+                  //     ? const FindingDriverCard()
+                  //     : const SizedBox.shrink(),
 
                   ref.watch(userLocationProvider).isNotEmpty
                       ? Padding(

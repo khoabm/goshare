@@ -107,13 +107,15 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
       hubConnection.on(
         'UpdateDriverLocation',
         (arguments) {
-          print("SIGNAL R DEP TRIP BOOK" + arguments.toString());
-          final stringData = arguments?.first as String;
-          final data = jsonDecode(stringData) as Map<String, dynamic>;
-          updateMarker(
-            data['latitude'],
-            data['longitude'],
-          );
+          if (mounted) {
+            print("SIGNAL R DEP TRIP BOOK" + arguments.toString());
+            final stringData = arguments?.first as String;
+            final data = jsonDecode(stringData) as Map<String, dynamic>;
+            updateMarker(
+              data['latitude'],
+              data['longitude'],
+            );
+          }
         },
       );
       // hubConnection.onclose((exception) async {

@@ -292,7 +292,7 @@ class HomeRepository {
         Map<String, dynamic> data = json.decode(responseData);
         return left(
           UpdateProfileFailure(
-            data['message'][0][0],
+            data['message'],
           ),
         );
       } else {

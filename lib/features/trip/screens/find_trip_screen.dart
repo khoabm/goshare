@@ -312,6 +312,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     final driverData =
         (message as List<dynamic>).cast<Map<String, dynamic>>().first;
     final String passengerId = (message as List<dynamic>).cast<String>().last;
+    print('PASSENGER ID NÈ: $passengerId');
     setState(() {
       driverName = driverData['name'];
       driverId = driverData['id'];
@@ -322,8 +323,14 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           driverData['car']['model'] + " " + driverData['car']['make'];
     });
     if (mounted) {
-      if (widget.passengerId == passengerId) {
-        _showDriverInfoDialog();
+      if (result != null) {
+        if (result!.passengerId == passengerId) {
+          _showDriverInfoDialog();
+        }
+      } else {
+        if (widget.passengerId == passengerId) {
+          _showDriverInfoDialog();
+        }
       }
     }
   }
