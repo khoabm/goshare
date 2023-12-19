@@ -136,7 +136,7 @@ class _DependentListState extends ConsumerState<DependentList> {
                                     1, // Increase the itemCount by 1
                                 itemBuilder: (context, index) {
                                   // Check if this is the last item
-                                  if (index == list?.items.length) {
+                                  if (index == 0) {
                                     // Return your InkWell wrapped custom card here
                                     return InkWell(
                                       onTap: () {
@@ -155,9 +155,9 @@ class _DependentListState extends ConsumerState<DependentList> {
                                             const Expanded(
                                               child: Column(
                                                 children: [
-                                                  Text('Chọn điểm pick up'),
+                                                  Text('Chọn điểm đón'),
                                                   Text(
-                                                    'Chọn điểm pick up',
+                                                    'Chọn điểm đón',
                                                   ),
                                                 ],
                                               ),
@@ -202,7 +202,7 @@ class _DependentListState extends ConsumerState<DependentList> {
                                     );
                                   } else {
                                     return DependentCard(
-                                      dependentModel: list?.items[index],
+                                      dependentModel: list?.items[index - 1],
                                       isGetLocation: widget.isGetLocation,
                                       isLoading: isLoading,
                                     );

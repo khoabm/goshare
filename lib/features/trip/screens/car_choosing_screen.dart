@@ -8,6 +8,7 @@ import 'package:goshare/features/trip/controller/trip_controller.dart';
 import 'package:goshare/models/car_model.dart';
 import 'package:goshare/models/dependent_location_model.dart';
 import 'package:goshare/models/dependent_model.dart';
+import 'package:goshare/models/non_app_user_pick_up_location_model.dart';
 import 'package:goshare/theme/pallet.dart';
 import 'package:intl/intl.dart';
 
@@ -470,13 +471,13 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                             final data = dependentModel
                                                 as DependentModel?;
                                             if (data != null) {
-                                              print(data);
                                               if (data.id == 'NonAppUser') {
                                                 if (mounted) {
-                                                  context.pushNamed(
-                                                      RouteConstants
-                                                          .nonAppUserProfileForTrip,
-                                                      extra: {
+                                                  final nonAppResult =
+                                                      await context.pushNamed(
+                                                          RouteConstants
+                                                              .nonAppUserProfileForTrip,
+                                                          extra: {
                                                         'endLatitude':
                                                             widget.endLatitude,
                                                         'endLongitude':
@@ -501,6 +502,57 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                                                 .state]
                                                             .capacity,
                                                       });
+                                                  Map<String, dynamic>
+                                                      nonAppResultMap =
+                                                      nonAppResult as Map<
+                                                          String, dynamic>;
+                                                  print(nonAppResultMap
+                                                      .toString());
+                                                  var nonAppDependentModel =
+                                                      nonAppResultMap[
+                                                          'dependentModel'];
+                                                  var nonAppDependentLocationData =
+                                                      nonAppResultMap[
+                                                          'dependentLocationData'];
+                                                  passenger =
+                                                      nonAppDependentModel
+                                                          as DependentModel?;
+                                                  final nonAppDependentLocation =
+                                                      (nonAppDependentLocationData
+                                                          as NonAppUserPickUpLocation?);
+                                                  passengerLocation = DependentLocationModel(
+                                                      id: '',
+                                                      userId: '',
+                                                      address: '',
+                                                      latitude:
+                                                          nonAppDependentLocation
+                                                                  ?.latitude ??
+                                                              0,
+                                                      longitude:
+                                                          nonAppDependentLocation
+                                                                  ?.longitude ??
+                                                              0,
+                                                      type: 1);
+                                                  if (mounted) {
+                                                    cars = await ref
+                                                        .watch(
+                                                            tripControllerProvider
+                                                                .notifier)
+                                                        .getCarDetails(
+                                                          context,
+                                                          passengerLocation
+                                                                  ?.latitude ??
+                                                              0,
+                                                          passengerLocation
+                                                                  ?.longitude ??
+                                                              0,
+                                                          double.parse(widget
+                                                              .endLatitude),
+                                                          double.parse(widget
+                                                              .endLongitude),
+                                                        );
+                                                    setState(() {});
+                                                  }
                                                 }
                                               } else {
                                                 if (mounted) {
@@ -510,23 +562,42 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                                           as DependentLocationModel?);
                                                   print(passengerLocation
                                                       .toString());
-                                                  cars = await ref
-                                                      .watch(
-                                                          tripControllerProvider
-                                                              .notifier)
-                                                      .getCarDetails(
-                                                        context,
-                                                        passengerLocation
-                                                                ?.latitude ??
-                                                            0,
-                                                        passengerLocation
-                                                                ?.longitude ??
-                                                            0,
-                                                        double.parse(
-                                                            widget.endLatitude),
-                                                        double.parse(widget
-                                                            .endLongitude),
-                                                      );
+                                                  if (passengerLocation !=
+                                                      null) {
+                                                    cars = await ref
+                                                        .watch(
+                                                            tripControllerProvider
+                                                                .notifier)
+                                                        .getCarDetails(
+                                                          context,
+                                                          passengerLocation
+                                                                  ?.latitude ??
+                                                              0,
+                                                          passengerLocation
+                                                                  ?.longitude ??
+                                                              0,
+                                                          double.parse(widget
+                                                              .endLatitude),
+                                                          double.parse(widget
+                                                              .endLongitude),
+                                                        );
+                                                  } else {
+                                                    cars = await ref
+                                                        .watch(
+                                                            tripControllerProvider
+                                                                .notifier)
+                                                        .getCarDetails(
+                                                          context,
+                                                          double.parse(widget
+                                                              .startLatitude),
+                                                          double.parse(widget
+                                                              .startLongitude),
+                                                          double.parse(widget
+                                                              .endLatitude),
+                                                          double.parse(widget
+                                                              .endLongitude),
+                                                        );
+                                                  }
                                                 }
                                                 setState(
                                                   () {},
