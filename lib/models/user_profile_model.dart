@@ -7,6 +7,7 @@ class UserProfileModel {
   final String? avatarUrl;
   final int gender;
   final DateTime birth;
+  final bool isDriver;
   UserProfileModel({
     required this.id,
     required this.name,
@@ -14,6 +15,7 @@ class UserProfileModel {
     this.avatarUrl,
     required this.gender,
     required this.birth,
+    required this.isDriver,
   });
 
   UserProfileModel copyWith({
@@ -23,6 +25,7 @@ class UserProfileModel {
     String? avatarUrl,
     int? gender,
     DateTime? birth,
+    bool? isDriver,
   }) {
     return UserProfileModel(
       id: id ?? this.id,
@@ -31,6 +34,7 @@ class UserProfileModel {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       gender: gender ?? this.gender,
       birth: birth ?? this.birth,
+      isDriver: isDriver ?? this.isDriver,
     );
   }
 
@@ -42,6 +46,7 @@ class UserProfileModel {
       'avatarUrl': avatarUrl,
       'gender': gender,
       'birth': birth.millisecondsSinceEpoch,
+      'isDriver': isDriver,
     };
   }
 
@@ -55,6 +60,7 @@ class UserProfileModel {
       birth: DateTime.fromMillisecondsSinceEpoch(
         DateTime.parse(map['birth']).millisecondsSinceEpoch,
       ),
+      isDriver: map['isDriver'] ?? false,
     );
   }
 
@@ -65,7 +71,7 @@ class UserProfileModel {
 
   @override
   String toString() {
-    return 'UserProfileModel(id: $id, name: $name, phone: $phone, avatarUrl: $avatarUrl, gender: $gender, birth: $birth)';
+    return 'UserProfileModel(id: $id, name: $name, phone: $phone, avatarUrl: $avatarUrl, gender: $gender, birth: $birth, isDriver: $isDriver)';
   }
 
   @override
@@ -78,7 +84,8 @@ class UserProfileModel {
         other.phone == phone &&
         other.avatarUrl == avatarUrl &&
         other.gender == gender &&
-        other.birth == birth;
+        other.birth == birth &&
+        other.isDriver == isDriver;
   }
 
   @override
@@ -88,6 +95,7 @@ class UserProfileModel {
         phone.hashCode ^
         avatarUrl.hashCode ^
         gender.hashCode ^
-        birth.hashCode;
+        birth.hashCode ^
+        isDriver.hashCode;
   }
 }

@@ -156,6 +156,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
+  void navigateToCurrentFindTrip(
+    String startLat,
+    String startLon,
+    String endLat,
+    String endLon,
+    String paymentMethod,
+    String bookerId,
+    String carTypeId,
+    String driverNote,
+    String nonAppDepName,
+    String nonAppDepPhone,
+    String passengerId,
+    String tripId,
+    bool isFindingTrip,
+  ) {
+    context.goNamed(RouteConstants.findTrip, extra: {
+      'startLatitude': startLat,
+      'startLongitude': startLon,
+      'endLatitude': endLat,
+      'endLongitude': endLon,
+      'paymentMethod': paymentMethod,
+      'bookerId': bookerId,
+      'carTypeId': carTypeId,
+      'driverNote': driverNote,
+      'nonAppDepName': nonAppDepName,
+      'nonAppDepPhone': nonAppDepPhone,
+      'passengerId': passengerId,
+      'tripId': tripId,
+      'isFindingTrip': false,
+    });
+  }
+
   void navigateToOnTripScreen(
     TripModel trip,
   ) {
@@ -388,6 +420,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     String driverId,
     String endLatitude,
     String endLongitude,
+    String passengerId,
   ) {
     context.pushNamed(RouteConstants.driverPickUp, extra: {
       'driverName': driverName,
@@ -398,6 +431,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       'driverId': driverId,
       'endLatitude': endLatitude,
       'endLongitude': endLongitude,
+      'passengerId': passengerId,
     });
   }
 
@@ -495,20 +529,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         .watch(currentOnTripIdProvider.notifier)
                                         .currentTripId!,
                                   );
-                              if (result?.status == 1) {
-                                navigateToDriverPickupScreen(
-                                  result?.driver?.name ?? 'Không rõ',
-                                  result?.driver?.car?.make ?? '',
-                                  result?.driver?.car?.licensePlate ?? '',
-                                  result?.driver?.phone ?? '',
-                                  result?.driver?.avatarUrl ?? '',
-                                  result?.driver?.id ?? '',
-                                  result?.endLocation.latitude.toString() ?? '',
-                                  result?.endLocation.latitude.toString() ?? '',
-                                );
-                              }
-                              if (result?.status == 2) {
-                                navigateToOnTripScreen(result!);
+                              if (result != null) {
+                                if (result.status == 0) {
+                                  navigateToCurrentFindTrip(
+                                    result.startLocation.latitude.toString(),
+                                    result.startLocation.longitude.toString(),
+                                    result.endLocation.latitude.toString(),
+                                    result.endLocation.longitude.toString(),
+                                    result.paymentMethod.toString(),
+                                    result.bookerId,
+                                    result.cartypeId,
+                                    result.note ?? '',
+                                    result.passengerName,
+                                    result.passengerPhoneNumber ?? '',
+                                    result.passengerId,
+                                    result.id,
+                                    false,
+                                  );
+                                }
+                                if (result.status == 1) {
+                                  navigateToDriverPickupScreen(
+                                    result.driver?.name ?? '',
+                                    result.driver?.car?.make ?? '',
+                                    result.driver?.car?.licensePlate ?? '',
+                                    result.driver?.phone ?? '',
+                                    result.driver?.avatarUrl ?? '',
+                                    result.driver?.id ?? '',
+                                    result.endLocation.latitude.toString(),
+                                    result.endLocation.latitude.toString(),
+                                    result.passengerId,
+                                  );
+                                }
+                                if (result.status == 2) {
+                                  navigateToOnTripScreen(result);
+                                }
                               }
                               print(result);
                             }

@@ -231,6 +231,9 @@ class AppRouter {
             final bool? isFindingTrip = extras['isFindingTrip'] as bool?;
             final String? nonAppDepName = extras['nonAppDepName'] as String?;
             final String? nonAppDepPhone = extras['nonAppDepPhone'] as String?;
+            final String? passengerId = extras['passengerId'] as String?;
+            final String? tripId = extras['tripId'] as String?;
+            // final bool? nonAppDepPhone = extras['nonAppDepPhone'] as String?;
             //final String? driverNote = params['driverNote'] as String?;
             return SlideBottomTransition(
               child: FindTripScreen2(
@@ -245,6 +248,8 @@ class AppRouter {
                 isFindingTrip: isFindingTrip,
                 nonAppDepName: nonAppDepName,
                 nonAppDepPhone: nonAppDepPhone,
+                passengerId: passengerId,
+                tripId: tripId,
               ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
@@ -305,6 +310,7 @@ class AppRouter {
             final String driverId = extras['driverId'] as String;
             final String endLatitude = extras['endLatitude'] as String;
             final String endLongitude = extras['endLongitude'] as String;
+            final String passengerId = extras['passengerId'] as String;
             return SlideRightTransition(
               child: DriverPickUpScreen(
                 driverId: driverId,
@@ -315,6 +321,7 @@ class AppRouter {
                 driverCarType: driverCarType,
                 endLatitude: endLatitude,
                 endLongitude: endLongitude,
+                passengerId: passengerId,
               ),
               key: state.pageKey,
             );

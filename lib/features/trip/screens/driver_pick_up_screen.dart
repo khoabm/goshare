@@ -7,7 +7,7 @@ import 'package:goshare/core/utils/locations_util.dart';
 import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/theme/pallet.dart';
 import 'package:location/location.dart';
-import 'package:signalr_core/signalr_core.dart';
+//import 'package:signalr_core/signalr_core.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 
 import 'package:goshare/common/loader.dart';
@@ -23,6 +23,7 @@ class DriverPickUpScreen extends ConsumerStatefulWidget {
   final String driverId;
   final String endLatitude;
   final String endLongitude;
+  final String passengerId;
   const DriverPickUpScreen({
     super.key,
     required this.driverName,
@@ -33,6 +34,7 @@ class DriverPickUpScreen extends ConsumerStatefulWidget {
     required this.driverId,
     required this.endLatitude,
     required this.endLongitude,
+    required this.passengerId,
   });
 
   @override
@@ -147,7 +149,9 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
         } else {
           if (isNotifyToGuardian == true) {
             if (mounted) {
-              _showDependentDriverInfoDialog(trip);
+              if (trip.passengerId == widget.passengerId) {
+                _showDependentDriverInfoDialog(trip);
+              }
             }
           }
         }

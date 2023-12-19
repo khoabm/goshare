@@ -60,6 +60,11 @@ class TripController extends StateNotifier<bool> {
         showLoginTimeOut(
           context: context,
         );
+      } else if (l is AlreadyInTripFailure) {
+        showAlreadyInTripError(
+          context: context,
+          message: l.message,
+        );
       } else {
         showSnackBar(
           context: context,
@@ -109,6 +114,10 @@ class TripController extends StateNotifier<bool> {
           context: context,
         );
       } else if (l is AlreadyInTripFailure) {
+        showAlreadyInTripError(
+          context: context,
+          message: l.message,
+        );
       } else {
         showFindTripErrorDialog(
           context: context,
@@ -181,8 +190,8 @@ class TripController extends StateNotifier<bool> {
     return list;
   }
 
-  Future<bool> cancelTrip(BuildContext context, String tripId) async {
-    bool isCanceled = false;
+  Future<TripModel?> cancelTrip(BuildContext context, String tripId) async {
+    TripModel? trip;
     final result = await _tripRepository.cancelTrip(tripId);
     result.fold((l) {
       if (l is UnauthorizedFailure) {
@@ -196,9 +205,9 @@ class TripController extends StateNotifier<bool> {
         );
       }
     }, (r) {
-      isCanceled = r;
+      trip = r;
     });
-    return isCanceled;
+    return trip;
   }
 
   Future<bool> sendChat(
@@ -258,6 +267,11 @@ class TripController extends StateNotifier<bool> {
       if (l is UnauthorizedFailure) {
         showLoginTimeOut(
           context: context,
+        );
+      } else if (l is AlreadyInTripFailure) {
+        showAlreadyInTripError(
+          context: context,
+          message: l.message,
         );
       } else {
         showSnackBar(

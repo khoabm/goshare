@@ -312,12 +312,13 @@ class _DashBoardState extends ConsumerState<DashBoard> {
           }
         },
       );
-      // connection.onreconnected((connectionId) async {
-      //   await connection.start()?.then(
-      //         (value) => print('Start thanh cong'),
-      //       );
-      // });
-
+      connection.onreconnected((connectionId) async {
+        print('reconnected $connectionId');
+      });
+      connection.onreconnecting((exception) {
+        print(exception.toString());
+        print('reconnecting');
+      });
       connection.onclose(
         (exception) async {
           print('LOI SIGNALR CONNECTION DASHBOARD');

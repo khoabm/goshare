@@ -31,11 +31,15 @@ class FindTripScreen2 extends ConsumerStatefulWidget {
   final bool? isFindingTrip;
   final String? nonAppDepName;
   final String? nonAppDepPhone;
+  final String? passengerId;
+  final String? tripId;
   const FindTripScreen2({
     super.key,
     this.driverNote,
     this.nonAppDepName,
     this.nonAppDepPhone,
+    this.passengerId,
+    this.tripId,
     required this.startLongitude,
     required this.startLatitude,
     required this.endLongitude,
@@ -83,77 +87,15 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
         await initSignalR(ref);
         await setAddress();
         if (mounted) {
-          print('START ADDRESS: $startAddress');
-          print('END ADDRESS: $endAddress');
-          print('TEN NGUOI DAT DUM: ${widget.nonAppDepName}');
-          if (widget.nonAppDepName != null) {
-            print("TÌM XE CHO DEP KHÔNG CÓ LOCATIONNNNNNNNNNNNNNNNNN");
-            if (mounted) {
-              result = await ref
-                  .read(tripControllerProvider.notifier)
-                  .findDriverForNonAppDependent(
-                    context,
-                    FindTripNonAppModel(
-                      startLatitude: double.parse(widget.startLatitude),
-                      startLongitude: double.parse(widget.startLongitude),
-                      startAddress: startAddress,
-                      endLatitude: double.parse(widget.endLatitude),
-                      endLongitude: double.parse(widget.endLongitude),
-                      endAddress: endAddress,
-                      cartypeId: widget.carTypeId,
-                      paymentMethod: int.parse(widget.paymentMethod),
-                      note: widget.driverNote,
-                      dependentInfo: DependentInfo(
-                        phone: widget.nonAppDepPhone,
-                        name: widget.nonAppDepName ?? '',
-                      ),
-                    ),
-                  );
-              if (result != null) {
-                ref
-                    .read(currentDependentOnTripProvider.notifier)
-                    .addDependentCurrentOnTripId(
-                      DependentTrip(
-                        id: result!.id,
-                        name: result!.passengerName,
-                        dependentId: result!.passengerId,
-                      ),
-                    );
-              }
-            }
-          } else {
-            if (widget.bookerId == ref.read(userProvider.notifier).state?.id) {
-              if (context.mounted) {
-                print("TÌM XE CHO BẢN THÂN");
-                result =
-                    await ref.read(tripControllerProvider.notifier).findDriver(
-                          context,
-                          FindTripModel(
-                            startLatitude: double.parse(widget.startLatitude),
-                            startLongitude: double.parse(widget.startLongitude),
-                            startAddress: startAddress,
-                            endLatitude: double.parse(widget.endLatitude),
-                            endLongitude: double.parse(widget.endLongitude),
-                            endAddress: endAddress,
-                            cartypeId: widget.carTypeId,
-                            paymentMethod: int.parse(widget.paymentMethod),
-                            note: widget.driverNote,
-                          ),
-                        );
-
-                if (result != null) {
-                  ref
-                      .read(currentOnTripIdProvider.notifier)
-                      .setCurrentOnTripId(result?.id);
-                }
-              }
-            } else {
-              if (context.mounted) {
+          if (widget.isFindingTrip == true) {
+            if (widget.nonAppDepName != null) {
+              print("TÌM XE CHO DEP KHÔNG CÓ LOCATIONNNNNNNNNNNNNNNNNN");
+              if (mounted) {
                 result = await ref
                     .read(tripControllerProvider.notifier)
-                    .findDriverForDependent(
+                    .findDriverForNonAppDependent(
                       context,
-                      FindTripModel(
+                      FindTripNonAppModel(
                         startLatitude: double.parse(widget.startLatitude),
                         startLongitude: double.parse(widget.startLongitude),
                         startAddress: startAddress,
@@ -163,20 +105,83 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                         cartypeId: widget.carTypeId,
                         paymentMethod: int.parse(widget.paymentMethod),
                         note: widget.driverNote,
+                        dependentInfo: DependentInfo(
+                          phone: widget.nonAppDepPhone,
+                          name: widget.nonAppDepName ?? '',
+                        ),
                       ),
-                      widget.bookerId,
                     );
-              }
-
-              if (result != null) {
-                ref
-                    .read(currentDependentOnTripProvider.notifier)
-                    .addDependentCurrentOnTripId(
-                      DependentTrip(
+                if (result != null) {
+                  ref
+                      .read(currentDependentOnTripProvider.notifier)
+                      .addDependentCurrentOnTripId(
+                        DependentTrip(
                           id: result!.id,
-                          name: result!.passenger.name,
-                          dependentId: result!.passenger.id),
-                    );
+                          name: result!.passengerName,
+                          dependentId: result!.passengerId,
+                        ),
+                      );
+                }
+              }
+            } else {
+              if (widget.bookerId ==
+                  ref.read(userProvider.notifier).state?.id) {
+                if (context.mounted) {
+                  print("TÌM XE CHO BẢN THÂN");
+                  result = await ref
+                      .read(tripControllerProvider.notifier)
+                      .findDriver(
+                        context,
+                        FindTripModel(
+                          startLatitude: double.parse(widget.startLatitude),
+                          startLongitude: double.parse(widget.startLongitude),
+                          startAddress: startAddress,
+                          endLatitude: double.parse(widget.endLatitude),
+                          endLongitude: double.parse(widget.endLongitude),
+                          endAddress: endAddress,
+                          cartypeId: widget.carTypeId,
+                          paymentMethod: int.parse(widget.paymentMethod),
+                          note: widget.driverNote,
+                        ),
+                      );
+
+                  if (result != null) {
+                    ref
+                        .read(currentOnTripIdProvider.notifier)
+                        .setCurrentOnTripId(result?.id);
+                  }
+                }
+              } else {
+                if (context.mounted) {
+                  result = await ref
+                      .read(tripControllerProvider.notifier)
+                      .findDriverForDependent(
+                        context,
+                        FindTripModel(
+                          startLatitude: double.parse(widget.startLatitude),
+                          startLongitude: double.parse(widget.startLongitude),
+                          startAddress: startAddress,
+                          endLatitude: double.parse(widget.endLatitude),
+                          endLongitude: double.parse(widget.endLongitude),
+                          endAddress: endAddress,
+                          cartypeId: widget.carTypeId,
+                          paymentMethod: int.parse(widget.paymentMethod),
+                          note: widget.driverNote,
+                        ),
+                        widget.bookerId,
+                      );
+                }
+
+                if (result != null) {
+                  ref
+                      .read(currentDependentOnTripProvider.notifier)
+                      .addDependentCurrentOnTripId(
+                        DependentTrip(
+                            id: result!.id,
+                            name: result!.passenger.name,
+                            dependentId: result!.passenger.id),
+                      );
+                }
               }
             }
           }
@@ -306,7 +311,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
   void _handleNotifyPassengerDriverOnTheWay(dynamic message) {
     final driverData =
         (message as List<dynamic>).cast<Map<String, dynamic>>().first;
-
+    final String passengerId = (message as List<dynamic>).cast<String>().last;
     setState(() {
       driverName = driverData['name'];
       driverId = driverData['id'];
@@ -317,13 +322,18 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           driverData['car']['model'] + " " + driverData['car']['make'];
     });
     if (mounted) {
-      _showDriverInfoDialog();
+      if (widget.passengerId == passengerId) {
+        _showDriverInfoDialog();
+      }
     }
   }
 
   void _handleNotifyPassengerTripTimedOut(dynamic message) {
+    final String passengerId = (message as List<dynamic>).cast<String>().last;
     if (mounted) {
-      _showFindTripTimeOutDialog();
+      if (passengerId == widget.passengerId) {
+        _showFindTripTimeOutDialog();
+      }
     }
   }
 
@@ -408,6 +418,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                   widget.endLongitude,
                   widget.startLatitude,
                   widget.startLongitude,
+                  result?.passengerId ?? widget.passengerId ?? '',
                 );
               },
               child: const Text(
@@ -577,6 +588,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     String endLongitude,
     String startLatitude,
     String startLongitude,
+    String passengerId,
   ) {
     context.replaceNamed(RouteConstants.driverPickUp, extra: {
       'driverName': driverName,
@@ -589,6 +601,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       'endLongitude': endLongitude,
       'startLatitude': startLatitude,
       'startLongitude': startLongitude,
+      'passengerId': passengerId,
     });
   }
 
@@ -656,9 +669,9 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                       setState(() {
                         _isLoading = false;
                       });
-                      if (check) {
+                      if (check != null) {
                         if (context.mounted) {
-                          if (result?.type == 0) {
+                          if (check.type == 0) {
                             ref
                                 .watch(currentOnTripIdProvider.notifier)
                                 .setCurrentOnTripId(null);
@@ -670,6 +683,34 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
 
                           context.goNamed(RouteConstants.dashBoard);
                         }
+                      }
+                    }
+                  } else if (widget.tripId != null) {
+                    setState(() {
+                      _isLoading = true;
+                    });
+                    final check = await ref
+                        .watch(tripControllerProvider.notifier)
+                        .cancelTrip(
+                          context,
+                          widget.tripId!,
+                        );
+                    setState(() {
+                      _isLoading = false;
+                    });
+                    if (check != null) {
+                      if (context.mounted) {
+                        if (check.type == 0) {
+                          ref
+                              .watch(currentOnTripIdProvider.notifier)
+                              .setCurrentOnTripId(null);
+                        } else {
+                          ref
+                              .watch(currentDependentOnTripProvider.notifier)
+                              .removeDependentCurrentOnTripId(widget.tripId!);
+                        }
+
+                        context.goNamed(RouteConstants.dashBoard);
                       }
                     }
                   }
@@ -833,44 +874,44 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                           padding: const EdgeInsets.all(8.0),
                           child: InkWell(
                             onTap: () async {
-                              if (result != null) {
-                                if (result!.id.isNotEmpty) {
-                                  setState(() {
-                                    _isLoading = true;
-                                  });
-                                  final check = await ref
-                                      .watch(tripControllerProvider.notifier)
-                                      .cancelTrip(
-                                        context,
-                                        result!.id,
-                                      );
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
-                                  if (check) {
-                                    if (context.mounted) {
-                                      if (ref.watch(userProvider)?.id ==
-                                          result!.passengerId) {
-                                        ref
-                                            .watch(currentOnTripIdProvider
-                                                .notifier)
-                                            .setCurrentOnTripId(null);
-                                      } else {
-                                        ref
-                                            .watch(
-                                                currentDependentOnTripProvider
-                                                    .notifier)
-                                            .removeDependentCurrentOnTripId(
-                                                result!.id);
-                                      }
-                                      context.goNamed(RouteConstants.dashBoard);
-                                    }
-                                  }
-                                }
-                              }
+                              // if (result != null) {
+                              //   if (result!.id.isNotEmpty) {
+                              //     setState(() {
+                              //       _isLoading = true;
+                              //     });
+                              //     final check = await ref
+                              //         .watch(tripControllerProvider.notifier)
+                              //         .cancelTrip(
+                              //           context,
+                              //           result!.id,
+                              //         );
+                              //     setState(() {
+                              //       _isLoading = false;
+                              //     });
+                              //     if (check) {
+                              //       if (context.mounted) {
+                              //         if (ref.watch(userProvider)?.id ==
+                              //             result!.passengerId) {
+                              //           ref
+                              //               .watch(currentOnTripIdProvider
+                              //                   .notifier)
+                              //               .setCurrentOnTripId(null);
+                              //         } else {
+                              //           ref
+                              //               .watch(
+                              //                   currentDependentOnTripProvider
+                              //                       .notifier)
+                              //               .removeDependentCurrentOnTripId(
+                              //                   result!.id);
+                              //         }
+                              //         context.goNamed(RouteConstants.dashBoard);
+                              //       }
+                              //     }
+                              //   }
+                              // }
 
                               if (context.mounted) {
-                                context.goNamed(RouteConstants.dashBoard);
+                                context.pop();
                               }
                             },
                             child: const Row(

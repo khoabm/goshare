@@ -434,6 +434,7 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
       'driverNote': widget.driverNote,
       'nonAppDepName': widget.nonAppDepName,
       'nonAppDepPhone': widget.nonAppDepPhone,
+      'isFindingTrip': true,
     });
   }
 
