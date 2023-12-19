@@ -16,7 +16,7 @@ class GreetingWidget extends StatelessWidget {
                 color: Colors.white,
                 fontSize: 20,
                 fontFamily: 'Raleway',
-                fontWeight: FontWeight.w400,
+                fontWeight: FontWeight.normal,
               ),
             ),
             TextSpan(

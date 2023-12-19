@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:goshare/features/trip_history/trip_history_controller.dart';
 import 'package:goshare/models/trip_model.dart';
+import 'package:goshare/theme/pallet.dart';
 import 'package:intl/intl.dart';
 
 class TripHistoryWidget extends ConsumerStatefulWidget {
@@ -94,11 +95,12 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
                                                   .format(trip.createTime),
                                               textAlign: TextAlign.right,
                                               style: const TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 13,
+                                                color:
+                                                    Color.fromRGBO(0, 0, 0, 1),
+                                                fontSize: 12,
                                                 fontStyle: FontStyle.italic,
                                                 fontFamily: 'Raleway',
-                                                fontWeight: FontWeight.w300,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                           ),
@@ -136,8 +138,8 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
                                                                 'Từ',
                                                                 style:
                                                                     TextStyle(
-                                                                  color: Colors
-                                                                      .black,
+                                                                  color: Pallete
+                                                                      .primaryColor,
                                                                   fontSize: 16,
                                                                   fontStyle:
                                                                       FontStyle
@@ -146,7 +148,7 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
                                                                       'Raleway',
                                                                   fontWeight:
                                                                       FontWeight
-                                                                          .w600,
+                                                                          .w800,
                                                                 ),
                                                               ),
                                                             ),
@@ -164,12 +166,12 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
                                                                     color: Colors
                                                                         .black,
                                                                     fontSize:
-                                                                        15,
+                                                                        13,
                                                                     fontFamily:
                                                                         'Raleway',
                                                                     fontWeight:
                                                                         FontWeight
-                                                                            .w500,
+                                                                            .w600,
                                                                   ),
                                                                 ),
                                                               ),
@@ -195,8 +197,8 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
                                                                 'Đến',
                                                                 style:
                                                                     TextStyle(
-                                                                  color: Colors
-                                                                      .black,
+                                                                  color: Pallete
+                                                                      .primaryColor,
                                                                   fontSize: 16,
                                                                   fontStyle:
                                                                       FontStyle
@@ -205,7 +207,7 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
                                                                       'Raleway',
                                                                   fontWeight:
                                                                       FontWeight
-                                                                          .w600,
+                                                                          .w800,
                                                                 ),
                                                               ),
                                                             ),
@@ -222,12 +224,12 @@ class _TripHistoryWidgetState extends ConsumerState<TripHistoryWidget> {
                                                                     color: Colors
                                                                         .black,
                                                                     fontSize:
-                                                                        15,
+                                                                        13,
                                                                     fontFamily:
                                                                         'Raleway',
                                                                     fontWeight:
                                                                         FontWeight
-                                                                            .w500,
+                                                                            .w600,
                                                                   ),
                                                                 ),
                                                               ),
