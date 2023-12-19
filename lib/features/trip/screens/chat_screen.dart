@@ -55,6 +55,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ),
           widget.receiver,
         );
+    print(widget.receiver);
+    var chatProviderItem = ref.watch(chatMessagesProvider).firstWhere(
+      (item) {
+        print('TÌM THẤY RỒI');
+        return item.driverId == widget.receiver;
+      },
+      orElse: () => ChatProviderItem(driverId: widget.receiver, messages: []),
+    );
+    print(chatProviderItem.driverId);
+    print(chatProviderItem.messages.length);
+    print(ref.watch(chatMessagesProvider).length);
   }
 
   Future<void> initSignalR(WidgetRef ref) async {

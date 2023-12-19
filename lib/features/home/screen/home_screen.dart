@@ -144,7 +144,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void navigateToFindTrip(String startLat, String startLon, String endLat,
       String endLon, String carTypeId) {
-    context.goNamed(RouteConstants.findTrip, extra: {
+    context.pushNamed(RouteConstants.findTrip, extra: {
       'startLatitude': startLat,
       'startLongitude': startLon,
       'endLatitude': endLat,
@@ -152,6 +152,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       'paymentMethod': '0',
       'bookerId': ref.watch(userProvider.notifier).state?.id ?? '',
       'carTypeId': carTypeId,
+      'isFindingTrip': true,
       //'driverNote': driverNote ?? '',
     });
   }
@@ -171,7 +172,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     String tripId,
     bool isFindingTrip,
   ) {
-    context.goNamed(RouteConstants.findTrip, extra: {
+    context.pushNamed(RouteConstants.findTrip, extra: {
       'startLatitude': startLat,
       'startLongitude': startLon,
       'endLatitude': endLat,

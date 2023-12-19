@@ -215,6 +215,10 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
             double.parse(widget.endLatitude),
           );
       endAddress = data2.address ?? '';
+      print(widget.startLatitude);
+      print(widget.startLongitude);
+      print(startAddress);
+      print(endAddress);
       setState(() {});
     }
   }

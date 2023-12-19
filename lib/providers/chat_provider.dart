@@ -27,15 +27,25 @@ class ChatMessagesNotifier extends StateNotifier<List<ChatProviderItem>> {
         );
 
   void addMessage(ChatMessage message, String driverId) {
+    print(message.message);
+    print(driverId);
+    print(state.first.driverId);
     state = state.map((chatProviderItem) {
+      print(chatProviderItem.driverId);
       if (chatProviderItem.driverId == driverId) {
+        print("SO SÁNH BẰNG");
         return ChatProviderItem(
           driverId: driverId,
-          messages: [...chatProviderItem.messages, message],
+          messages: [message, ...chatProviderItem.messages],
         );
       } else {
-        return chatProviderItem;
+        return ChatProviderItem(
+          driverId: driverId,
+          messages: [message],
+        );
       }
     }).toList();
+    print(state.length);
+    // print(state.)
   }
 }

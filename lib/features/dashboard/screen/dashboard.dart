@@ -160,49 +160,50 @@ class _DashBoardState extends ConsumerState<DashBoard> {
             }
           },
         );
-        connection.on(
-          'NotifyPassengerTripCanceled',
-          (arguments) {
-            try {
-              if (mounted) {
-                if (ModalRoute.of(context)?.isCurrent ?? false) {
-                  final data = arguments as List<dynamic>;
-                  final tripData = data.cast<Map<String, dynamic>>().first;
-                  final trip = TripModel.fromMap(tripData);
-                  bool isSelfBook = data.cast<bool>()[1];
-                  bool isNotifyToGuardian = data.cast<bool>()[2];
-                  bool isCanceledByAdmin = data.cast<bool>()[3];
-                  if (isSelfBook == false) {
-                    if (isNotifyToGuardian == false) {
-                      ref.read(stageProvider.notifier).setStage(
-                            Stage.stage0,
-                          );
-                      showCancelDialogInfo(trip, context, ref);
-                    } else if (isCanceledByAdmin == true) {
-                      if (mounted) {
-                        ref.read(stageProvider.notifier).setStage(
-                              Stage.stage0,
-                            );
-                        context.goNamed(RouteConstants.dashBoard);
-                      }
-                    }
-                  }
-                  if (isCanceledByAdmin == true) {
-                    if (mounted) {
+      }
+
+      connection.on(
+        'NotifyPassengerTripCanceled',
+        (arguments) {
+          try {
+            if (mounted) {
+              print('TRIP CANCEL');
+              final data = arguments as List<dynamic>;
+              final tripData = data.cast<Map<String, dynamic>>().first;
+              final trip = TripModel.fromMap(tripData);
+              bool isSelfBook = data.cast<bool>()[1];
+              bool isNotifyToGuardian = data.cast<bool>()[2];
+              bool isCanceledByAdmin = data.cast<bool>()[3];
+              if (isSelfBook == false) {
+                if (isNotifyToGuardian == false) {
+                  ref.read(stageProvider.notifier).setStage(
+                        Stage.stage0,
+                      );
+                  showCancelDialogInfo(trip, context, ref);
+                }
+                if (isCanceledByAdmin == true) {
+                  if (mounted) {
+                    print('CANCEL ADMIN TRIP ĐẶT DÙM');
+                    if (trip.type == 0) {
                       ref
                           .read(currentOnTripIdProvider.notifier)
                           .setCurrentOnTripId(null);
-                      context.goNamed(RouteConstants.dashBoard);
+                    } else if (trip.type == 1) {
+                      ref.read(stageProvider.notifier).setStage(
+                            Stage.stage0,
+                          );
                     }
+                    context.goNamed(RouteConstants.dashBoard);
+                    showAdminCancelDialogInfo(context);
                   }
                 }
               }
-            } catch (e) {
-              print("Error in SignalR callback: $e");
             }
-          },
-        );
-      }
+          } catch (e) {
+            print("Error in SignalR callback: $e");
+          }
+        },
+      );
 
       connection.on(
         'NotifyPassengerDriverOnTheWay',
@@ -240,6 +241,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         (message) {
           try {
             if (mounted) {
+              print('DRIVER PICK UP');
               if (ModalRoute.of(context)?.isCurrent ?? false) {
                 final data = message as List<dynamic>;
                 final tripData = data.cast<Map<String, dynamic>>().first;

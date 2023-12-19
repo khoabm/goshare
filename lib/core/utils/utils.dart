@@ -234,28 +234,36 @@ void showCancelDialogInfo(
   );
 }
 
-void showAdminCancelDialogInfo(
-    TripModel? trip, BuildContext context, WidgetRef ref) {
+void showAdminCancelDialogInfo(BuildContext context) {
   showDialog(
     barrierDismissible: false,
     context: context,
     builder: (BuildContext abcContext) {
       return AlertDialog(
-        title: const Center(
-          child: Text(
-            'Chuyến đi đã bị hủy',
-          ),
+        title: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Text(
+                'Chuyến đi đã bị hủy',
+              ),
+            ),
+          ],
         ),
-        content: const SizedBox.shrink(),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Text(
+                'Chuyến đi đã bị hủy bởi quản trị viên',
+              ),
+            ),
+          ],
+        ),
         actions: [
           ElevatedButton(
             onPressed: () {
               Navigator.of(abcContext).pop();
-              ref
-                  .watch(currentOnTripIdProvider.notifier)
-                  .setCurrentOnTripId(null);
-              ref.watch(stageProvider.notifier).setStage(Stage.stage0);
-              GoRouter.of(context).goNamed(RouteConstants.dashBoard);
             },
             child: const Text(
               'Xác nhận',
