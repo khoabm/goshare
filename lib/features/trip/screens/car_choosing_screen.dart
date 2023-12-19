@@ -520,7 +520,7 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                                                 ?.latitude ??
                                                             0,
                                                         passengerLocation
-                                                                ?.latitude ??
+                                                                ?.longitude ??
                                                             0,
                                                         double.parse(
                                                             widget.endLatitude),

@@ -502,8 +502,10 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                         _mapController?.animateCamera(
                           CameraUpdate.newCameraPosition(
                             CameraPosition(
-                                target: LatLng(currentLocation?.latitude ?? 0,
-                                    currentLocation?.longitude ?? 0),
+                                target: LatLng(
+                                  currentLocation?.latitude ?? 0,
+                                  currentLocation?.longitude ?? 0,
+                                ),
                                 zoom: 17.5,
                                 tilt: 0),
                           ),
