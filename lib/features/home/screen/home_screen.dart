@@ -422,6 +422,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     String endLatitude,
     String endLongitude,
     String passengerId,
+    String tripId,
   ) {
     context.pushNamed(RouteConstants.driverPickUp, extra: {
       'driverName': driverName,
@@ -433,25 +434,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       'endLatitude': endLatitude,
       'endLongitude': endLongitude,
       'passengerId': passengerId,
+      'tripId': tripId,
     });
   }
 
-  void revokeHub(WidgetRef widgetRef) async {
-    if (mounted) {
-      final connection = await widgetRef.read(
-        hubConnectionProvider.future,
-      );
-      final user = widgetRef.read(userProvider.notifier).state;
-      if (user?.role.toLowerCase() == 'dependent') {
-        connection.off('RequestLocation');
-        connection.off('SendLocation');
-        connection.off('NotifyDependentNewTripBooked');
-      }
-      connection.off('NotifyPassengerDriverOnTheWay');
-      connection.off('NotifyPassengerDriverPickup');
-      connection.off('NotifyPassengerTripEnded');
-    }
-  }
+  // void revokeHub(WidgetRef widgetRef) async {
+  //   if (mounted) {
+  //     final connection = await widgetRef.read(
+  //       hubConnectionProvider.future,
+  //     );
+  //     final user = widgetRef.read(userProvider.notifier).state;
+  //     if (user?.role.toLowerCase() == 'dependent') {
+  //       connection.off('RequestLocation');
+  //       connection.off('SendLocation');
+  //       connection.off('NotifyDependentNewTripBooked');
+  //     }
+  //     connection.off('NotifyPassengerDriverOnTheWay');
+  //     connection.off('NotifyPassengerDriverPickup');
+  //     connection.off('NotifyPassengerTripEnded');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -559,6 +561,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     result.endLocation.latitude.toString(),
                                     result.endLocation.latitude.toString(),
                                     result.passengerId,
+                                    result.id,
                                   );
                                 }
                                 if (result.status == 2) {

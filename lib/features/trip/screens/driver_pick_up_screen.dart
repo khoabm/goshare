@@ -24,6 +24,7 @@ class DriverPickUpScreen extends ConsumerStatefulWidget {
   final String endLatitude;
   final String endLongitude;
   final String passengerId;
+  final String tripId;
   const DriverPickUpScreen({
     super.key,
     required this.driverName,
@@ -35,6 +36,7 @@ class DriverPickUpScreen extends ConsumerStatefulWidget {
     required this.endLatitude,
     required this.endLongitude,
     required this.passengerId,
+    required this.tripId,
   });
 
   @override
@@ -46,6 +48,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   double _containerHeight = 60.0;
   VietmapController? _mapController;
   List<Marker> temp = [];
+  List<Marker> tempDep = [];
   UserLocation? userLocation;
   LocationData? currentLocation;
   bool _isLoading = false;
@@ -110,14 +113,34 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           if (mounted) {
             print("SIGNAL R DEP TRIP BOOK" + arguments.toString());
             final stringData = arguments?.first as String;
+            final tripId = arguments?[1] as String;
             final data = jsonDecode(stringData) as Map<String, dynamic>;
-            updateMarker(
-              data['latitude'],
-              data['longitude'],
-            );
+            if (tripId == widget.tripId) {
+              updateMarker(
+                data['latitude'],
+                data['longitude'],
+              );
+            }
           }
         },
       );
+      // hubConnection.on(
+      //   'UpdateDependentLocation',
+      //   (arguments) {
+      //     if (mounted) {
+      //       print("SIGNAL R DEP TRIP BOOK" + arguments.toString());
+      //       final stringData = arguments?.first as String;
+      //       final data = jsonDecode(stringData) as Map<String, dynamic>;
+      //       final tripId = arguments?[1] as String;
+      //       if (tripId == widget.tripId) {
+      //         updateMarkerDep(
+      //           data['latitude'],
+      //           data['longitude'],
+      //         );
+      //       }
+      //     }
+      //   },
+      // );
       // hubConnection.onclose((exception) async {
       //   await Future.delayed(
       //     const Duration(seconds: 3),
@@ -151,7 +174,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
         } else {
           if (isNotifyToGuardian == true) {
             if (mounted) {
-              if (trip.passengerId == widget.passengerId) {
+              if (trip.id == widget.tripId) {
                 _showDependentDriverInfoDialog(trip);
               }
             }
@@ -421,7 +444,9 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
       List<Marker> tempMarkers = []; // Temporary list to hold the new markers
 
       // Wait for a while before updating the marker
-      await Future.delayed(const Duration(seconds: 3));
+      await Future.delayed(
+        const Duration(seconds: 2),
+      );
       print('did update marker');
       // Add the new marker to the temporary list
       tempMarkers.clear();
@@ -438,21 +463,62 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
         ),
       );
       if (mounted) {
-        setState(() {
-          temp = tempMarkers;
-          _mapController?.animateCamera(
-            CameraUpdate.newCameraPosition(
-              CameraPosition(
-                target: temp.first.latLng,
-                zoom: 15.5,
-                tilt: 0,
+        setState(
+          () {
+            temp = tempMarkers;
+            _mapController?.animateCamera(
+              CameraUpdate.newCameraPosition(
+                CameraPosition(
+                  target: temp.first.latLng,
+                  zoom: 15.5,
+                  tilt: 0,
+                ),
               ),
-            ),
-          );
-        });
+            );
+          },
+        );
       }
     }
   }
+
+  // void updateMarkerDep(double latitude, double longitude) async {
+  //   if (mounted) {
+  //     List<Marker> tempMarkersDep =
+  //         []; // Temporary list to hold the new markers
+
+  //     // Wait for a while before updating the marker
+  //     await Future.delayed(const Duration(seconds: 3));
+  //     print('did update marker');
+  //     // Add the new marker to the temporary list
+  //     tempMarkersDep.clear();
+  //     tempDep.clear();
+  //     tempMarkersDep.add(
+  //       Marker(
+  //         child: _markerWidgetDep(),
+  //         latLng: LatLng(
+  //           latitude,
+  //           longitude,
+  //         ),
+  //       ),
+  //     );
+  //     if (mounted) {
+  //       setState(
+  //         () {
+  //           tempDep = tempMarkersDep;
+  //           // _mapController?.animateCamera(
+  //           //   CameraUpdate.newCameraPosition(
+  //           //     CameraPosition(
+  //           //       target: tempDep.first.latLng,
+  //           //       zoom: 15.5,
+  //           //       tilt: 0,
+  //           //     ),
+  //           //   ),
+  //           // );
+  //         },
+  //       );
+  //     }
+  //   }
+  // }
 
   //   // Update the markers list
   // }
@@ -757,6 +823,14 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
           backgroundColor: Colors.transparent,
         ),
       ),
+    );
+  }
+
+  _markerWidgetDep() {
+    return const SizedBox(
+      width: 20,
+      height: 20,
+      child: Icon(Icons.person_2_outlined),
     );
   }
 }

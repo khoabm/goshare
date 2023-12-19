@@ -9,7 +9,7 @@ import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/models/vietmap_route_model.dart';
 import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:location/location.dart';
-import 'package:signalr_core/signalr_core.dart';
+// import 'package:signalr_core/signalr_core.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 
 import 'package:goshare/common/loader.dart';
@@ -34,7 +34,9 @@ class _GuardianObserveDependentTripScreenState
     extends ConsumerState<GuardianObserveDependentTripScreen> {
   double _containerHeight = 60.0;
   VietmapController? _mapController;
-  List<Marker> temp = [];
+  // List<Marker> temp = [];
+  List<Marker> tempDep = [];
+
   UserLocation? userLocation;
   LocationData? currentLocation;
   bool _isLoading = false;
@@ -68,39 +70,78 @@ class _GuardianObserveDependentTripScreenState
     hubConnection.off('NotifyPassengerTripEnded');
   }
 
-  void updateMarker(double latitude, double longitude) async {
+  // void updateMarker(double latitude, double longitude) async {
+  //   if (mounted) {
+  //     List<Marker> tempMarkers = []; // Temporary list to hold the new markers
+
+  //     // Wait for a while before updating the marker
+  //     await Future.delayed(const Duration(seconds: 1));
+  //     print('did update marker');
+  //     // Add the new marker to the temporary list
+  //     tempMarkers.clear();
+  //     temp.clear();
+  //     tempMarkers.add(
+  //       Marker(
+  //         child: _markerWidget(
+  //           const IconData(0xe1d7, fontFamily: 'MaterialIcons'),
+  //         ),
+  //         latLng: LatLng(
+  //           latitude,
+  //           longitude,
+  //         ),
+  //       ),
+  //     );
+  //     setState(() {
+  //       temp = tempMarkers;
+  //       _mapController?.animateCamera(
+  //         CameraUpdate.newCameraPosition(
+  //           CameraPosition(
+  //             target: temp.first.latLng,
+  //             zoom: 15.5,
+  //             tilt: 0,
+  //           ),
+  //         ),
+  //       );
+  //     });
+  //   }
+  // }
+
+  void updateMarkerDep(double latitude, double longitude) async {
     if (mounted) {
-      List<Marker> tempMarkers = []; // Temporary list to hold the new markers
+      List<Marker> tempMarkersDep =
+          []; // Temporary list to hold the new markers
 
       // Wait for a while before updating the marker
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 3));
       print('did update marker');
       // Add the new marker to the temporary list
-      tempMarkers.clear();
-      temp.clear();
-      tempMarkers.add(
+      tempMarkersDep.clear();
+      tempDep.clear();
+      tempMarkersDep.add(
         Marker(
-          child: _markerWidget(
-            const IconData(0xe1d7, fontFamily: 'MaterialIcons'),
-          ),
+          child: _markerWidgetDep(),
           latLng: LatLng(
             latitude,
             longitude,
           ),
         ),
       );
-      setState(() {
-        temp = tempMarkers;
-        _mapController?.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: temp.first.latLng,
-              zoom: 15.5,
-              tilt: 0,
-            ),
-          ),
+      if (mounted) {
+        setState(
+          () {
+            tempDep = tempMarkersDep;
+            _mapController?.animateCamera(
+              CameraUpdate.newCameraPosition(
+                CameraPosition(
+                  target: tempDep.first.latLng,
+                  zoom: 15.5,
+                  tilt: 0,
+                ),
+              ),
+            );
+          },
         );
-      });
+      }
     }
   }
 
@@ -110,15 +151,32 @@ class _GuardianObserveDependentTripScreenState
         hubConnectionProvider.future,
       );
 
+      // hubConnection.on(
+      //   'UpdateDriverLocation',
+      //   (arguments) {
+      //     if (mounted) {
+      //       if (ModalRoute.of(context)?.isCurrent ?? false) {
+      //         final stringData = arguments?.first as String;
+      //         print(stringData);
+      //         final data = jsonDecode(stringData) as Map<String, dynamic>;
+      //         updateMarker(
+      //           data['latitude'],
+      //           data['longitude'],
+      //         );
+      //       }
+      //     }
+      //   },
+      // );
       hubConnection.on(
-        'UpdateDriverLocation',
+        'UpdateDependentLocation',
         (arguments) {
           if (mounted) {
-            if (ModalRoute.of(context)?.isCurrent ?? false) {
-              final stringData = arguments?.first as String;
-              print(stringData);
-              final data = jsonDecode(stringData) as Map<String, dynamic>;
-              updateMarker(
+            print("SIGNAL R DEP TRIP BOOK" + arguments.toString());
+            final stringData = arguments?.first as String;
+            final data = jsonDecode(stringData) as Map<String, dynamic>;
+            final tripId = arguments?[1] as String;
+            if (tripId == widget.trip.id) {
+              updateMarkerDep(
                 data['latitude'],
                 data['longitude'],
               );
@@ -126,7 +184,6 @@ class _GuardianObserveDependentTripScreenState
           }
         },
       );
-
       hubConnection.on('NotifyPassengerTripEnded', (message) {
         if (mounted) {
           if (ModalRoute.of(context)?.isCurrent ?? false) {
@@ -155,7 +212,7 @@ class _GuardianObserveDependentTripScreenState
       final data = message as List<dynamic>;
       final tripData = data.cast<Map<String, dynamic>>().first;
       final trip = TripModel.fromMap(tripData);
-      if (trip.passengerId == widget.trip.passengerId) {
+      if (trip.id == widget.trip.id) {
         ref
             .watch(currentDependentOnTripProvider.notifier)
             .removeDependentCurrentOnTripId(trip.id);
@@ -400,7 +457,7 @@ class _GuardianObserveDependentTripScreenState
                       : MarkerLayer(
                           ignorePointer: true,
                           mapController: _mapController!,
-                          markers: temp,
+                          markers: tempDep,
                         ),
                   Positioned(
                     bottom: 0,
@@ -559,6 +616,22 @@ class _GuardianObserveDependentTripScreenState
           radius: 20.0,
           backgroundImage: NetworkImage(
             widget.trip.driver?.avatarUrl ?? '',
+          ),
+          backgroundColor: Colors.transparent,
+        ),
+      ),
+    );
+  }
+
+  _markerWidgetDep() {
+    return SizedBox(
+      width: 20,
+      height: 20,
+      child: Center(
+        child: CircleAvatar(
+          radius: 20.0,
+          backgroundImage: NetworkImage(
+            widget.trip.passenger.avatarUrl ?? '',
           ),
           backgroundColor: Colors.transparent,
         ),

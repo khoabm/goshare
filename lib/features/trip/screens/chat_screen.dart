@@ -31,7 +31,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final TextEditingController _textController = TextEditingController();
-  // final List<ChatMessage> _messages = [];
+  final List<ChatMessage> _messages = [];
   @override
   void initState() {
     if (!mounted) return;
@@ -48,24 +48,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           text,
           widget.receiver,
         );
-    ref.read(chatMessagesProvider.notifier).addMessage(
-          ChatMessage(
-            text,
-            true,
-          ),
-          widget.receiver,
-        );
-    print(widget.receiver);
-    var chatProviderItem = ref.watch(chatMessagesProvider).firstWhere(
-      (item) {
-        print('TÌM THẤY RỒI');
-        return item.driverId == widget.receiver;
-      },
-      orElse: () => ChatProviderItem(driverId: widget.receiver, messages: []),
+    _messages.insert(
+      0,
+      ChatMessage(text, true),
     );
-    print(chatProviderItem.driverId);
-    print(chatProviderItem.messages.length);
-    print(ref.watch(chatMessagesProvider).length);
+    // ref.read(chatMessagesProvider.notifier).addMessage(
+    //       ChatMessage(
+    //         text,
+    //         true,
+    //       ),
+    //       widget.receiver,
+    //     );
+    // print(widget.receiver);
+    // var chatProviderItem = ref.watch(chatMessagesProvider).firstWhere(
+    //   (item) {
+    //     print('TÌM THẤY RỒI');
+    //     return item.driverId == widget.receiver;
+    //   },
+    //   orElse: () => ChatProviderItem(driverId: widget.receiver, messages: []),
+    // );
   }
 
   Future<void> initSignalR(WidgetRef ref) async {
@@ -79,15 +80,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           print(
               "${message.toString()} DAY ROI SIGNAL R DAY ROI RECEIVE SMS MESSAGE");
           setState(() {
-            // _messages.insert(
-            //     0, ChatMessage(message?.first.toString() ?? '', false));
-            ref.read(chatMessagesProvider.notifier).addMessage(
-                  ChatMessage(
-                    message?.first.toString() ?? '',
-                    false,
-                  ),
-                  widget.receiver,
-                );
+            _messages.insert(
+                0, ChatMessage(message?.first.toString() ?? '', false));
+            // ref.read(chatMessagesProvider.notifier).addMessage(
+            //       ChatMessage(
+            //         message?.first.toString() ?? '',
+            //         false,
+            //       ),
+            //       widget.receiver,
+            //     );
           });
         }
       });
@@ -195,9 +196,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             child: ListView.builder(
               padding: const EdgeInsets.all(8.0),
               reverse: true,
-              itemBuilder: (_, int index) =>
-                  _buildMessage(chatProviderItem.messages[index]),
-              itemCount: chatProviderItem.messages.length,
+              itemBuilder: (_, int index) => _buildMessage(_messages[index]),
+              itemCount: _messages.length,
             ),
           ),
           const Divider(height: 1.0),

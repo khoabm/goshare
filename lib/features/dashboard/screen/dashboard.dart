@@ -60,11 +60,11 @@ class _DashBoardState extends ConsumerState<DashBoard> {
 
   @override
   void initState() {
+    if (!mounted) return;
     final user = ref.read(userProvider);
     isDependent = user?.role.toLowerCase() == 'dependent';
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        if (!mounted) return;
         setState(() {
           _isLoading = true;
         });
@@ -277,7 +277,12 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         (message) {
           try {
             if (mounted) {
-              if (ModalRoute.of(context)?.isCurrent ?? false) {
+              if (GoRouter.of(context)
+                      .routeInformationProvider
+                      .value
+                      .uri
+                      .toString() !=
+                  RouteConstants.onTripUrl) {
                 print('ON TRIP ENDED DASHBOARD');
                 final data = message as List<dynamic>;
                 final tripData = data.cast<Map<String, dynamic>>().first;

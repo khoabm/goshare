@@ -102,6 +102,31 @@ class HomeController extends StateNotifier<bool> {
     return list;
   }
 
+  Future<bool> deleteUserLocation(
+    BuildContext context,
+    String locationId,
+  ) async {
+    // List<LocationModel> list = [];
+    bool check = false;
+    final result = await _homeRepository.deleteUserLocation(locationId);
+    result.fold((l) {
+      if (l is UnauthorizedFailure) {
+        showLoginTimeOut(
+          context: context,
+        );
+      } else {
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      }
+    }, (r) {
+      // print(r.length.toString());
+      check = r;
+    });
+    return check;
+  }
+
   Stream<List<Place>> searchPlace({
     required String query,
     String format = 'jsonv2',

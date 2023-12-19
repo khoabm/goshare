@@ -170,6 +170,34 @@ class HomeRepository {
     }
   }
 
+  FutureEither<bool> deleteUserLocation(String locationId) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+
+      final client = HttpClientWithAuth(accessToken ?? '');
+      final res = await client.delete(
+        Uri.parse('$baseApiUrl/location/$locationId'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      if (res.statusCode == 200) {
+        return right(true);
+      } else if (res.statusCode == 429) {
+        return left(Failure('Too many request'));
+      } else if (res.statusCode == 401) {
+        return left(UnauthorizedFailure('Unauthorized'));
+      } else {
+        return left(Failure('Co loi xay ra'));
+      }
+    } on TimeoutException catch (_) {
+      return left(
+        Failure('Timeout'),
+      );
+    }
+  }
+
   FutureEither<UserProfileModel> getUserProfile() async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();

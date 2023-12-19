@@ -311,6 +311,7 @@ class AppRouter {
             final String endLatitude = extras['endLatitude'] as String;
             final String endLongitude = extras['endLongitude'] as String;
             final String passengerId = extras['passengerId'] as String;
+            final String tripId = extras['tripId'] as String;
             return SlideRightTransition(
               child: DriverPickUpScreen(
                 driverId: driverId,
@@ -322,6 +323,7 @@ class AppRouter {
                 endLatitude: endLatitude,
                 endLongitude: endLongitude,
                 passengerId: passengerId,
+                tripId: tripId,
               ),
               key: state.pageKey,
             );

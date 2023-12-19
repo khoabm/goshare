@@ -14,7 +14,7 @@ import 'package:goshare/models/user_data_model.dart';
 import 'package:goshare/models/vietmap_route_model.dart';
 import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:goshare/theme/pallet.dart';
-import 'package:signalr_core/signalr_core.dart';
+// import 'package:signalr_core/signalr_core.dart';
 
 import 'package:goshare/providers/signalr_providers.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
@@ -267,24 +267,24 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
           print(e.toString());
         }
       });
-      hubConnection.on('NotifyPassengerTripCanceled', (message) {
-        try {
-          // setState(() {
-          //   _isLoading = true;
-          // });
-          // await Future.delayed(
-          //   const Duration(seconds: 2),
-          // );
-          // setState(() {
-          //   _isLoading = false;
-          // });
-          if (mounted) {
-            _handleNotifyPassengerTripCanceled(message);
-          }
-        } catch (e) {
-          print(e.toString());
-        }
-      });
+      // hubConnection.on('NotifyPassengerTripCanceled', (message) {
+      //   try {
+      //     // setState(() {
+      //     //   _isLoading = true;
+      //     // });
+      //     // await Future.delayed(
+      //     //   const Duration(seconds: 2),
+      //     // );
+      //     // setState(() {
+      //     //   _isLoading = false;
+      //     // });
+      //     if (mounted) {
+      //       _handleNotifyPassengerTripCanceled(message);
+      //     }
+      //   } catch (e) {
+      //     print(e.toString());
+      //   }
+      // });
       hubConnection.on('NotifyPassengerTripTimedOut', (message) {
         try {
           if (mounted) {
@@ -316,6 +316,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     final driverData =
         (message as List<dynamic>).cast<Map<String, dynamic>>().first;
     final String passengerId = (message as List<dynamic>).cast<String>().last;
+    final String tripId = (message as List<dynamic>).cast<String>()[3];
     print('PASSENGER ID NÈ: $passengerId');
     setState(() {
       driverName = driverData['name'];
@@ -328,11 +329,11 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     });
     if (mounted) {
       if (result != null) {
-        if (result!.passengerId == passengerId) {
+        if (result!.id == tripId) {
           _showDriverInfoDialog();
         }
       } else {
-        if (widget.passengerId == passengerId) {
+        if (widget.tripId == tripId) {
           _showDriverInfoDialog();
         }
       }
@@ -340,9 +341,9 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
   }
 
   void _handleNotifyPassengerTripTimedOut(dynamic message) {
-    final String passengerId = (message as List<dynamic>).cast<String>().last;
+    final String tripId = (message as List<dynamic>).cast<String>()[3];
     if (mounted) {
-      if (passengerId == widget.passengerId) {
+      if (tripId == widget.tripId) {
         _showFindTripTimeOutDialog();
       }
     }
@@ -430,6 +431,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                   widget.startLatitude,
                   widget.startLongitude,
                   result?.passengerId ?? widget.passengerId ?? '',
+                  result?.id ?? widget.tripId ?? '',
                 );
               },
               child: const Text(
@@ -600,6 +602,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     String startLatitude,
     String startLongitude,
     String passengerId,
+    String tripId,
   ) {
     context.replaceNamed(RouteConstants.driverPickUp, extra: {
       'driverName': driverName,
@@ -613,6 +616,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       'startLatitude': startLatitude,
       'startLongitude': startLongitude,
       'passengerId': passengerId,
+      'tripId': tripId,
     });
   }
 
