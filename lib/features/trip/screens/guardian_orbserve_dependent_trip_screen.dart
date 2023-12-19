@@ -175,9 +175,10 @@ class _GuardianObserveDependentTripScreenState
             child: Text(
               'Chuyến đi của người thân, ${trip.passenger.name} đã hoàn thành',
               style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.blue),
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: Pallete.primaryColor,
+              ),
             ),
           ),
           content: Row(

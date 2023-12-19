@@ -458,7 +458,7 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                               'isGetLocation': true,
                                             },
                                           );
-                                          print(result);
+
                                           if (result != null) {
                                             Map<String, dynamic> resultMap =
                                                 result as Map<String, dynamic>;
@@ -503,13 +503,33 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                                       });
                                                 }
                                               } else {
+                                                if (mounted) {
+                                                  passenger = data;
+                                                  passengerLocation =
+                                                      (dependentLocationData
+                                                          as DependentLocationModel?);
+                                                  print(passengerLocation
+                                                      .toString());
+                                                  cars = await ref
+                                                      .watch(
+                                                          tripControllerProvider
+                                                              .notifier)
+                                                      .getCarDetails(
+                                                        context,
+                                                        passengerLocation
+                                                                ?.latitude ??
+                                                            0,
+                                                        passengerLocation
+                                                                ?.latitude ??
+                                                            0,
+                                                        double.parse(
+                                                            widget.endLatitude),
+                                                        double.parse(widget
+                                                            .endLongitude),
+                                                      );
+                                                }
                                                 setState(
-                                                  () {
-                                                    passenger = data;
-                                                    passengerLocation =
-                                                        (dependentLocationData
-                                                            as DependentLocationModel?);
-                                                  },
+                                                  () {},
                                                 );
                                               }
                                             }

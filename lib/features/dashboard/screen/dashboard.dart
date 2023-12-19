@@ -295,9 +295,12 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                 } else {
                   if (isNotifyToGuardian == false) {
                     ref.read(stageProvider.notifier).setStage(Stage.stage0);
-                    context.pushNamed(RouteConstants.rating, pathParameters: {
-                      'idTrip': trip.id,
-                    });
+                    context.pushNamed(
+                      RouteConstants.rating,
+                      pathParameters: {
+                        'idTrip': trip.id,
+                      },
+                    );
                   } else {
                     ref
                         .watch(currentDependentOnTripProvider.notifier)

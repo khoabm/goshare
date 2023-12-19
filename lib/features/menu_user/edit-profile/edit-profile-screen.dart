@@ -106,9 +106,11 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     if (res != null) {
       setState(() {
         avatar = File(res.path);
-        _isLoading = false;
       });
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
