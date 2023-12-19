@@ -146,6 +146,20 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                               const SizedBox(
                                 height: 20,
                               ),
+                              (profile?.isDriver ?? false)
+                                  ? const Text(
+                                      '* Không thể chỉnh sửa vì thông tin tài xế đã được xác thực',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 18,
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.yellowAccent,
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                              const SizedBox(
+                                height: 20,
+                              ),
                               GestureDetector(
                                 onTap: () {
                                   selectAvatar();
