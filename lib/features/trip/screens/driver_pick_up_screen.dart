@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/utils/locations_util.dart';
 import 'package:goshare/models/trip_model.dart';
+import 'package:goshare/models/vietmap_route_model.dart';
 import 'package:goshare/theme/pallet.dart';
 import 'package:location/location.dart';
 //import 'package:signalr_core/signalr_core.dart';
@@ -52,7 +54,8 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
   UserLocation? userLocation;
   LocationData? currentLocation;
   bool _isLoading = false;
-
+  VietMapRouteModel? routeModel;
+  PolylinePoints polylinePoints = PolylinePoints();
   // List<LatLng> latLngList = [
   //   const LatLng(10.736657, 106.672240),
   //   const LatLng(10.766543, 106.742378),
@@ -463,6 +466,43 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
         ),
       );
       if (mounted) {
+        final data = await LocationUtils.getRoute(
+          latitude,
+          longitude,
+          double.parse(widget.endLatitude),
+          double.parse(widget.endLongitude),
+        );
+        data.fold(
+          (l) {
+            // showSnackBar(
+            //   context: context,
+            //   message: 'Có lỗi khi lấy tuyến đường tài xế',
+            // );
+            print("CÓ LỖI KHI LẤY TUYẾN ĐƯỜNG");
+          },
+          (r) => routeModel = r,
+        );
+        if (routeModel != null) {
+          List<PointLatLng> pointLatLngList = polylinePoints.decodePolyline(
+            routeModel!.paths[0].points,
+          );
+          List<LatLng> latLngList = pointLatLngList
+              .map(
+                (point) => LatLng(point.latitude, point.longitude),
+              )
+              .toList();
+          await _mapController?.addPolyline(
+            PolylineOptions(
+              //polylineGapWidth: 0,
+              geometry: latLngList,
+              polylineColor: Pallete.primaryColor,
+              polylineWidth: 6.5,
+              polylineOpacity: 1,
+              draggable: false,
+              polylineBlur: 0.8,
+            ),
+          );
+        }
         setState(
           () {
             temp = tempMarkers;
@@ -566,6 +606,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                         });
                         // final location = ref.read(locationProvider);
                         // currentLocation = await location.getCurrentLocation();
+
                         _mapController?.animateCamera(
                           CameraUpdate.newCameraPosition(
                             CameraPosition(
