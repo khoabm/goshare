@@ -60,6 +60,18 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
                 final trip = trips[index];
                 return Column(
                   children: [
+                    trip.status != 3
+                        ? const Center(
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text("Chuyến đang chạy"),
+                              ],
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                     GestureDetector(
                       onTap: () {
                         print(trip.toJson());
@@ -87,7 +99,11 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
                         ),
                       ),
                     ),
-                    const Divider()
+                    trip.status != 3
+                        ? const Divider(
+                            color: Colors.black,
+                          )
+                        : const Divider(),
                   ],
                 );
               },
