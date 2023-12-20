@@ -23,7 +23,10 @@ class _DependentListTripState extends ConsumerState<DependentListTrip> {
     String driverId,
     String endLatitude,
     String endLongitude,
+    String startLatitude,
+    String startLongitude,
     String passengerId,
+    String tripId,
   ) {
     context.pushNamed(RouteConstants.driverPickUp, extra: {
       'driverName': driverName,
@@ -34,7 +37,10 @@ class _DependentListTripState extends ConsumerState<DependentListTrip> {
       'driverId': driverId,
       'endLatitude': endLatitude,
       'endLongitude': endLongitude,
+      'startLatitude': startLatitude,
+      'startLongitude': startLongitude,
       'passengerId': passengerId,
+      'tripId': tripId,
     });
   }
 
@@ -77,8 +83,11 @@ class _DependentListTripState extends ConsumerState<DependentListTrip> {
                     result.driver?.avatarUrl ?? '',
                     result.driver?.id ?? '',
                     result.endLocation.latitude.toString(),
-                    result.endLocation.latitude.toString(),
+                    result.endLocation.longitude.toString(),
+                    result.startLocation.latitude.toString(),
+                    result.startLocation.longitude.toString(),
                     result.passengerId,
+                    result.id,
                   );
                 }
                 if (result.status == 2) {
