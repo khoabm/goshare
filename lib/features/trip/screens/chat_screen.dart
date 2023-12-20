@@ -48,6 +48,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               context,
               widget.tripId,
             );
+        _messages = _messages.reversed.toList();
       }
       setState(() {});
     });

@@ -25,6 +25,8 @@ class DriverPickUpScreen extends ConsumerStatefulWidget {
   final String driverId;
   final String endLatitude;
   final String endLongitude;
+  final String startLatitude;
+  final String startLongitude;
   final String passengerId;
   final String tripId;
   const DriverPickUpScreen({
@@ -37,6 +39,8 @@ class DriverPickUpScreen extends ConsumerStatefulWidget {
     required this.driverId,
     required this.endLatitude,
     required this.endLongitude,
+    required this.startLatitude,
+    required this.startLongitude,
     required this.passengerId,
     required this.tripId,
   });
@@ -466,11 +470,12 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
         ),
       );
       if (mounted) {
+        await _mapController?.clearLines();
         final data = await LocationUtils.getRoute(
           latitude,
           longitude,
-          double.parse(widget.endLatitude),
-          double.parse(widget.endLongitude),
+          double.parse(widget.startLatitude),
+          double.parse(widget.startLongitude),
         );
         data.fold(
           (l) {

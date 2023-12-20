@@ -86,6 +86,8 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
         });
         await initSignalR(ref);
         await setAddress();
+        print(startAddress);
+        print(endAddress);
         if (mounted) {
           if (widget.isFindingTrip == true) {
             if (widget.nonAppDepName != null) {
@@ -217,8 +219,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       endAddress = data2.address ?? '';
       print(widget.startLatitude);
       print(widget.startLongitude);
-      print(startAddress);
-      print(endAddress);
+
       setState(() {});
     }
   }

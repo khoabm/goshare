@@ -310,6 +310,8 @@ class AppRouter {
             final String driverId = extras['driverId'] as String;
             final String endLatitude = extras['endLatitude'] as String;
             final String endLongitude = extras['endLongitude'] as String;
+            final String startLatitude = extras['startLatitude'] as String;
+            final String startLongitude = extras['startLongitude'] as String;
             final String passengerId = extras['passengerId'] as String;
             final String tripId = extras['tripId'] as String;
             return SlideRightTransition(
@@ -322,6 +324,8 @@ class AppRouter {
                 driverCarType: driverCarType,
                 endLatitude: endLatitude,
                 endLongitude: endLongitude,
+                startLatitude: startLatitude,
+                startLongitude: startLongitude,
                 passengerId: passengerId,
                 tripId: tripId,
               ),

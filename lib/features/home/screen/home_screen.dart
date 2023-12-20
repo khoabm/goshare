@@ -137,10 +137,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     context.go('/details');
   }
 
-  Future<DependentModel?> navigateToDependentList(BuildContext context) async {
-    DependentModel? dependent = await context.pushNamed('dependent-list');
-    return dependent;
-  }
+  // Future<DependentModel?> navigateToDependentList(BuildContext context) async {
+  //   DependentModel? dependent = await context.pushNamed('dependent-list');
+  //   return dependent;
+  // }
 
   void navigateToFindTrip(String startLat, String startLon, String endLat,
       String endLon, String carTypeId) {
@@ -421,6 +421,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     String driverId,
     String endLatitude,
     String endLongitude,
+    String startLatitude,
+    String startLongitude,
     String passengerId,
     String tripId,
   ) {
@@ -433,6 +435,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       'driverId': driverId,
       'endLatitude': endLatitude,
       'endLongitude': endLongitude,
+      'startLatitude': startLatitude,
+      'startLongitude': startLongitude,
       'passengerId': passengerId,
       'tripId': tripId,
     });
@@ -559,7 +563,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     result.driver?.avatarUrl ?? '',
                                     result.driver?.id ?? '',
                                     result.endLocation.latitude.toString(),
-                                    result.endLocation.latitude.toString(),
+                                    result.endLocation.longitude.toString(),
+                                    result.startLocation.latitude.toString(),
+                                    result.startLocation.longitude.toString(),
                                     result.passengerId,
                                     result.id,
                                   );
