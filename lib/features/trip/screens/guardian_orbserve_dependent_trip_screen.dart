@@ -34,7 +34,7 @@ class _GuardianObserveDependentTripScreenState
     extends ConsumerState<GuardianObserveDependentTripScreen> {
   double _containerHeight = 60.0;
   VietmapController? _mapController;
-  // List<Marker> temp = [];
+  List<Marker> temp = [];
   List<Marker> tempDep = [];
 
   UserLocation? userLocation;
@@ -70,41 +70,41 @@ class _GuardianObserveDependentTripScreenState
     hubConnection.off('NotifyPassengerTripEnded');
   }
 
-  // void updateMarker(double latitude, double longitude) async {
-  //   if (mounted) {
-  //     List<Marker> tempMarkers = []; // Temporary list to hold the new markers
+  void updateMarker(double latitude, double longitude) async {
+    if (mounted) {
+      List<Marker> tempMarkers = []; // Temporary list to hold the new markers
 
-  //     // Wait for a while before updating the marker
-  //     await Future.delayed(const Duration(seconds: 1));
-  //     print('did update marker');
-  //     // Add the new marker to the temporary list
-  //     tempMarkers.clear();
-  //     temp.clear();
-  //     tempMarkers.add(
-  //       Marker(
-  //         child: _markerWidget(
-  //           const IconData(0xe1d7, fontFamily: 'MaterialIcons'),
-  //         ),
-  //         latLng: LatLng(
-  //           latitude,
-  //           longitude,
-  //         ),
-  //       ),
-  //     );
-  //     setState(() {
-  //       temp = tempMarkers;
-  //       _mapController?.animateCamera(
-  //         CameraUpdate.newCameraPosition(
-  //           CameraPosition(
-  //             target: temp.first.latLng,
-  //             zoom: 15.5,
-  //             tilt: 0,
-  //           ),
-  //         ),
-  //       );
-  //     });
-  //   }
-  // }
+      // Wait for a while before updating the marker
+      await Future.delayed(const Duration(seconds: 1));
+      print('did update marker');
+      // Add the new marker to the temporary list
+      tempMarkers.clear();
+      temp.clear();
+      tempMarkers.add(
+        Marker(
+          child: _markerWidget(
+            const IconData(0xe1d7, fontFamily: 'MaterialIcons'),
+          ),
+          latLng: LatLng(
+            latitude,
+            longitude,
+          ),
+        ),
+      );
+      setState(() {
+        temp = tempMarkers;
+        _mapController?.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: temp.first.latLng,
+              zoom: 15.5,
+              tilt: 0,
+            ),
+          ),
+        );
+      });
+    }
+  }
 
   void updateMarkerDep(double latitude, double longitude) async {
     if (mounted) {
@@ -150,23 +150,24 @@ class _GuardianObserveDependentTripScreenState
       final hubConnection = await ref.watch(
         hubConnectionProvider.future,
       );
-
-      // hubConnection.on(
-      //   'UpdateDriverLocation',
-      //   (arguments) {
-      //     if (mounted) {
-      //       if (ModalRoute.of(context)?.isCurrent ?? false) {
-      //         final stringData = arguments?.first as String;
-      //         print(stringData);
-      //         final data = jsonDecode(stringData) as Map<String, dynamic>;
-      //         updateMarker(
-      //           data['latitude'],
-      //           data['longitude'],
-      //         );
-      //       }
-      //     }
-      //   },
-      // );
+      if (widget.trip.type == 2) {
+        hubConnection.on(
+          'UpdateDriverLocation',
+          (arguments) {
+            if (mounted) {
+              if (ModalRoute.of(context)?.isCurrent ?? false) {
+                final stringData = arguments?.first as String;
+                print(stringData);
+                final data = jsonDecode(stringData) as Map<String, dynamic>;
+                updateMarker(
+                  data['latitude'],
+                  data['longitude'],
+                );
+              }
+            }
+          },
+        );
+      }
       hubConnection.on(
         'UpdateDependentLocation',
         (arguments) {
@@ -457,7 +458,7 @@ class _GuardianObserveDependentTripScreenState
                       : MarkerLayer(
                           ignorePointer: true,
                           mapController: _mapController!,
-                          markers: tempDep,
+                          markers: widget.trip.type == 2 ? temp : tempDep,
                         ),
                   Positioned(
                     bottom: 0,
