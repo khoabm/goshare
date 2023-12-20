@@ -120,7 +120,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                         DependentTrip(
                           id: result!.id,
                           name: result!.passengerName,
-                          dependentId: result!.passengerId,
+                          // dependentId: result!.passengerId,
                         ),
                       );
                 }
@@ -179,9 +179,10 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
                       .read(currentDependentOnTripProvider.notifier)
                       .addDependentCurrentOnTripId(
                         DependentTrip(
-                            id: result!.id,
-                            name: result!.passenger.name,
-                            dependentId: result!.passenger.id),
+                          id: result!.id,
+                          name: result!.passenger.name,
+                          // dependentId: result!.passenger.id,
+                        ),
                       );
                 }
               }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 class UserDataModel {
   final String accessToken;
@@ -129,22 +130,19 @@ class UserDataModel {
 class DependentTrip {
   final String id;
   final String name;
-  final String dependentId;
+
   DependentTrip({
     required this.id,
     required this.name,
-    required this.dependentId,
   });
 
   DependentTrip copyWith({
     String? id,
     String? name,
-    String? dependentId,
   }) {
     return DependentTrip(
       id: id ?? this.id,
       name: name ?? this.name,
-      dependentId: dependentId ?? this.dependentId,
     );
   }
 
@@ -152,7 +150,6 @@ class DependentTrip {
     return {
       'id': id,
       'name': name,
-      'dependentId': dependentId,
     };
   }
 
@@ -160,7 +157,6 @@ class DependentTrip {
     return DependentTrip(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
-      dependentId: map['dependentId'] ?? '',
     );
   }
 
@@ -170,19 +166,15 @@ class DependentTrip {
       DependentTrip.fromMap(json.decode(source));
 
   @override
-  String toString() =>
-      'DependentTrips(id: $id, name: $name, dependentId: $dependentId)';
+  String toString() => 'DependentTrip(id: $id, name: $name)';
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is DependentTrip &&
-        other.id == id &&
-        other.name == name &&
-        other.dependentId == dependentId;
+    return other is DependentTrip && other.id == id && other.name == name;
   }
 
   @override
-  int get hashCode => id.hashCode ^ name.hashCode ^ dependentId.hashCode;
+  int get hashCode => id.hashCode ^ name.hashCode;
 }

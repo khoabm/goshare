@@ -302,7 +302,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
                   } else {
                     ref
                         .watch(currentDependentOnTripProvider.notifier)
-                        .removeDependentCurrentOnTripId(trip.passengerId);
+                        .removeDependentCurrentOnTripId(trip.id);
                     showNavigateDashBoardDialog(trip, context);
                   }
                 }
