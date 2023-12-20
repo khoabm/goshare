@@ -155,9 +155,13 @@ class _DependentListState extends ConsumerState<DependentList> {
                                             const Expanded(
                                               child: Column(
                                                 children: [
-                                                  Text('Chọn điểm đón'),
+                                                  //Text('Chọn điểm đón'),
                                                   Text(
                                                     'Chọn điểm đón',
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
                                                   ),
                                                 ],
                                               ),
