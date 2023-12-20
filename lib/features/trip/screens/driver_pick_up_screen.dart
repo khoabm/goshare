@@ -527,6 +527,7 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
     context.pushNamed(RouteConstants.chat, pathParameters: {
       'receiver': widget.driverId,
       'driverAvatar': widget.driverAvatar,
+      'tripId': widget.tripId,
     });
   }
 

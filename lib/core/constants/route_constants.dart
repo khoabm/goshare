@@ -52,7 +52,7 @@ class RouteConstants {
   static const feedback = '/feedback';
   static const driverPickUpUrl = '/driver-pickup';
 
-  static const chatUrl = '/chat/:receiver/:driverAvatar';
+  static const chatUrl = '/chat/:receiver/:driverAvatar/:tripId';
   static const routeConfirmUrl = '/route-confirm';
   static const onTripUrl = '/on-trip';
   static const createDestinationUrl = '/create-destination/:destinationAddress';

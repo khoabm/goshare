@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:goshare/features/login/screen/log_in_screen.dart';
+import 'package:goshare/models/chat_model.dart';
 import 'package:signalr_core/signalr_core.dart';
 
 import 'package:goshare/features/trip/controller/trip_controller.dart';
@@ -19,10 +21,12 @@ class ChatMessage {
 class ChatScreen extends ConsumerStatefulWidget {
   final String receiver;
   final String driverAvatar;
+  final String tripId;
   const ChatScreen({
     super.key,
     required this.receiver,
     required this.driverAvatar,
+    required this.tripId,
   });
 
   @override
@@ -31,14 +35,36 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final TextEditingController _textController = TextEditingController();
-  final List<ChatMessage> _messages = [];
+  List<ChatModel> _messages = [];
+  //List<ChatModel> chats = [];
   @override
   void initState() {
     if (!mounted) return;
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await initSignalR(ref);
+      if (mounted) {
+        _messages = await ref.read(tripControllerProvider.notifier).getChat(
+              context,
+              widget.tripId,
+            );
+      }
+      setState(() {});
     });
+  }
+
+  ChatMessage chatModelToChatMessage(ChatModel chatModel, String userId) {
+    return ChatMessage(
+      chatModel.content,
+      chatModel.from == userId,
+    );
+  }
+
+  List<ChatMessage> chatModelsToChatMessages(
+      List<ChatModel> chatModels, String userId) {
+    return chatModels
+        .map((chatModel) => chatModelToChatMessage(chatModel, userId))
+        .toList();
   }
 
   void _handleSubmitted(String text) async {
@@ -47,11 +73,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           context,
           text,
           widget.receiver,
+          widget.tripId,
         );
-    _messages.insert(
-      0,
-      ChatMessage(text, true),
-    );
+    setState(() {
+      // Assuming you have userId available here
+      _messages.insert(
+        0,
+        ChatModel(
+          from: ref.read(userProvider)?.id ?? '',
+          to: widget.receiver,
+          content: text,
+          time: DateTime.now(),
+        ),
+      );
+    });
+
     // ref.read(chatMessagesProvider.notifier).addMessage(
     //       ChatMessage(
     //         text,
@@ -80,15 +116,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           print(
               "${message.toString()} DAY ROI SIGNAL R DAY ROI RECEIVE SMS MESSAGE");
           setState(() {
+            // _messages.insert(
+            //     0, ChatMessage(message?.first.toString() ?? '', false));
             _messages.insert(
-                0, ChatMessage(message?.first.toString() ?? '', false));
-            // ref.read(chatMessagesProvider.notifier).addMessage(
-            //       ChatMessage(
-            //         message?.first.toString() ?? '',
-            //         false,
-            //       ),
-            //       widget.receiver,
-            //     );
+              0,
+              ChatModel(
+                from: widget.receiver,
+                to: ref.read(userProvider)?.id ?? '',
+                content: message?.first.toString() ?? '',
+                time: DateTime.now(),
+              ),
+            );
           });
         }
       });
@@ -180,13 +218,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Get the ChatProviderItem for the current receiver
-    var chatProviderItem = ref.watch(chatMessagesProvider).firstWhere(
-          (item) => item.driverId == widget.receiver,
-          orElse: () =>
-              ChatProviderItem(driverId: widget.receiver, messages: []),
-        );
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text('Nhắn tin')),
@@ -196,7 +227,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             child: ListView.builder(
               padding: const EdgeInsets.all(8.0),
               reverse: true,
-              itemBuilder: (_, int index) => _buildMessage(_messages[index]),
+              itemBuilder: (_, int index) => _buildMessage(
+                chatModelToChatMessage(
+                  _messages[index],
+                  ref.read(userProvider)?.id ?? '',
+                ),
+              ),
               itemCount: _messages.length,
             ),
           ),

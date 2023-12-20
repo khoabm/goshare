@@ -7,6 +7,7 @@ import 'package:goshare/features/home/controller/home_controller.dart';
 import 'package:goshare/features/trip/repository/trip_repository.dart';
 
 import 'package:goshare/models/car_model.dart';
+import 'package:goshare/models/chat_model.dart';
 import 'package:goshare/models/find_trip_model.dart';
 import 'package:goshare/models/trip_model.dart';
 
@@ -211,11 +212,16 @@ class TripController extends StateNotifier<bool> {
   }
 
   Future<bool> sendChat(
-      BuildContext context, String content, String receiver) async {
+    BuildContext context,
+    String content,
+    String receiver,
+    String tripId,
+  ) async {
     bool isSent = false;
     final result = await _tripRepository.sendChat(
       content,
       receiver,
+      tripId,
     );
     result.fold((l) {
       if (l is UnauthorizedFailure) {
@@ -232,6 +238,31 @@ class TripController extends StateNotifier<bool> {
       isSent = r;
     });
     return isSent;
+  }
+
+  Future<List<ChatModel>> getChat(
+    BuildContext context,
+    String tripId,
+  ) async {
+    List<ChatModel> chats = [];
+    final result = await _tripRepository.getChat(
+      tripId,
+    );
+    result.fold((l) {
+      if (l is UnauthorizedFailure) {
+        showLoginTimeOut(
+          context: context,
+        );
+      } else {
+        showSnackBar(
+          context: context,
+          message: l.message,
+        );
+      }
+    }, (r) {
+      chats = r;
+    });
+    return chats;
   }
 
   Future<double> getWallet(

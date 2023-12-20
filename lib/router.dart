@@ -359,10 +359,12 @@ class AppRouter {
             final Map<String, dynamic> params = state.pathParameters;
             final String receiver = params['receiver'] as String;
             final String driverAvatar = params['driverAvatar'] as String;
+            final String tripId = params['tripId'] as String;
             return SlideRightTransition(
               child: ChatScreen(
                 receiver: receiver,
                 driverAvatar: driverAvatar,
+                tripId: tripId,
               ), // Pass the phone parameter to OtpScreen
               key: state.pageKey,
             );
