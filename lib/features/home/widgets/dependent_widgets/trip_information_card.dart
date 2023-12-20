@@ -1,8 +1,15 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/providers/dependent_trip_provider.dart';
+import 'package:goshare/providers/signalr_providers.dart';
+import 'package:location/location.dart';
+import 'package:signalr_core/signalr_core.dart';
 
 class TripInformationCardWidget extends ConsumerStatefulWidget {
   final int tripStatus;
@@ -22,6 +29,65 @@ class _TripInformationCardWidgetState
   // late final Driver? driver;
   TripModel? trip;
 
+  final Location location = Location();
+  StreamSubscription<LocationData>? _locationSubscription;
+  String? _error;
+  LocationData? driverLocation;
+
+  Future<void> _listenLocation() async {
+    final hubConnection = await ref.read(
+      hubConnectionProvider.future,
+    );
+    location.changeSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 2,
+      interval: 1000,
+    );
+    _locationSubscription =
+        location.onLocationChanged.handleError((dynamic err) {
+      if (err is PlatformException) {
+        setState(() {
+          _error = err.code;
+        });
+      }
+      _locationSubscription?.cancel();
+      setState(() {
+        _locationSubscription = null;
+      });
+    }).listen((currentLocation) {
+      setState(() {
+        _error = null;
+        print('${currentLocation.latitude} + ${currentLocation.longitude},');
+        if (mounted) {
+          driverLocation = currentLocation;
+
+          if (hubConnection.state == HubConnectionState.connected) {
+            hubConnection.invoke(
+              "SendDependentLocation",
+              args: [
+                jsonEncode({
+                  'latitude': currentLocation.latitude,
+                  'longitude': currentLocation.longitude
+                }),
+                trip!.id,
+              ],
+            ).then(
+              (value) {
+                print(
+                  "Location sent to server - in card: ${currentLocation.latitude} + ${currentLocation.longitude}",
+                );
+              },
+            ).catchError((error) {
+              print("Error sending location to server: $error");
+            });
+          } else {
+            print("Connection is not in the 'Connected' state");
+          }
+        }
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -32,12 +98,24 @@ class _TripInformationCardWidgetState
       setState(() {
         trip = ref.watch(tripProvider.notifier).tripData;
         trip?.copyWith(driver: ref.watch(driverProvider.notifier).driverData);
-
+        if (mounted) {
+          _listenLocation();
+        }
         print("????????????????????????????????????????");
         print(trip.toString());
       });
     });
     // driver = ref.read(driverProvider.notifier).driverData;
+  }
+
+  @override
+  void dispose() {
+    //revokeHub();
+    _locationSubscription?.cancel();
+    setState(() {
+      _locationSubscription = null;
+    });
+    super.dispose();
   }
 
   @override

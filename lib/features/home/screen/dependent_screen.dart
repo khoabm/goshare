@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
@@ -16,6 +20,9 @@ import 'package:goshare/providers/current_on_trip_provider.dart';
 import 'package:goshare/providers/dependent_booking_stage_provider.dart';
 import 'package:goshare/providers/dependent_trip_provider.dart';
 import 'package:goshare/providers/guardian_provider.dart';
+import 'package:goshare/providers/signalr_providers.dart';
+import 'package:location/location.dart';
+import 'package:signalr_core/signalr_core.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../widgets/dependent_widgets/greeting.dart';
@@ -46,11 +53,11 @@ class _DependentHomeScreenState extends ConsumerState<DependentHomeScreen> {
     super.initState();
     if (!mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (context.mounted) {
+      if (mounted) {
         final u = await ref
-            .watch(homeControllerProvider.notifier)
+            .read(homeControllerProvider.notifier)
             .getGuardianProfile(context);
-        ref.watch(guardianProfileProvider.notifier).setGuardianDataWithModel(u);
+        ref.read(guardianProfileProvider.notifier).setGuardianDataWithModel(u);
       }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) async {

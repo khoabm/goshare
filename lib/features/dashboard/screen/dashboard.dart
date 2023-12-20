@@ -90,10 +90,6 @@ class _DashBoardState extends ConsumerState<DashBoard> {
     super.initState();
   }
 
-  // void initSignalR() async {
-
-  // }
-
   Future<void> initSignalR(WidgetRef ref) async {
     if (mounted) {
       final connection = await ref.read(
@@ -130,7 +126,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
               jsonEncode(location),
             ],
           ).then((value) {
-            print("Location sent to server: $location");
+            print("Location sent to server - in dashboard: $location");
           }).catchError((error) {
             print("Error sending location to server: $error");
           });
