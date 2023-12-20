@@ -353,7 +353,7 @@ class _SearchNonAppUserPickUpLocationScreenState
                             _containerHeight += details.primaryDelta!;
                             // Clamp the height between 60 and 300
                             _containerHeight = _containerHeight.clamp(
-                                60.0, MediaQuery.of(context).size.height * .3);
+                                60.0, MediaQuery.of(context).size.height * .21);
                           });
                         },
                         onVerticalDragEnd: (details) {
@@ -367,7 +367,7 @@ class _SearchNonAppUserPickUpLocationScreenState
                             // Swipe up
                             setState(() {
                               _containerHeight =
-                                  MediaQuery.of(context).size.height * .3;
+                                  MediaQuery.of(context).size.height * .21;
                             });
                           }
                         },

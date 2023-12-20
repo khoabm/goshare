@@ -67,7 +67,7 @@ class TripController extends StateNotifier<bool> {
           message: l.message,
         );
       } else {
-        showSnackBar(
+        showFindTripErrorDialog(
           context: context,
           message: l.message,
         );

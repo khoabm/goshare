@@ -74,6 +74,8 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
     String carTypeId,
     String? driverNote,
     int capacity,
+    String? nonAppDepName,
+    String? nonAppDepPhone,
   ) {
     context.replaceNamed(RouteConstants.routeConfirm, extra: {
       'startLatitude': startLatitude,
@@ -85,6 +87,8 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
       'carTypeId': carTypeId,
       'driverNote': driverNote,
       'capacity': capacity,
+      'nonAppDepName': nonAppDepName,
+      'nonAppDepPhone': nonAppDepPhone,
     });
   }
 
@@ -520,19 +524,21 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                                   final nonAppDependentLocation =
                                                       (nonAppDependentLocationData
                                                           as NonAppUserPickUpLocation?);
-                                                  passengerLocation = DependentLocationModel(
-                                                      id: '',
-                                                      userId: '',
-                                                      address: '',
-                                                      latitude:
-                                                          nonAppDependentLocation
-                                                                  ?.latitude ??
-                                                              0,
-                                                      longitude:
-                                                          nonAppDependentLocation
-                                                                  ?.longitude ??
-                                                              0,
-                                                      type: 1);
+                                                  passengerLocation =
+                                                      DependentLocationModel(
+                                                    id: '',
+                                                    userId: '',
+                                                    address: '',
+                                                    latitude:
+                                                        nonAppDependentLocation
+                                                                ?.latitude ??
+                                                            0,
+                                                    longitude:
+                                                        nonAppDependentLocation
+                                                                ?.longitude ??
+                                                            0,
+                                                    type: 10,
+                                                  );
                                                   if (mounted) {
                                                     cars = await ref
                                                         .watch(
@@ -690,6 +696,12 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                                 .notifier)
                                             .state]
                                         .capacity,
+                                    passengerLocation?.type == 10
+                                        ? passenger?.name
+                                        : null,
+                                    passengerLocation?.type == 10
+                                        ? passenger?.phone
+                                        : null,
                                   );
                                 }
                               }
@@ -730,6 +742,12 @@ class _CarChoosingScreenState extends ConsumerState<CarChoosingScreen> {
                                               selectedCarIndexProvider.notifier)
                                           .state]
                                       .capacity,
+                                  passengerLocation?.type == 10
+                                      ? passenger?.name
+                                      : null,
+                                  passengerLocation?.type == 10
+                                      ? passenger?.phone
+                                      : null,
                                 );
                               }
                             }

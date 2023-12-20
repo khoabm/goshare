@@ -277,12 +277,7 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         (message) {
           try {
             if (mounted) {
-              if (GoRouter.of(context)
-                      .routeInformationProvider
-                      .value
-                      .uri
-                      .toString() !=
-                  RouteConstants.onTripUrl) {
+              if (ModalRoute.of(context)?.isCurrent ?? false) {
                 print('ON TRIP ENDED DASHBOARD');
                 final data = message as List<dynamic>;
                 final tripData = data.cast<Map<String, dynamic>>().first;
@@ -325,10 +320,12 @@ class _DashBoardState extends ConsumerState<DashBoard> {
       );
       connection.onreconnected((connectionId) async {
         print('reconnected $connectionId');
+        showSnackBar(context: context, message: 'Đã kết nối lại');
       });
       connection.onreconnecting((exception) {
         print(exception.toString());
         print('reconnecting');
+        showSnackBar(context: context, message: 'Đang kết nối lại');
       });
       connection.onclose(
         (exception) async {

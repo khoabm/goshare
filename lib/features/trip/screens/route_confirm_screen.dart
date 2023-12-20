@@ -389,6 +389,7 @@ class _FindTripScreenState extends ConsumerState<RouteConfirmScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       print('----------- TRONG ROUTE CONFIRM ------------');
       print(widget.nonAppDepName);
+      print(widget.nonAppDepPhone);
       // setState(() {
       //   _isLoading = true;
       // });

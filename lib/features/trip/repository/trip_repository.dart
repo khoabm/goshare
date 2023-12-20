@@ -110,7 +110,7 @@ class TripRepository {
           Failure('Có lỗi xảy ra'),
         );
       } else {
-        return left(Failure('Co loi xay ra'));
+        return left(Failure('Có lỗi xảy ra'));
       }
     } catch (e) {
       return left(Failure(e.toString()));
@@ -173,7 +173,7 @@ class TripRepository {
           Failure('Có lỗi xảy ra'),
         );
       } else {
-        return left(Failure('Co loi xay ra'));
+        return left(Failure('Có lỗi xảy ra'));
       }
     } catch (e) {
       return left(Failure(e.toString()));
@@ -413,7 +413,7 @@ class TripRepository {
           Failure('Có lỗi xảy ra'),
         );
       } else {
-        return left(Failure('Co loi xay ra'));
+        return left(Failure('Có lỗi xảy ra'));
       }
     } catch (e) {
       return left(Failure(e.toString()));
