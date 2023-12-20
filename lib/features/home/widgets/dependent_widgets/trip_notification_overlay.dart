@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/providers/dependent_trip_provider.dart';
 import 'package:goshare/theme/pallet.dart';
+import 'package:intl/intl.dart';
 
 class CountdownButton extends StatefulWidget {
   final VoidCallback onCountdownDone;
@@ -126,153 +127,197 @@ class _TripNotificationScreenState
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 20.0,
-              ),
-              Center(
-                child: CircleAvatar(
-                  radius: 50.0,
-                  backgroundImage: NetworkImage(
-                    trip?.driver?.avatarUrl ?? '',
+    final oCcy = NumberFormat("#,##0", "vi_VN");
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Center(
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 20.0,
                   ),
-                  backgroundColor: Colors.transparent,
-                ),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              Text(
-                trip?.driver?.name ?? '',
-                style: const TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              Text(
-                'Xe ${trip?.cartype.capacity} chỗ',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(10),
+                  Center(
+                    child: CircleAvatar(
+                      radius: 50.0,
+                      backgroundImage: NetworkImage(
+                        trip?.driver?.avatarUrl ??
+                            'https://firebasestorage.googleapis.com/v0/b/goshare-bc3c4.appspot.com/o/7b0ae9e0-013b-4213-9e33-3321fda277b3%2F7b0ae9e0-013b-4213-9e33-3321fda277b3_avatar?alt=media',
+                      ),
+                      backgroundColor: Colors.transparent,
+                    ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.grey,
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text(
-                              '${trip?.distance.toString() ?? 1} km',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Text(
+                    trip?.driver?.name ?? 'Tài xế',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Text(
+                    '${oCcy.format(trip?.price)}đ',
+                    style: TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.green[500],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      //padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[350],
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
                               ),
                             ),
-                            Container(
-                              height: 20,
-                              width: 1,
-                              color: Pallete.primaryColor,
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                              ),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Expanded(
+                                  flex: 5,
+                                  child: Text(
+                                    '${trip?.distance.toString() ?? 1} km',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  height: 20,
+                                  width: 1,
+                                  color: Pallete.primaryColor,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 5,
+                                  child: Text(
+                                    trip?.paymentMethod == 0
+                                        ? 'Ví'
+                                        : 'Tiền mặt',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              trip?.paymentMethod == 0 ? 'Ví' : 'Tiền mặt',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        trip?.startLocation.address ?? 'Địa điểm đi',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Icon(
-                        Icons.keyboard_arrow_down,
-                        color: Colors.grey,
-                        size: 30,
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        height: 60, // Adjust the height as needed
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 12.0,
-                          horizontal: 8.0,
-                        ),
-                        width: double.infinity,
-                        decoration: const BoxDecoration(
-                          color: Colors.grey,
-                        ),
-                        child: Text(
-                          trip?.endLocation.address ?? "Địa điểm đến",
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
                           ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8.0,
-                          horizontal: 8.0,
-                        ),
-                        child: Text(
-                          trip?.note ?? 'Ghi chú',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                          const SizedBox(height: 12),
+                          Column(
+                            children: [
+                              Container(
+                                // Adjust the height as needed
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                  horizontal: 8.0,
+                                ),
+                                width: double.infinity,
+                                child: Text(
+                                  (trip?.startLocation.address != null)
+                                      ? 'Từ: ${trip?.startLocation.address}'
+                                      : 'Địa điểm đi',
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Container(
+                                // Adjust the height as needed
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                  horizontal: 8.0,
+                                ),
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[350],
+                                ),
+                                child: Text(
+                                  trip?.endLocation.address != null
+                                      ? 'Đến: ${trip?.endLocation.address}'
+                                      : "Địa điểm đến",
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8.0,
+                              horizontal: 8.0,
+                            ),
+                            child: Text(
+                              trip?.note != null
+                                  ? 'Ghi chú: ${trip?.note}'
+                                  : 'Ghi chú',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CountdownButton(
+                    onCountdownDone: () {
+                      context.pop();
+                    },
+                    onPress: () async {
+                      context.pop();
+                    },
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                ],
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              CountdownButton(
-                onCountdownDone: () {
-                  context.pop();
-                },
-                onPress: () async {
-                  context.pop();
-                },
-              ),
-            ],
+            ),
           ),
         ),
       ),
