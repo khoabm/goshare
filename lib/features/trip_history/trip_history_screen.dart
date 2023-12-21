@@ -17,7 +17,7 @@ class TripHistoryScreen extends ConsumerStatefulWidget {
 
 class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
   List<TripModel> trips = [];
-
+  bool _isLoading = false;
   @override
   void initState() {
     if (!mounted) return;
@@ -28,6 +28,9 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
 
   void fetchData() async {
     if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
       final result = await ref
           .read(TripHistoryControllerProvider.notifier)
           .tripHistory(context);
@@ -35,6 +38,7 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
         setState(() {
           if (mounted) {
             trips = result;
+            _isLoading = false;
           }
         });
       }
@@ -50,7 +54,7 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
         foregroundColor: Colors.black,
       ),
       backgroundColor: Colors.white,
-      body: trips.isEmpty
+      body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(),
             )

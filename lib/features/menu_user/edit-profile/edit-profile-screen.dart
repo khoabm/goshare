@@ -40,7 +40,13 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   void initState() {
     // TODO: implement initState
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      getUserData();
+      clearImageCache();
+      await getUserData();
+      if (avatar == null) {
+        print('ava null');
+      } else {
+        print('ava ${avatar?.path}');
+      }
     });
     super.initState();
   }
@@ -54,7 +60,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     _birthDateTextController.dispose();
   }
 
-  void getUserData() async {
+  Future<void> getUserData() async {
     profile = await ref.watch(homeControllerProvider.notifier).getUserProfile(
           context,
         );
@@ -64,9 +70,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       _birthDateTextController.text = DateFormat('dd/MM/yyyy').format(
         profile!.birth,
       );
-      _gender = profile?.gender == 1 ? Gender.male : Gender.female;
+      _gender = profile?.gender == 0 ? Gender.male : Gender.female;
     }
+    print(profile?.avatarUrl);
     setState(() {});
+  }
+
+  void clearImageCache() {
+    imageCache.clear();
   }
 
   void _onSubmit(WidgetRef ref) async {
@@ -87,9 +98,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       if (data != null) {
         if (mounted) {
           showUpdateProfileSuccessDialog(context);
-          setState(() {
-            profile = data;
-          });
+          // avatar = null;
+          await getUserData();
+          // avatar = null;
         }
       }
       setState(() {
@@ -185,7 +196,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                               ? FileImage(avatar!)
                                                   as ImageProvider
                                               : NetworkImage(
-                                                  profile!.avatarUrl ??
+                                                  "${profile!.avatarUrl}" ??
                                                       'https://firebasestorage.googleapis.com/v0/b/goshare-bc3c4.appspot.com/o/7b0ae9e0-013b-4213-9e33-3321fda277b3%2F7b0ae9e0-013b-4213-9e33-3321fda277b3_avatar?alt=media',
                                                 ),
                                         ),
