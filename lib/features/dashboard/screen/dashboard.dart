@@ -107,11 +107,11 @@ class _DashBoardState extends ConsumerState<DashBoard> {
         });
       }
 
-      final location = ref.read(locationProvider);
+      final locationPro = ref.read(locationProvider);
       final user = ref.read(userProvider.notifier).state;
       if (user?.role.toLowerCase() == 'dependent') {
-        final currentLocation = await location.getCurrentLocation();
-        connection.on("RequestLocation", (message) {
+        connection.on("RequestLocation", (message) async {
+          final currentLocation = await locationPro.getCurrentLocation();
           final location = {
             "latitude": currentLocation?.latitude,
             "longitude":
