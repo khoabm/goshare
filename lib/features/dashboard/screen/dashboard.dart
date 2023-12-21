@@ -90,6 +90,24 @@ class _DashBoardState extends ConsumerState<DashBoard> {
     super.initState();
   }
 
+  void _handleNotifyPassengerTripTimedOut(dynamic message) {
+    //final String tripId = (message as List<dynamic>).cast<String>()[3];
+    final data = message as List<dynamic>;
+    final tripData = data.cast<Map<String, dynamic>>().first;
+    final trip = TripModel.fromMap(tripData);
+    if (mounted) {
+      if (trip.type == 2 || trip.type == 1) {
+        ref
+            .watch(currentDependentOnTripProvider.notifier)
+            .removeDependentCurrentOnTripId(trip.id);
+      } else {
+        ref.read(currentOnTripIdProvider.notifier).setCurrentOnTripId(null);
+      }
+
+      //showFindTripTimeOutDialog(context, trip);
+    }
+  }
+
   Future<void> initSignalR(WidgetRef ref) async {
     if (mounted) {
       final connection = await ref.read(
@@ -267,7 +285,16 @@ class _DashBoardState extends ConsumerState<DashBoard> {
           }
         },
       );
-
+      connection.on('NotifyPassengerTripTimedOut', (message) {
+        try {
+          if (mounted) {
+            _handleNotifyPassengerTripTimedOut(message);
+          }
+          //_handleNotifyPassengerDriverOnTheWay(message);
+        } catch (e) {
+          print(e.toString());
+        }
+      });
       connection.on(
         'NotifyPassengerTripEnded',
         (message) {

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/constants/route_constants.dart';
 import 'package:goshare/core/utils/locations_util.dart';
+import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/features/home/controller/home_controller.dart';
 import 'package:goshare/features/login/screen/log_in_screen.dart';
 import 'package:goshare/features/trip/controller/trip_controller.dart';
@@ -290,6 +291,7 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
       hubConnection.on('NotifyPassengerTripTimedOut', (message) {
         try {
           if (mounted) {
+            print('ĐÂY RỒI SIGNALR ĐÂY RỒI $message');
             _handleNotifyPassengerTripTimedOut(message);
           }
           //_handleNotifyPassengerDriverOnTheWay(message);
@@ -343,10 +345,26 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
   }
 
   void _handleNotifyPassengerTripTimedOut(dynamic message) {
-    final String tripId = (message as List<dynamic>).cast<String>()[3];
+    //final String tripId = (message as List<dynamic>).cast<String>()[3];
+    final data = message as List<dynamic>;
+    final tripData = data.cast<Map<String, dynamic>>().first;
+    final trip = TripModel.fromMap(tripData);
     if (mounted) {
-      if (tripId == widget.tripId) {
-        _showFindTripTimeOutDialog();
+      if (trip.type == 2 || trip.type == 1) {
+        ref
+            .watch(currentDependentOnTripProvider.notifier)
+            .removeDependentCurrentOnTripId(trip.id);
+      } else {
+        ref.read(currentOnTripIdProvider.notifier).setCurrentOnTripId(null);
+      }
+      if (result != null) {
+        if (result!.id == trip.id) {
+          showFindTripTimeOutDialog(context, trip);
+        }
+      } else {
+        if (widget.tripId == trip.id) {
+          showFindTripTimeOutDialog(context, trip);
+        }
       }
     }
   }
@@ -466,15 +484,15 @@ class _FindTripScreenState extends ConsumerState<FindTripScreen2> {
     });
   }
 
-  void _showFindTripTimeOutDialog() {
+  void _showFindTripTimeOutDialog(TripModel trip) {
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Center(
+          title: Center(
             child: Text(
-              'Thời gian tìm xe đã hết',
+              'Thời gian tìm xe đã cho ${trip.passenger.name} hết ',
             ),
           ),
           content: ConstrainedBox(

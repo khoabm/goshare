@@ -645,6 +645,68 @@ void showBannedDialog(BuildContext context, String message) {
   );
 }
 
+void showFindTripTimeOutDialog(BuildContext context, TripModel trip) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext dialogContext) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20), // Rounded corners.
+        ),
+        title: Center(
+          child: Text(
+            'Thời gian tìm xe đã cho ${trip.passenger.name} hết ',
+            style: const TextStyle(
+              color: Colors.red, // Red text for emphasis.
+              fontWeight: FontWeight.bold, // Bold text for emphasis.
+              fontSize: 20, // Larger font size.
+            ),
+          ),
+        ),
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 200.0),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Đã quá hạn tìm xe mà chúng tôi không tìm được tài xế cho bạn. Vui lòng thử lại',
+                      style: TextStyle(
+                        fontSize: 16, // Larger font size.
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              GoRouter.of(context).goNamed(RouteConstants.dashBoard);
+            },
+            child: const Text(
+              'Xác nhận',
+              style: TextStyle(
+                color: Pallete.primaryColor, // Blue text to stand out.
+                fontWeight: FontWeight.bold, // Bold text for emphasis.
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 void showNotVerifiedDialog(BuildContext context, WidgetRef ref, String phone) {
   showDialog(
     barrierDismissible: false,
