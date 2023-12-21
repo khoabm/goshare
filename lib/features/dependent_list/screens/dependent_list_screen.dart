@@ -157,7 +157,7 @@ class _DependentListState extends ConsumerState<DependentList> {
                                                 children: [
                                                   //Text('Chọn điểm đón'),
                                                   Text(
-                                                    'Chọn điểm đón',
+                                                    'Người đi không có tài khoản GoShare?',
                                                     style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.w600,
