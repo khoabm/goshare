@@ -627,8 +627,13 @@ void showBannedDialog(BuildContext context, String message) {
             ),
           ],
         ),
-        content: Center(
-          child: Text(message),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Text(message),
+            ),
+          ],
         ),
         actions: [
           ElevatedButton(
@@ -890,6 +895,45 @@ void showUpdateProfileSuccessDialog(BuildContext context) {
           ],
         ),
         content: const SizedBox.shrink(),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(abcContext).pop();
+            },
+            child: const Text(
+              'Xác nhận',
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void showErrorDialog2(BuildContext context, String message) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext abcContext) {
+      return AlertDialog(
+        title: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Text(
+                'Có lỗi',
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              message,
+            ),
+          ],
+        ),
         actions: [
           ElevatedButton(
             onPressed: () {

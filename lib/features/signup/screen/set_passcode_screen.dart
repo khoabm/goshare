@@ -62,7 +62,7 @@ class _SetPassCodeScreenState extends ConsumerState<SetPassCodeScreen> {
           showDialog(
             barrierDismissible: false,
             context: context,
-            builder: (BuildContext abcContext) {
+            builder: (BuildContext dialogContext) {
               return AlertDialog(
                 title: const Center(
                   child: Text(
@@ -89,8 +89,9 @@ class _SetPassCodeScreenState extends ConsumerState<SetPassCodeScreen> {
                 actions: [
                   ElevatedButton(
                     onPressed: () {
-                      abcContext.pop();
-                      context.go(RouteConstants.loginUrl);
+                      Navigator.of(dialogContext).pop();
+                      GoRouter.of(context).goNamed(RouteConstants.login);
+                      //context.go(RouteConstants.loginUrl);
                     },
                     child: const Text(
                       'Xác nhận',
@@ -134,7 +135,8 @@ class _SetPassCodeScreenState extends ConsumerState<SetPassCodeScreen> {
                 actions: [
                   ElevatedButton(
                     onPressed: () {
-                      abcContext.pop();
+                      //abcContext.pop();
+                      Navigator.of(abcContext).pop();
                       //context.go(RouteConstants.loginUrl);
                     },
                     child: const Text(

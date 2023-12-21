@@ -42,7 +42,7 @@ class LoginRepository {
     //   phone = '+84363111098';
     //   passcode = '123456';
     // }
-
+    print('hehe');
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
@@ -87,7 +87,7 @@ class LoginRepository {
         } else if (resultMap['message'] == 'Wrong passcode') {
           return LoginResult(error: LoginErrorConstants.wrongPassword);
         }
-        return LoginResult();
+        return LoginResult(error: resultMap['message']);
       } else if (response.statusCode == 403) {
         return LoginResult(error: resultMap['message']);
       } else {

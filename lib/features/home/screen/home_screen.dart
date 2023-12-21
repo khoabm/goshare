@@ -729,46 +729,50 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   HomeCenterContainer(
                     width: MediaQuery.of(context).size.width * .9,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircleAvatar(),
-                            Text(
-                              'GoShare hotline \n 1900xxxx',
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
+                    child: const Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircleAvatar(
+                                backgroundColor: Colors.transparent,
+                                backgroundImage:
+                                    AssetImage('assets/images/logo.jpg'),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'Giúp chúng tôi cải thiện',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
+                              Text(
+                                'GoShare hotline \n 19006084',
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                            AppButton(
-                              buttonText: 'Đóng góp',
-                              fontSize: 16,
-                              onPressed: () {},
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+
+                          // Column(
+                          //   crossAxisAlignment: CrossAxisAlignment.center,
+                          //   mainAxisAlignment: MainAxisAlignment.center,
+                          //   children: [
+                          //     const Text(
+                          //       'Giúp chúng tôi cải thiện',
+                          //       style: TextStyle(
+                          //         fontWeight: FontWeight.w600,
+                          //       ),
+                          //     ),
+                          //     AppButton(
+                          //       buttonText: 'Đóng góp',
+                          //       fontSize: 16,
+                          //       onPressed: () {},
+                          //     ),
+                          //   ],
+                          // ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(

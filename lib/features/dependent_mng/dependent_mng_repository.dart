@@ -42,8 +42,28 @@ class DependentMngRepository {
       );
       if (res.statusCode == 200) {
         return right(true);
+      } else if (res.statusCode == 400) {
+        final response = json.decode(res.body);
+        if (response['message'] == 'Phone number existed') {
+          return left(
+            Failure(
+              'Số điện thoại đã tồn tại',
+            ),
+          );
+        } else {
+          return left(
+            Failure(
+              response['message'],
+            ),
+          );
+        }
       } else {
-        return right(false);
+        final response = json.decode(res.body);
+        return left(
+          Failure(
+            response['message'],
+          ),
+        );
       }
     } catch (e) {
       return left(

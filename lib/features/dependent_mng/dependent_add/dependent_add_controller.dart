@@ -28,9 +28,9 @@ class DependentAddController extends StateNotifier<bool> {
     result.fold(
       (l) {
         state = false;
-        showSnackBar(
-          context: context,
-          message: l.message,
+        showErrorDialog2(
+          context,
+          l.message,
         );
       },
       (success) {

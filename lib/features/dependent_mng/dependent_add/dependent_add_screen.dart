@@ -101,6 +101,9 @@ class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
 
   void _onSubmit(WidgetRef ref) async {
     if (_dependentAddFormKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
       String phone = _phoneNumberTextController.text;
       String name = _nameTextController.text;
       DateTime birth =
@@ -109,12 +112,16 @@ class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
       final result = await ref
           .read(DependentAddControllerProvider.notifier)
           .dependentAdd(phone, name, _gender!, birth, context);
-
+      setState(() {
+        _isLoading = false;
+      });
       if (result) {
-        context.goNamed(RouteConstants.otp, pathParameters: {
-          'phone': phone,
-          'isFor': RouteConstants.dependentAdd,
-        });
+        if (mounted) {
+          context.goNamed(RouteConstants.otp, pathParameters: {
+            'phone': phone,
+            'isFor': RouteConstants.dependentAdd,
+          });
+        }
       }
     }
   }
@@ -137,188 +144,178 @@ class _DependentAddScreenState extends ConsumerState<DependentAddScreen> {
             SingleChildScrollView(
               child: Column(
                 children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * .15,
-                    // child: Row(children: [
-                    //   Image.asset(
-                    //     Constants.dep1,
-                    //     fit: BoxFit.cover,
-                    //   ),
-                    //   Image.asset(
-                    //     Constants.dep2,
-                    //     fit: BoxFit.cover,
-                    //   ),
-                    //   Image.asset(
-                    //     Constants.dep3,
-                    //     fit: BoxFit.cover,
-                    //   ),
-                    // ])
-                  ),
-                  HomeCenterContainer(
-                    width: MediaQuery.of(context).size.width * .9,
-                    child: Form(
-                      key: _dependentAddFormKey,
-                      child: Column(
-                        children: [
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          const LeftSideText(
-                            title: 'Số điện thoại',
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          AppTextField(
-                            prefixIcons: const Icon(Icons.phone),
-                            controller: _phoneNumberTextController,
-                            hintText: '0987654321',
-                            inputType: TextInputType.phone,
-                            formatters: [
-                              LengthLimitingTextInputFormatter(10),
-                            ],
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Số điện thoại không được trống';
-                              } else if (value.length != 10 ||
-                                  value[0] != '0') {
-                                return 'Sai định dạng';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          const LeftSideText(
-                            title: 'Tên',
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          AppTextField(
-                            controller: _nameTextController,
-                            hintText: 'Nguyễn Văn A',
-                            prefixIcons: const Icon(
-                              Icons.abc,
-                            ),
-                            inputType: TextInputType.phone,
-                            formatters: [
-                              LengthLimitingTextInputFormatter(100),
-                            ],
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Tên không được trống';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          const LeftSideText(
-                            title: 'Giới tính',
-                          ),
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: ListTile(
-                                  title: const Text('Nam'),
-                                  selectedColor: Pallete.primaryColor,
-                                  leading: Radio<String>(
-                                    value: 'Nam',
-                                    groupValue: _gender,
-                                    onChanged: (String? value) {
-                                      setState(() {
-                                        _gender = value;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: ListTile(
-                                  title: const Text('Nữ'),
-                                  selectedColor: Pallete.primaryColor,
-                                  leading: Radio<String>(
-                                    value: 'Nữ',
-                                    groupValue: _gender,
-                                    onChanged: (String? value) {
-                                      setState(() {
-                                        _gender = value;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          // const SizedBox(
-                          //   height: 20,
-                          // ),
-                          const LeftSideText(
-                            title: 'Ngày tháng năm sinh',
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          AppTextField(
-                            hintText: 'dd/MM/yyyy',
-                            inputType: TextInputType.phone,
-                            prefixIcons: const Icon(
-                              Icons.calendar_today,
-                            ),
-                            controller: _birthDateTextController,
-                            formatters: [
-                              DateTextFormatter(),
-                              LengthLimitingTextInputFormatter(10),
-                              FilteringTextInputFormatter.singleLineFormatter,
-                            ],
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Ngày tháng năm sinh không được trống';
-                              } else if (int.parse(
-                                      value.toString().substring(0, 2)) >
-                                  31) {
-                                return 'Ngày không hợp lệ';
-                              } else if (int.parse(
-                                      value.toString().substring(3, 5)) >
-                                  12) {
-                                return 'Ngày không hợp lệ';
-                              } else if (int.parse(
-                                          value.toString().substring(6)) <=
-                                      1920 ||
-                                  int.parse(value.toString().substring(6)) >=
-                                      2023) {
-                                return 'Năm không hợp lệ';
-                              }
-                              return null;
-                            },
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Center(
+                      child: HomeCenterContainer(
+                        width: MediaQuery.of(context).size.width * .9,
+                        child: Form(
+                          key: _dependentAddFormKey,
+                          child: Column(
                             children: [
-                              Container(
-                                padding: const EdgeInsets.all(
-                                  8.0,
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              const LeftSideText(
+                                title: 'Số điện thoại',
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              AppTextField(
+                                prefixIcons: const Icon(Icons.phone),
+                                controller: _phoneNumberTextController,
+                                hintText: '0987654321',
+                                inputType: TextInputType.phone,
+                                formatters: [
+                                  LengthLimitingTextInputFormatter(10),
+                                ],
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Số điện thoại không được trống';
+                                  } else if (value.length != 10 ||
+                                      value[0] != '0') {
+                                    return 'Sai định dạng';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              const LeftSideText(
+                                title: 'Tên',
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              AppTextField(
+                                controller: _nameTextController,
+                                hintText: 'Nguyễn Văn A',
+                                prefixIcons: const Icon(
+                                  Icons.abc,
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
+                                //inputType: TextInputType.phone,
+                                formatters: [
+                                  LengthLimitingTextInputFormatter(100),
+                                ],
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Tên không được trống';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              const LeftSideText(
+                                title: 'Giới tính',
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: ListTile(
+                                      title: const Text('Nam'),
+                                      selectedColor: Pallete.primaryColor,
+                                      leading: Radio<String>(
+                                        value: 'Nam',
+                                        groupValue: _gender,
+                                        onChanged: (String? value) {
+                                          setState(() {
+                                            _gender = value;
+                                          });
+                                        },
+                                      ),
+                                    ),
                                   ),
-                                  child: AppButton(
-                                    buttonText: 'Thêm người ',
-                                    onPressed: () => _onSubmit(ref),
+                                  Expanded(
+                                    child: ListTile(
+                                      title: const Text('Nữ'),
+                                      selectedColor: Pallete.primaryColor,
+                                      leading: Radio<String>(
+                                        value: 'Nữ',
+                                        groupValue: _gender,
+                                        onChanged: (String? value) {
+                                          setState(() {
+                                            _gender = value;
+                                          });
+                                        },
+                                      ),
+                                    ),
                                   ),
+                                ],
+                              ),
+                              // const SizedBox(
+                              //   height: 20,
+                              // ),
+                              const LeftSideText(
+                                title: 'Ngày tháng năm sinh',
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              AppTextField(
+                                hintText: 'dd/MM/yyyy',
+                                inputType: TextInputType.phone,
+                                prefixIcons: const Icon(
+                                  Icons.calendar_today,
                                 ),
+                                controller: _birthDateTextController,
+                                formatters: [
+                                  DateTextFormatter(),
+                                  LengthLimitingTextInputFormatter(10),
+                                  FilteringTextInputFormatter
+                                      .singleLineFormatter,
+                                ],
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Ngày tháng năm sinh không được trống';
+                                  } else if (int.parse(
+                                          value.toString().substring(0, 2)) >
+                                      31) {
+                                    return 'Ngày không hợp lệ';
+                                  } else if (int.parse(
+                                          value.toString().substring(3, 5)) >
+                                      12) {
+                                    return 'Ngày không hợp lệ';
+                                  } else if (int.parse(
+                                              value.toString().substring(6)) <=
+                                          1920 ||
+                                      int.parse(
+                                              value.toString().substring(6)) >=
+                                          2023) {
+                                    return 'Năm không hợp lệ';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(
+                                      8.0,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                      child: AppButton(
+                                        buttonText: 'Thêm người ',
+                                        onPressed: () => _onSubmit(ref),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
