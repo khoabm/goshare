@@ -651,14 +651,24 @@ void showNotVerifiedDialog(BuildContext context, WidgetRef ref, String phone) {
     context: context,
     builder: (BuildContext abcContext) {
       return AlertDialog(
-        title: const Center(
-          child: Text(
-            'Lỗi đăng nhập',
-          ),
+        title: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Text(
+                'Lỗi đăng nhập',
+              ),
+            ),
+          ],
         ),
-        content: const Center(
-          child: Text(
-              'Tài khoản chưa xác thực. Chọn "Xác nhận" để tiếp tục xác thực'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Text(
+                  'Tài khoản chưa xác thực. Chọn "Xác nhận" để tiếp tục xác thực'),
+            ),
+          ],
         ),
         actions: [
           ElevatedButton(
@@ -674,6 +684,9 @@ void showNotVerifiedDialog(BuildContext context, WidgetRef ref, String phone) {
                 if (result == true) {
                   context.goNamed(
                     RouteConstants.otp,
+                    pathParameters: {
+                      'phone': phone,
+                    },
                   );
                 }
               }
