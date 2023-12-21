@@ -46,6 +46,8 @@ class _SetPassCodeScreenState extends ConsumerState<SetPassCodeScreen> {
       final passcode = _passCodeTextController.text;
       final phone = widget.phone;
       final setToken = widget.setToken;
+      print("isFor");
+      print(widget.isFor);
 
       final result =
           await ref.read(signUpControllerProvider.notifier).setPasscode(
@@ -90,7 +92,10 @@ class _SetPassCodeScreenState extends ConsumerState<SetPassCodeScreen> {
                   ElevatedButton(
                     onPressed: () {
                       Navigator.of(dialogContext).pop();
-                      GoRouter.of(context).goNamed(RouteConstants.login);
+                      GoRouter.of(context).goNamed(
+                          widget.isFor == RouteConstants.dependentAdd
+                              ? RouteConstants.dashBoard
+                              : RouteConstants.login);
                       //context.go(RouteConstants.loginUrl);
                     },
                     child: const Text(
