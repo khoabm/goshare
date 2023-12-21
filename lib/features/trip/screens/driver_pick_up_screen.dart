@@ -5,10 +5,12 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goshare/core/utils/locations_util.dart';
+import 'package:goshare/core/utils/utils.dart';
 import 'package:goshare/models/trip_model.dart';
 import 'package:goshare/models/vietmap_route_model.dart';
 import 'package:goshare/theme/pallet.dart';
 import 'package:location/location.dart';
+import 'package:url_launcher/url_launcher.dart';
 //import 'package:signalr_core/signalr_core.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 
@@ -779,40 +781,93 @@ class _DriverPickUpScreenState extends ConsumerState<DriverPickUpScreen> {
                                             const SizedBox(
                                               height: 8,
                                             ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: InkWell(
-                                                onTap: () {
-                                                  navigateToChatScreen();
-                                                },
-                                                child: const Column(
-                                                  children: [
-                                                    CircleAvatar(
-                                                      backgroundColor:
-                                                          Colors.black54,
-                                                      radius: 20,
-                                                      child: Icon(
-                                                        color: Colors.white,
-                                                        IconData(0xe153,
-                                                            fontFamily:
-                                                                'MaterialIcons'),
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                        height:
-                                                            4), // Adjust the spacing as needed
-                                                    Text(
-                                                      'Chat',
-                                                      style: TextStyle(
-                                                          fontSize: 15,
-                                                          fontWeight: FontWeight
-                                                              .w700 // Adjust the font size as needed
+                                            Row(
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: InkWell(
+                                                    onTap: () {
+                                                      navigateToChatScreen();
+                                                    },
+                                                    child: const Column(
+                                                      children: [
+                                                        CircleAvatar(
+                                                          backgroundColor:
+                                                              Colors.black54,
+                                                          radius: 20,
+                                                          child: Icon(
+                                                            color: Colors.white,
+                                                            IconData(0xe153,
+                                                                fontFamily:
+                                                                    'MaterialIcons'),
                                                           ),
+                                                        ),
+                                                        SizedBox(
+                                                            height:
+                                                                4), // Adjust the spacing as needed
+                                                        Text(
+                                                          'Chat',
+                                                          style: TextStyle(
+                                                              fontSize: 15,
+                                                              fontWeight: FontWeight
+                                                                  .w700 // Adjust the font size as needed
+                                                              ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ],
+                                                  ),
                                                 ),
-                                              ),
+                                                const SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: InkWell(
+                                                    onTap: () async {
+                                                      final call = Uri.parse(
+                                                          'tel:${convertPhoneNumber(widget.driverPhone)}');
+                                                      if (await canLaunchUrl(
+                                                          call)) {
+                                                        launchUrl(call);
+                                                      } else {
+                                                        if (mounted) {
+                                                          showSnackBar(
+                                                            context: context,
+                                                            message:
+                                                                'Không thể gọi',
+                                                          );
+                                                        }
+                                                      }
+                                                    },
+                                                    child: const Column(
+                                                      children: [
+                                                        CircleAvatar(
+                                                          backgroundColor:
+                                                              Colors.black54,
+                                                          radius: 20,
+                                                          child: Icon(
+                                                            Icons.phone,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                            height:
+                                                                4), // Adjust the spacing as needed
+                                                        Text(
+                                                          'Gọi',
+                                                          style: TextStyle(
+                                                              fontSize: 15,
+                                                              fontWeight: FontWeight
+                                                                  .w700 // Adjust the font size as needed
+                                                              ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             )
                                           ],
                                         ),
