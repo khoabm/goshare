@@ -341,7 +341,7 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
                           ],
                         ),
                         const SizedBox(height: 10),
-                        trip.type == 1
+                        (trip.type == 1 || trip.type == 2)
                             ? Column(
                                 children: [
                                   const SizedBox(height: 20),
@@ -355,8 +355,9 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
                                       Expanded(
                                         flex: 3,
                                         child: CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                              trip.passenger.avatarUrl ?? ''),
+                                          backgroundImage: NetworkImage(trip
+                                                  .passenger.avatarUrl ??
+                                              'https://firebasestorage.googleapis.com/v0/b/goshare-bc3c4.appspot.com/o/default-user-avatar.webp?alt=media&token=cd67cce4-611c-49c5-a819-956a33ce90ba'),
                                           radius: 60,
                                         ),
                                       ),
@@ -370,14 +371,15 @@ class _TripHistoryScreenState extends ConsumerState<TripHistoryScreen> {
                                               MainAxisAlignment.start,
                                           children: [
                                             Text(
-                                              trip.passenger.name,
+                                              trip.passengerName,
                                               style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w500),
                                             ),
                                             Text(
                                               convertBackPhoneNumber(
-                                                  trip.passenger.phone),
+                                                  trip.passengerPhoneNumber ??
+                                                      trip.passenger.phone),
                                               style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w500),
